@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.2.1](https://github.com/webgrip/renovate-config/compare/v1.2.0...v1.2.1) (2026-05-31)
+
+### 🐛 Rule Corrections & Fixes
+
+* **workflows:** run on home cluster ([a34e884](https://github.com/webgrip/renovate-config/commit/a34e8841ebc505afe2e2455495bb2f642041546f))
+
 ## [1.2.0](https://github.com/webgrip/renovate-config/compare/v1.1.0...v1.2.0) (2026-05-31)
 
 ### 🚀 New Preset Rules & Features
