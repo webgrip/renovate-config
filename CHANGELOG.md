@@ -11,6 +11,16 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.2.0](https://github.com/webgrip/renovate-config/compare/v1.1.0...v1.2.0) (2026-05-31)
+
+### 🚀 New Preset Rules & Features
+
+* add semantic-release automation with multi-channel release pipeline ([4e0fdbb](https://github.com/webgrip/renovate-config/commit/4e0fdbbb924cd65d0147d625bfc81dd65cd5c065))
+
+### ⚙️ CI / CD
+
+* replace release.yml with on_source_change.yml using shared semantic-release workflow ([9033b07](https://github.com/webgrip/renovate-config/commit/9033b07f1eebfcbf143acc3a86cbdea85333236f))
+
 ---
 
 <!-- releases below this line are prepended automatically by semantic-release -->
