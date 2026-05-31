@@ -30,13 +30,7 @@
             "/(^|/)kustomization\\.ya?ml(?:\\.j2)?$/"
         ]
     },
-    "renovate-config": {
-        "managerFilePatterns": [
-            "/(^|/)\\.renovaterc\\.json5$/",
-            "/(^|/)renovate\\.json$/"
-        ]
-    },
-    "customDatasources": {
+  "customDatasources": {
         "grafana-dashboards": {
             "defaultRegistryUrlTemplate": "https://grafana.com/api/dashboards/{{packageName}}",
             "format": "json",
@@ -275,10 +269,10 @@
             ]
         },
         {
-            "description": "Renovate config dependency PR polish.",
-            "matchManagers": [
-                "renovate-config"
-            ],
+      "description": "Renovate config dependency PR polish.",
+      "matchManagers": [
+        "renovate-config"
+      ],
             "semanticCommitScope": "renovate-config",
             "commitMessageTopic": "config {{depName}}"
         }
