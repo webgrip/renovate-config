@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay for repositories that want to group non-major dependency updates into fewer pull requests.",
+  "packageRules": [
+    {
+      "description": "Group non-major updates into a single review batch",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "non-major dependencies",
+      "groupSlug": "non-major-dependencies"
+    }
+  ]
+}

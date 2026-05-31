@@ -1,24 +1,77 @@
-# Renovate preset (webgrip/renovate-config)
+# Renovate preset guide
 
-This repository contains the organization-wide Renovate preset used across Webgrip repositories.
+This repository contains the organization-wide Renovate presets used across Webgrip repositories.
 
-Policy summary:
+## Design goals
 
-- Conservative defaults: no automerge by default, rangeStrategy: pin, separateMajorMinor/separateMinorPatch enabled.
-- Dependency Dashboard approval is required for regular updates.
-- Docker and GitHub Actions updates are pinned by digest.
-- Security/vulnerability PRs are labeled `security` and do not require dashboard approval.
+- Keep dependency change velocity intentionally low
+- Make every normal update visible and reviewable
+- Allow urgent security fixes to move immediately
+- Offer small, explicit opt-in overlays instead of one oversized default
 
-How to use
+## Default behavior
 
-- Extend this preset from any repo via:
+The default preset enforces the following:
 
-```
+- Dependency Dashboard enabled and approval required for normal updates
+- No automerge and no platform automerge
+- Pinned version ranges and digest pinning for Docker and GitHub Actions
+- Major, minor, and patch updates separated for easier review
+- Minimum release age of 7 days to avoid day-zero regressions
+- Low PR concurrency to reduce operational noise
+- Lock file maintenance and rollback PR support enabled
+- CODEOWNERS-driven assignees and reviewers
+
+## Available presets
+
+### Default
+
+Use for most repositories:
+
+```json
 {
-  "extends": ["github>webgrip/renovate-config"]
+  "extends": ["github>webgrip/renovate-config#v1.0.0"]
 }
 ```
 
-Validation
+### Grouped overlay
 
-A GitHub Actions workflow runs renovate-config-validator on PRs to this repo. Repos that want extra safety can run the same validator in their CI.
+Use when a repository wants fewer PRs for routine updates:
+
+```json
+{
+  "extends": [
+    "github>webgrip/renovate-config#v1.0.0",
+    "github>webgrip/renovate-config:grouped#v1.0.0"
+  ]
+}
+```
+
+### Safe automerge overlay
+
+Use when a repository has mature CI and wants the lowest-risk updates merged automatically:
+
+```json
+{
+  "extends": [
+    "github>webgrip/renovate-config#v1.0.0",
+    "github>webgrip/renovate-config:safe-automerge#v1.0.0"
+  ]
+}
+```
+
+## Release and change management
+
+- Prefer consumers pinning to a SemVer tag instead of following `main`
+- Treat changes to `default.json` as high-impact changes for the whole organization
+- Keep overlays narrow and composable
+- Update examples and documentation whenever preset behavior changes
+- Cut a new tag after merging changes that affect consumers
+
+## Local validation
+
+Run the same command used by CI:
+
+```bash
+npx --yes --package renovate renovate-config-validator --strict default.json grouped.json safe-automerge.json
+```

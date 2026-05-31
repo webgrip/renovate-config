@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay for repositories that want automerge only for the lowest-risk updates after checks pass.",
+  "packageRules": [
+    {
+      "description": "Automerge digest updates after CI passes",
+      "matchUpdateTypes": ["digest"],
+      "automerge": true,
+      "automergeType": "pr",
+      "labels": ["dependencies", "automerge"]
+    },
+    {
+      "description": "Automerge GitHub Actions patch and minor updates after CI passes",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "labels": ["dependencies", "automerge", "github-actions"]
+    }
+  ]
+}

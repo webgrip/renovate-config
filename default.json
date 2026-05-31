@@ -1,32 +1,48 @@
 {
-  "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repos to extend.",
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Webgrip org default Renovate preset - strict, conservative defaults for repositories that want strong control over dependency change velocity.",
+  "dependencyDashboard": true,
   "dependencyDashboardApproval": true,
   "assigneesFromCodeOwners": true,
   "reviewersFromCodeOwners": true,
+  "automerge": false,
+  "platformAutomerge": false,
   "prConcurrentLimit": 2,
   "prHourlyLimit": 2,
   "timezone": "UTC",
   "schedule": ["every weekend"],
   "labels": ["dependencies"],
+  "rebaseWhen": "behind-base-branch",
   "rangeStrategy": "pin",
   "separateMajorMinor": true,
   "separateMinorPatch": true,
-  "minimumReleaseAge": 7,
-  "semanticCommitType": "chore",
+  "minimumReleaseAge": "7 days",
+  "ignoreUnstable": true,
+  "respectLatest": true,
+  "configMigration": true,
+  "rollbackPrs": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["every weekend"]
+  },
   "packageRules": [
     {
+      "description": "Pin digests anywhere immutable references are available",
       "matchDatasources": ["docker", "github-actions"],
       "pinDigests": true,
       "rangeStrategy": "pin",
-      "labels": ["docker", "github-actions"]
+      "labels": ["dependencies", "digest"]
     },
     {
+      "description": "Security fixes should not wait for dashboard approval",
       "matchUpdateTypes": ["vulnerability"],
-      "labels": ["security"],
-      "dependencyDashboardApproval": false
+      "dependencyDashboardApproval": false,
+      "labels": ["dependencies", "security"],
+      "schedule": ["at any time"]
     },
     {
-      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
+      "description": "Require explicit approval for all normal updates",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest", "replacement", "rollback"],
       "dependencyDashboardApproval": true,
       "labels": ["dependencies"]
     }

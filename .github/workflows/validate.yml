@@ -1,15 +1,26 @@
-name: Validate Renovate config
+name: Validate Renovate presets
 
 on:
   pull_request:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - default.json
+          - grouped.json
+          - safe-automerge.json
     steps:
       - uses: actions/checkout@v4
-      - name: Run renovate-config-validator
-        run: npx renovate-config-validator --strict
+      - name: Validate ${{ matrix.preset }}
+        run: npx --yes --package renovate renovate-config-validator --strict ${{ matrix.preset }}

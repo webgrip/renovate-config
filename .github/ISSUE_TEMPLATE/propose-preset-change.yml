@@ -1,0 +1,25 @@
+name: Propose preset change
+description: Suggest a new preset or a behavior change to an existing preset
+title: "[preset] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the desired Renovate behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Consumer impact
+      description: Which repositories would be affected, and how risky is the change?
+    validations:
+      required: true
