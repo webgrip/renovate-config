@@ -1,0 +1,49 @@
+name: On Source Change
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+      - alpha
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: validate (${{ matrix.preset }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - default.json
+          - grouped.json
+          - safe-automerge.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Validate ${{ matrix.preset }}
+        run: npx --yes --package renovate renovate-config-validator --strict ${{ matrix.preset }}
+
+  release:
+    name: Semantic Release
+    needs: validate
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/alpha'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      statuses: write
+      id-token: write
+    uses: webgrip/workflows/.github/workflows/semantic-release.yml@main
+    with:
+      use-bot-to-commit: true
+    secrets:
+      WEBGRIP_CI_APP_ID: ${{ secrets.WEBGRIP_CI_APP_ID }}
+      WEBGRIP_CI_APP_PRIVATE_KEY: ${{ secrets.WEBGRIP_CI_APP_PRIVATE_KEY }}
