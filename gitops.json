@@ -1,0 +1,286 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "description": "Webgrip GitOps Renovate overlay. Adds Kubernetes/GitOps extraction coverage, OCI/Talos/CNPG/Grafana custom managers, registry aliases, and ecosystem-specific PR polish. Extend after the default org preset.",
+    "registryAliases": {
+        "mirror.gcr.io": "docker.io"
+    },
+    "flux": {
+        "managerFilePatterns": [
+            "/(^|/)kubernetes/.+/(?:helmrelease(?:-[^/]+)?|helmrepository|ks(?:-[^/]+)?|kustomization|receiver|grafana-annotations)\\.ya?ml(?:\\.j2)?$/"
+        ]
+    },
+    "helm-values": {
+        "managerFilePatterns": [
+            "/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"
+        ]
+    },
+    "helmfile": {
+        "managerFilePatterns": [
+            "/(^|/)helmfile\\.ya?ml(?:\\.gotmpl)?(?:\\.j2)?$/",
+            "/(^|/)helmfile\\.d/.+\\.ya?ml(?:\\.gotmpl)?(?:\\.j2)?$/"
+        ]
+    },
+    "kubernetes": {
+        "managerFilePatterns": [
+            "/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"
+        ]
+    },
+    "kustomize": {
+        "managerFilePatterns": [
+            "/(^|/)kustomization\\.ya?ml(?:\\.j2)?$/"
+        ]
+    },
+    "renovate-config": {
+        "managerFilePatterns": [
+            "/(^|/)\\.renovaterc\\.json5$/",
+            "/(^|/)renovate\\.json$/"
+        ]
+    },
+    "customDatasources": {
+        "grafana-dashboards": {
+            "defaultRegistryUrlTemplate": "https://grafana.com/api/dashboards/{{packageName}}",
+            "format": "json",
+            "transformTemplates": [
+                "{\"releases\":[{\"version\": $string(revision)}], \"sourceDirectory\": name}"
+            ]
+        },
+        "talos-factory": {
+            "defaultRegistryUrlTemplate": "https://factory.talos.dev/versions",
+            "format": "json",
+            "transformTemplates": [
+                "{\"releases\": [$.{\"version\": $}]}"
+            ]
+        }
+    },
+    "customManagers": [
+        {
+            "customType": "regex",
+            "description": "Process annotated dependencies in YAML, shell, and env files.",
+            "managerFilePatterns": [
+                "/(^|/).+\\.env(?:\\.j2)?$/",
+                "/(^|/).+\\.sh(?:\\.j2)?$/",
+                "/(^|/).+\\.ya?ml(?:\\.j2)?$/"
+            ],
+            "matchStrings": [
+                "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: repository=(?<registryUrl>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?[\"']?(?<currentValue>[^\"'\\s]+)[\"']?",
+                "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n.+/(?<currentValue>(v|\\d)[^/]+)"
+            ],
+            "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}"
+        },
+        {
+            "customType": "regex",
+            "description": "Process Flux OCIRepository tags; digest fields should be refreshed by a repo-local post-upgrade task when used.",
+            "managerFilePatterns": [
+                "/(^|/)kubernetes/apps/.+/ocirepository\\.ya?ml(?:\\.j2)?$/"
+            ],
+            "matchStrings": [
+                "kind:\\s*OCIRepository[\\s\\S]*?ref:\\s*\\n[\\s\\S]*?tag:\\s*(?<currentValue>\\S+)[\\s\\S]*?url:\\s*oci://(?<depName>\\S+)",
+                "kind:\\s*OCIRepository[\\s\\S]*?url:\\s*oci://(?<depName>\\S+)[\\s\\S]*?ref:\\s*\\n[\\s\\S]*?tag:\\s*(?<currentValue>\\S+)"
+            ],
+            "datasourceTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "description": "Process inline oci://repo:tag references.",
+            "managerFilePatterns": [
+                "/(^|/).+\\.ya?ml(?:\\.j2)?$/"
+            ],
+            "matchStrings": [
+                "oci://(?<depName>[^:]+):(?<currentValue>\\S+)"
+            ],
+            "datasourceTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "description": "Detect CNPG Cluster imageName and extension reference fields.",
+            "managerFilePatterns": [
+                "/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"
+            ],
+            "matchStrings": [
+                "(?:imageName|reference):\\s+(?<depName>[^:\\s]+):(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+            ],
+            "datasourceTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "description": "Process Grafana dashboard download URLs.",
+            "managerFilePatterns": [
+                "/grafanadashboard\\.ya?ml(?:\\.j2)?$/"
+            ],
+            "matchStrings": [
+                "dashboards/(?<depName>\\d+)/revisions/(?<currentValue>\\d+)/download"
+            ],
+            "datasourceTemplate": "custom.grafana-dashboards",
+            "versioningTemplate": "regex:^(?<major>\\d+)$",
+            "autoReplaceStringTemplate": "dashboards/{{depName}}/revisions/{{newValue}}/download"
+        },
+        {
+            "customType": "regex",
+            "description": "Process Talos Factory installer image references.",
+            "managerFilePatterns": [
+                "/(^|/)talos/.+\\.ya?ml(?:\\.j2)?$/"
+            ],
+            "matchStrings": [
+                "factory\\.talos\\.dev/[^/]+/[^:]+:(?<currentValue>v\\S+)"
+            ],
+            "datasourceTemplate": "custom.talos-factory",
+            "versioningTemplate": "semver",
+            "depNameTemplate": "siderolabs/talos"
+        }
+    ],
+    "packageRules": [
+        {
+            "description": "Manage Flux OCIRepository tags without asking Renovate to calculate digest-only OCI Helm chart updates.",
+            "matchManagers": [
+                "custom.regex"
+            ],
+            "matchFileNames": [
+                "kubernetes/apps/**/ocirepository.yaml",
+                "kubernetes/apps/**/ocirepository.yml"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "groupName": "Flux OCI Helm charts",
+            "separateMinorPatch": true,
+            "pinDigests": false
+        },
+        {
+            "description": "Disable digest-only and pin-digest updates for Flux OCIRepository custom regex deps; repo-local post-upgrade tasks own spec.ref.digest.",
+            "matchManagers": [
+                "custom.regex"
+            ],
+            "matchFileNames": [
+                "kubernetes/apps/**/ocirepository.yaml",
+                "kubernetes/apps/**/ocirepository.yml"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchUpdateTypes": [
+                "pinDigest",
+                "digest"
+            ],
+            "enabled": false
+        },
+        {
+            "description": "Disable Helmfile OCI Helm chart digest pinning; bootstrap-only Helmfiles are usually not reconciled by Flux.",
+            "matchManagers": [
+                "helmfile"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchUpdateTypes": [
+                "pinDigest",
+                "digest"
+            ],
+            "pinDigests": false,
+            "enabled": false
+        },
+        {
+            "description": "Pin GitOps-managed container image digests by default.",
+            "matchManagers": [
+                "helm-values",
+                "kustomize",
+                "kubernetes"
+            ],
+            "matchDatasources": [
+                "docker"
+            ],
+            "groupName": "GitOps container images",
+            "pinDigests": true
+        },
+        {
+            "description": "Preserve real Docker image names for Helmfile-managed image dependencies.",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchManagers": [
+                "helmfile"
+            ],
+            "overrideDepName": "{{packageName}}"
+        },
+        {
+            "description": "Normalize mise GitHub release/tag package names so single-word tools resolve to owner/repo.",
+            "matchFileNames": [
+                ".mise.toml",
+                "mise.toml"
+            ],
+            "matchDatasources": [
+                "github-releases",
+                "github-tags"
+            ],
+            "overridePackageName": "{{#if (lookup (split packageName '/') 1)}}{{packageName}}{{else if (lookup (split packageName ':') 1)}}{{ lookup (split packageName ':') 1 }}/{{ lookup (split packageName ':') 1 }}{{else}}{{packageName}}/{{packageName}}{{/if}}"
+        },
+        {
+            "description": "Point mogenius/renovate-operator chart updates at the upstream source repository.",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "ghcr.io/mogenius/helm-charts/renovate-operator"
+            ],
+            "sourceUrl": "https://github.com/mogenius/renovate-operator"
+        },
+        {
+            "description": "Point 1Password Connect at its upstream changelog.",
+            "matchPackageNames": [
+                "/1password/"
+            ],
+            "changelogUrl": "https://github.com/1Password/connect/blob/main/CHANGELOG.md"
+        },
+        {
+            "description": "Point cloudflared at its upstream release notes.",
+            "matchPackageNames": [
+                "/cloudflared/"
+            ],
+            "changelogUrl": "https://github.com/cloudflare/cloudflared/blob/master/RELEASE_NOTES"
+        },
+        {
+            "description": "vchord-scratch uses a pg<N>-v<semver> tag prefix.",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "ghcr.io/tensorchord/vchord-scratch"
+            ],
+            "versioning": "regex:^pg18-v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$"
+        },
+        {
+            "description": "Grafana dashboard PR polish.",
+            "matchDatasources": [
+                "custom.grafana-dashboards"
+            ],
+            "matchUpdateTypes": [
+                "major"
+            ],
+            "semanticCommitType": "chore",
+            "semanticCommitScope": "grafana-dashboards",
+            "commitMessageTopic": "dashboard {{sourceDirectory}}",
+            "commitMessageExtra": "({{currentVersion}} ➔ {{newVersion}})",
+            "addLabels": [
+                "renovate/grafana-dashboard"
+            ]
+        },
+        {
+            "description": "Talos Factory PR polish.",
+            "matchDatasources": [
+                "custom.talos-factory"
+            ],
+            "semanticCommitScope": "container",
+            "commitMessageTopic": "{{depName}}",
+            "addLabels": [
+                "renovate/talos"
+            ]
+        },
+        {
+            "description": "Renovate config dependency PR polish.",
+            "matchManagers": [
+                "renovate-config"
+            ],
+            "semanticCommitScope": "renovate-config",
+            "commitMessageTopic": "config {{depName}}"
+        }
+    ]
+}

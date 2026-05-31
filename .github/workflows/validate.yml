@@ -18,6 +18,7 @@ jobs:
           - default.json
           - grouped.json
           - safe-automerge.json
+          - gitops.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
