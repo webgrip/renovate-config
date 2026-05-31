@@ -6,6 +6,15 @@ on:
       - main
       - beta
       - alpha
+    paths:
+      - default.json
+      - grouped.json
+      - safe-automerge.json
+      - .releaserc.json
+      - package.json
+      - package-lock.json
+      - .nvmrc
+      - .github/workflows/on_source_change.yml
 
 concurrency:
   group: release-${{ github.ref }}
