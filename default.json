@@ -1,0 +1,34 @@
+{
+  "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repos to extend.",
+  "dependencyDashboardApproval": true,
+  "assigneesFromCodeOwners": true,
+  "reviewersFromCodeOwners": true,
+  "prConcurrentLimit": 2,
+  "prHourlyLimit": 2,
+  "timezone": "UTC",
+  "schedule": ["every weekend"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "pin",
+  "separateMajorMinor": true,
+  "separateMinorPatch": true,
+  "minimumReleaseAge": 7,
+  "semanticCommitType": "chore",
+  "packageRules": [
+    {
+      "matchDatasources": ["docker", "github-actions"],
+      "pinDigests": true,
+      "rangeStrategy": "pin",
+      "labels": ["docker", "github-actions"]
+    },
+    {
+      "matchUpdateTypes": ["vulnerability"],
+      "labels": ["security"],
+      "dependencyDashboardApproval": false
+    },
+    {
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
+      "dependencyDashboardApproval": true,
+      "labels": ["dependencies"]
+    }
+  ]
+}
