@@ -18,7 +18,6 @@ jobs:
           - default.json
           - grouped.json
           - safe-automerge.json
-          - gitops.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,3 +26,15 @@ jobs:
           cache: npm
       - name: Validate ${{ matrix.preset }}
         run: npx --yes --package renovate renovate-config-validator --strict ${{ matrix.preset }}
+
+  validate-all:
+    name: validate all presets
+    runs-on: arc-runner-set
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Validate full preset suite
+        run: npm run validate

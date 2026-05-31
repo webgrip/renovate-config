@@ -8,7 +8,6 @@ This repository contains the organization-wide Renovate presets used across Webg
 - Make every normal update visible and reviewable
 - Allow urgent security fixes to move immediately
 - Offer small, explicit opt-in overlays instead of one oversized default
-- Keep GitOps extraction reusable without forcing Kubernetes-specific behavior into every repository
 
 ## Default behavior
 
@@ -31,7 +30,7 @@ Use for most repositories:
 
 ```json
 {
-  "extends": ["github>webgrip/renovate-config#v1.2.1"]
+  "extends": ["github>webgrip/renovate-config#v1.0.0"]
 }
 ```
 
@@ -42,8 +41,8 @@ Use when a repository wants fewer PRs for routine updates:
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.2.1",
-    "github>webgrip/renovate-config:grouped#v1.2.1"
+    "github>webgrip/renovate-config#v1.0.0",
+    "github>webgrip/renovate-config:grouped#v1.0.0"
   ]
 }
 ```
@@ -55,34 +54,11 @@ Use when a repository has mature CI and wants the lowest-risk updates merged aut
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.2.1",
-    "github>webgrip/renovate-config:safe-automerge#v1.2.1"
+    "github>webgrip/renovate-config#v1.0.0",
+    "github>webgrip/renovate-config:safe-automerge#v1.0.0"
   ]
 }
 ```
-
-### GitOps overlay
-
-Use for Kubernetes, Flux, or homelab-style GitOps repositories. Extend it after the default preset so repo-local rules can still override operational choices:
-
-```json
-{
-  "extends": [
-    "github>webgrip/renovate-config#v1.2.1",
-    "github>webgrip/renovate-config:gitops#v1.2.1"
-  ]
-}
-```
-
-The GitOps overlay adds:
-
-- Kubernetes-scoped manager file patterns for Flux, Helm values, Helmfile, Kubernetes, Kustomize, and Renovate config files
-- `mirror.gcr.io` registry aliasing to Docker Hub
-- Regex managers for annotated dependencies, Flux `OCIRepository` tags, inline `oci://repo:tag` references, CNPG image fields, Grafana dashboards, and Talos Factory installer images
-- GitOps package rules for Flux OCI chart grouping, disabling duplicate digest handling where repo-local digest refresh tasks own the digest field, Helmfile OCI digest safety, and GitOps container image digest pinning
-- PR polish for Grafana dashboards, Talos Factory, Renovate config dependencies, Helmfile image names, 1Password/cloudflared changelogs, and renovate-operator source URLs
-
-This preset deliberately does **not** configure credentials, `enabledManagers`, host throttling, `allowedCommands`, or post-upgrade scripts. Those belong in the Renovate runtime config or in the consuming repository.
 
 ## Release and change management
 
@@ -97,5 +73,5 @@ This preset deliberately does **not** configure credentials, `enabledManagers`, 
 Run the same command used by CI:
 
 ```bash
-npx --yes --package renovate renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json
+npx --yes --package renovate renovate-config-validator --strict default.json grouped.json safe-automerge.json
 ```

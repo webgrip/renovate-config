@@ -5,28 +5,28 @@
         "mirror.gcr.io": "docker.io"
     },
     "flux": {
-        "managerFilePatterns": [
+    "managerFilePatterns": [
             "/(^|/)kubernetes/.+/(?:helmrelease(?:-[^/]+)?|helmrepository|ks(?:-[^/]+)?|kustomization|receiver|grafana-annotations)\\.ya?ml(?:\\.j2)?$/"
         ]
     },
     "helm-values": {
-        "managerFilePatterns": [
+    "managerFilePatterns": [
             "/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"
         ]
     },
     "helmfile": {
-        "managerFilePatterns": [
+    "managerFilePatterns": [
             "/(^|/)helmfile\\.ya?ml(?:\\.gotmpl)?(?:\\.j2)?$/",
             "/(^|/)helmfile\\.d/.+\\.ya?ml(?:\\.gotmpl)?(?:\\.j2)?$/"
         ]
     },
     "kubernetes": {
-        "managerFilePatterns": [
+    "managerFilePatterns": [
             "/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"
         ]
     },
     "kustomize": {
-        "managerFilePatterns": [
+    "managerFilePatterns": [
             "/(^|/)kustomization\\.ya?ml(?:\\.j2)?$/"
         ]
     },
@@ -50,7 +50,7 @@
         {
             "customType": "regex",
             "description": "Process annotated dependencies in YAML, shell, and env files.",
-            "managerFilePatterns": [
+      "managerFilePatterns": [
                 "/(^|/).+\\.env(?:\\.j2)?$/",
                 "/(^|/).+\\.sh(?:\\.j2)?$/",
                 "/(^|/).+\\.ya?ml(?:\\.j2)?$/"
@@ -64,7 +64,7 @@
         {
             "customType": "regex",
             "description": "Process Flux OCIRepository tags; digest fields should be refreshed by a repo-local post-upgrade task when used.",
-            "managerFilePatterns": [
+      "managerFilePatterns": [
                 "/(^|/)kubernetes/apps/.+/ocirepository\\.ya?ml(?:\\.j2)?$/"
             ],
             "matchStrings": [
@@ -76,7 +76,7 @@
         {
             "customType": "regex",
             "description": "Process inline oci://repo:tag references.",
-            "managerFilePatterns": [
+      "managerFilePatterns": [
                 "/(^|/).+\\.ya?ml(?:\\.j2)?$/"
             ],
             "matchStrings": [
@@ -87,7 +87,7 @@
         {
             "customType": "regex",
             "description": "Detect CNPG Cluster imageName and extension reference fields.",
-            "managerFilePatterns": [
+      "managerFilePatterns": [
                 "/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"
             ],
             "matchStrings": [
@@ -98,7 +98,7 @@
         {
             "customType": "regex",
             "description": "Process Grafana dashboard download URLs.",
-            "managerFilePatterns": [
+      "managerFilePatterns": [
                 "/grafanadashboard\\.ya?ml(?:\\.j2)?$/"
             ],
             "matchStrings": [
@@ -111,7 +111,7 @@
         {
             "customType": "regex",
             "description": "Process Talos Factory installer image references.",
-            "managerFilePatterns": [
+      "managerFilePatterns": [
                 "/(^|/)talos/.+\\.ya?ml(?:\\.j2)?$/"
             ],
             "matchStrings": [
@@ -268,13 +268,12 @@
                 "renovate/talos"
             ]
         },
-        {
-      "description": "Renovate config dependency PR polish.",
+    {
+      "description": "Reserved terminal rule to keep future GitOps-specific PR polish appended after extraction rules.",
       "matchManagers": [
-        "renovate-config"
+        "custom.regex"
       ],
-            "semanticCommitScope": "renovate-config",
-            "commitMessageTopic": "config {{depName}}"
-        }
-    ]
+      "semanticCommitScope": "gitops"
+    }
+  ]
 }
