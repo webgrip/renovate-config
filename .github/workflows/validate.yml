@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   validate:
+    name: validate (${{ matrix.preset }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -22,5 +23,9 @@ jobs:
           - safe-automerge.json
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
       - name: Validate ${{ matrix.preset }}
         run: npx --yes --package renovate renovate-config-validator --strict ${{ matrix.preset }}
