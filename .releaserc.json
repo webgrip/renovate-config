@@ -101,6 +101,11 @@
             "path": "safe-automerge.json",
             "name": "safe-automerge.json",
             "label": "Safe-automerge overlay (v${nextRelease.version})"
+          },
+          {
+            "path": "gitops.json",
+            "name": "gitops.json",
+            "label": "GitOps overlay (v${nextRelease.version})"
           }
         ],
         "successComment": "🎉 This change ships in [v${nextRelease.version}](${nextRelease.url}).\n\nUpdate consuming repos to adopt it:\n\n```json\n{\n  \"extends\": [\"github>webgrip/renovate-config#v${nextRelease.version}\"]\n}\n```",
