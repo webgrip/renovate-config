@@ -11,6 +11,23 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.3.0](https://github.com/webgrip/renovate-config/compare/v1.2.1...v1.3.0) (2026-06-01)
+
+### 🚀 New Preset Rules & Features
+
+* add reusable GitOps Renovate preset ([938a175](https://github.com/webgrip/renovate-config/commit/938a175ccc659daea20922e6c19f168ad5298ef4))
+
+### 🐛 Rule Corrections & Fixes
+
+* include GitOps preset in release docs and assets ([d707418](https://github.com/webgrip/renovate-config/commit/d707418453635d649834c1d4a18229711ff4c7ec))
+* pin Renovate validator version ([0ace8b1](https://github.com/webgrip/renovate-config/commit/0ace8b1de4efba4b05a3f31f509a4df32da3df22))
+* validate GitOps preset as part of full preset suite ([285f472](https://github.com/webgrip/renovate-config/commit/285f4729c23f89b626bcaa7cdbe480a47b784ddc))
+* validate GitOps preset in source-change workflow ([943dcf9](https://github.com/webgrip/renovate-config/commit/943dcf933ceae22ee5d3f354b5f4e6bdfb98e4b0))
+
+### 🔧 Maintenance
+
+* **workflows:** make sure releases only run when important files are changed ([93a1c3c](https://github.com/webgrip/renovate-config/commit/93a1c3c22a3f9f02835e4b8b4fc76a57105a3808))
+
 ## [1.2.1](https://github.com/webgrip/renovate-config/compare/v1.2.0...v1.2.1) (2026-05-31)
 
 ### 🐛 Rule Corrections & Fixes
