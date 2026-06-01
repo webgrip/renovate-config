@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "validate": "npx --yes --package renovate renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json",
+    "validate": "npx --yes --package renovate@43.206.1 renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json",
     "release": "semantic-release"
   },
   "devDependencies": {

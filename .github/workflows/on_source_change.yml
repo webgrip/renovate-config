@@ -39,7 +39,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - name: Validate ${{ matrix.preset }}
-        run: npx --yes --package renovate renovate-config-validator --strict ${{ matrix.preset }}
+        run: npx --yes --package renovate@43.206.1 renovate-config-validator --strict ${{ matrix.preset }}
 
   validate-all:
     name: validate all presets
