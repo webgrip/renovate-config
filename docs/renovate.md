@@ -18,7 +18,7 @@ The default preset enforces the following:
 - No automerge and no platform automerge
 - Pinned version ranges and digest pinning for Docker and GitHub Actions
 - Major, minor, and patch updates separated for easier review
-- Minimum release age of 7 days to avoid day-zero regressions
+- Graduated release soak times to avoid day-zero regressions
 - Low PR concurrency to reduce operational noise
 - Lock file maintenance and rollback PR support enabled
 - CODEOWNERS-driven assignees and reviewers
@@ -74,15 +74,35 @@ Use for Kubernetes, Flux, or homelab-style GitOps repositories. Extend it after 
 }
 ```
 
+The GitOps overlay intentionally extends specific upstream home-operations presets instead of the entire `github>home-operations/renovate-presets` default, so Webgrip keeps its own dashboard, scheduling, approval, concurrency, and automerge policy from the default preset.
+
 The GitOps overlay adds:
 
-- Kubernetes-scoped manager file patterns for Flux, Helm values, Helmfile, Kubernetes, Kustomize, and Renovate config files
-- `mirror.gcr.io` registry aliasing to Docker Hub
-- Regex managers for annotated dependencies, Flux `OCIRepository` tags, inline `oci://repo:tag` references, CNPG image fields, Grafana dashboards, and Talos Factory installer images
+- Upstream home-operations manager file patterns, `mirror.gcr.io` registry aliasing, custom managers, package overrides, semantic commit polish, and versioning rules that are useful for homelab/GitOps repositories
+- Webgrip-specific regex handling for Flux `OCIRepository` tags where `spec.ref.digest` is owned by a repo-local post-upgrade task
 - GitOps package rules for Flux OCI chart grouping, disabling duplicate digest handling where repo-local digest refresh tasks own the digest field, Helmfile OCI digest safety, and GitOps container image digest pinning
-- PR polish for Grafana dashboards, Talos Factory, Helmfile image names, 1Password/cloudflared changelogs, and renovate-operator source URLs
+- PR polish from both upstream home-operations presets and Webgrip labels/scoping
 
 This preset deliberately does **not** configure credentials, `enabledManagers`, host throttling, `allowedCommands`, or post-upgrade scripts. Those belong in the Renovate runtime config or in the consuming repository.
+
+## Recommended homelab-cluster rollout
+
+Use `webgrip/homelab-cluster` as the repo-local policy layer, not as the place to copy shared extraction logic:
+
+1. Replace shared Renovate rules in `webgrip/homelab-cluster` with pinned Webgrip presets:
+
+   ```json
+   {
+     "extends": [
+       "github>webgrip/renovate-config#v1.2.1",
+       "github>webgrip/renovate-config:gitops#v1.2.1"
+     ]
+   }
+   ```
+
+2. Keep cluster-only settings in `webgrip/homelab-cluster`, for example credentials/runtime config, `enabledManagers`, `hostRules`, `allowedCommands`, post-upgrade tasks, and package rules that name cluster-specific apps, paths, labels, assignees, or maintenance windows.
+3. Prefer adding reusable homelab/GitOps extraction fixes here in `webgrip/renovate-config:gitops`; prefer adding one-off operational exceptions in `webgrip/homelab-cluster`.
+4. Pin to a released Webgrip tag first, then update the tag deliberately after validating the Dependency Dashboard output in the cluster repository.
 
 ## Release and change management
 
