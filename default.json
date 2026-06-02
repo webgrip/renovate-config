@@ -48,7 +48,7 @@
   "reviewersFromCodeOwners": true,
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dependency Dashboard",
-  "dependencyDashboardAutoclose": true,
+  "dependencyDashboardAutoclose": false,
   "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
   "osvVulnerabilityAlerts": true,
   "vulnerabilityAlerts": {
