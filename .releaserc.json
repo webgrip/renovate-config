@@ -112,7 +112,6 @@
         "failComment": "The release workflow failed to publish a new version. Check the [Actions tab](https://github.com/webgrip/renovate-config/actions) for details.",
         "releasedLabels": ["released"],
         "addReleases": "bottom",
-        "discussionCategoryName": "Releases",
         "draftRelease": false
       }
     ]
