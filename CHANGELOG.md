@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.3.2](https://github.com/webgrip/renovate-config/compare/v1.3.1...v1.3.2) (2026-06-02)
+
+### 🐛 Rule Corrections & Fixes
+
+* remove discussionCategoryName — Discussions not enabled on repo ([#3](https://github.com/webgrip/renovate-config/issues/3)) ([e7960ea](https://github.com/webgrip/renovate-config/commit/e7960eafcdf2077c5a52e38604ff152c22f8d999))
+
 ## [1.3.1](https://github.com/webgrip/renovate-config/compare/v1.3.0...v1.3.1) (2026-06-02)
 
 ### 🐛 Rule Corrections & Fixes
