@@ -11,6 +11,13 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.3.3](https://github.com/webgrip/renovate-config/compare/v1.3.2...v1.3.3) (2026-06-02)
+
+### 🐛 Rule Corrections & Fixes
+
+* **ci:** update renovate validator to 43.208.0 in CI ([9d4b2c5](https://github.com/webgrip/renovate-config/commit/9d4b2c500d8719618ca596669ed01aa1e04a7110))
+* **ci:** update renovate validator to 43.208.0 in package.json ([4010217](https://github.com/webgrip/renovate-config/commit/40102173f61f319e47a9877a9807d3f05d7c938f))
+
 ## [1.3.2](https://github.com/webgrip/renovate-config/compare/v1.3.1...v1.3.2) (2026-06-02)
 
 ### 🐛 Rule Corrections & Fixes
