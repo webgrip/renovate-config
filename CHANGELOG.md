@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.3.4](https://github.com/webgrip/renovate-config/compare/v1.3.3...v1.3.4) (2026-06-02)
+
+### 🐛 Rule Corrections & Fixes
+
+* allow dashboard approvals to trigger outside schedule ([842b70b](https://github.com/webgrip/renovate-config/commit/842b70bfb2d030c7de4b5176cfce72e18387e47a))
+
 ## [1.3.3](https://github.com/webgrip/renovate-config/compare/v1.3.2...v1.3.3) (2026-06-02)
 
 ### 🐛 Rule Corrections & Fixes
