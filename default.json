@@ -18,7 +18,7 @@
     "after 3am and before 7am every weekday",
     "every weekend"
   ],
-  "updateNotScheduled": false,
+  "updateNotScheduled": true,
   "fetchChangeLogs": "pr",
   "rebaseWhen": "behind-base-branch",
   "recreateWhen": "always",
