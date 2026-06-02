@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.3.5](https://github.com/webgrip/renovate-config/compare/v1.3.4...v1.3.5) (2026-06-02)
+
+### 🐛 Rule Corrections & Fixes
+
+* open approved renovate PRs immediately ([5a0bc22](https://github.com/webgrip/renovate-config/commit/5a0bc229e0189a22a008b5bc4beca4916e32e5c7))
+
 ## [1.3.4](https://github.com/webgrip/renovate-config/compare/v1.3.3...v1.3.4) (2026-06-02)
 
 ### 🐛 Rule Corrections & Fixes
