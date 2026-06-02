@@ -31,7 +31,7 @@
   "respectLatest": true,
   "rollbackPrs": true,
   "internalChecksFilter": "strict",
-  "prCreation": "not-pending",
+  "prCreation": "immediate",
   "prHourlyLimit": 1,
   "prConcurrentLimit": 3,
   "branchConcurrentLimit": 3,
