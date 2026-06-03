@@ -58,6 +58,15 @@ Releases are **fully automated**. Push (or merge a PR) to `main` for a stable re
 
 This repository's Renovate configuration targets `next`, so dependency updates publish RC tags for downstream testing before being promoted to `main`.
 
+### Release train
+
+1. Renovate opens dependency update PRs against `next`.
+2. Merging a dependency PR into `next` publishes an RC tag such as `v1.2.0-rc.1`.
+3. Test the RC tag in downstream repositories.
+4. When satisfied, open a `next` → `main` promotion PR manually.
+5. Merge it with a **merge commit** or **rebase merge** — do not squash, because semantic-release needs the original semantic commits to determine the stable version.
+6. `main` publishes the stable release. Renovate will keep targeting `next`, which stays ahead of `main` as new PRs land.
+
 ### Required secret
 
 `WEBGRIP_CI_APP_ID` and `WEBGRIP_CI_APP_PRIVATE_KEY` must be set in the repo (or org) secrets. The shared semantic-release workflow uses the GitHub App token to push release commits/tags and publish GitHub Releases.

@@ -3,14 +3,9 @@
     "branches": [
         "main",
         {
-            "name": "beta",
-            "prerelease": true,
-            "channel": "beta"
-        },
-        {
-            "name": "alpha",
-            "prerelease": true,
-            "channel": "alpha"
+            "name": "next",
+            "channel": "rc",
+            "prerelease": "rc"
         }
     ],
     "tagFormat": "v${version}",
