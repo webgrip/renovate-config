@@ -11,6 +11,13 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.3.7](https://github.com/webgrip/renovate-config/compare/v1.3.6...v1.3.7) (2026-06-03)
+
+### 🐛 Rule Corrections & Fixes
+
+* update default Renovate preset configuration and schedule settings ([2466452](https://github.com/webgrip/renovate-config/commit/2466452f8275f509c6db60a52d1c1e1441fda398))
+* update workflow and release configuration for 'next' branch support ([e33ee79](https://github.com/webgrip/renovate-config/commit/e33ee79a44273c14fb1a18bed60b18ae64d9ea9e))
+
 ## [1.3.6](https://github.com/webgrip/renovate-config/compare/v1.3.5...v1.3.6) (2026-06-03)
 
 ### 🐛 Rule Corrections & Fixes
