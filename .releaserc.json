@@ -152,7 +152,7 @@
         [
             "@semantic-release/exec",
             {
-                "verifyReleaseCmd": "npx --yes --package renovate@43.206.1 renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json && echo '✅ All presets passed validation'"
+                "verifyReleaseCmd": "npm run validate && echo '✅ All presets passed validation'"
             }
         ],
         [

@@ -8,7 +8,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "validate": "npx --yes --package renovate@43.208.0 renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json",
+    "validate": "renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json",
+    "validate:preset": "renovate-config-validator --strict",
     "release": "semantic-release"
   },
   "devDependencies": {
@@ -19,6 +20,7 @@
     "@semantic-release/github": "^10.3.5",
     "@semantic-release/release-notes-generator": "^14.0.3",
     "conventional-changelog-conventionalcommits": "^8.0.0",
+    "renovate": "43.208.0",
     "semantic-release": "^24.2.5"
   }
 }

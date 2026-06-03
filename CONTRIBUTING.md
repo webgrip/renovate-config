@@ -7,15 +7,11 @@
 3. **Always validate.** Run the validator before opening a PR:
 
 ```sh
-npx --yes --package renovate renovate-config-validator --strict default.json grouped.json safe-automerge.json
-```
-
-Or install devDependencies and use the npm script:
-
-```sh
-npm install
+npm ci
 npm run validate
 ```
+
+CI uses the same npm script with the pinned local Renovate devDependency, so avoid `npx` for validation.
 
 4. **Conventional commits required.** This repo uses [Conventional Commits](https://www.conventionalcommits.org/) — semantic-release derives the next version and CHANGELOG automatically from commit messages.
 

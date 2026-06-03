@@ -24,8 +24,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
       - name: Validate ${{ matrix.preset }}
-        run: npx --yes --package renovate@43.206.1 renovate-config-validator --strict ${{ matrix.preset }}
+        run: npm run validate:preset -- ${{ matrix.preset }}
 
   validate-all:
     name: validate all presets
@@ -36,5 +38,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
       - name: Validate full preset suite
         run: npm run validate

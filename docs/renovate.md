@@ -117,5 +117,8 @@ Use `webgrip/homelab-cluster` as the repo-local policy layer, not as the place t
 Run the same command used by CI:
 
 ```bash
-npx --yes --package renovate renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json
+npm ci
+npm run validate
 ```
+
+Renovate is pinned as a local devDependency; do not use `npx` for validator runs.
