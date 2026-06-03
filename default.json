@@ -30,7 +30,7 @@
     "ignoreUnstable": true,
     "respectLatest": true,
     "rollbackPrs": true,
-    "internalChecksFilter": "strict",
+    "internalChecksFilter": "none",
     "prCreation": "not-pending",
     "prNotPendingHours": 2,
     "prHourlyLimit": 0,
