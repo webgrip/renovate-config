@@ -200,7 +200,6 @@
                     "released"
                 ],
                 "addReleases": "bottom",
-                "discussionCategoryName": "Releases",
                 "draftRelease": false
             }
         ]
