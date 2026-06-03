@@ -182,6 +182,13 @@
             ]
         },
         {
+            "description": "Do not apply stability-days soak time to shared Renovate preset updates",
+            "matchPackageNames": [
+                "webgrip/renovate-config"
+            ],
+            "minimumReleaseAge": "0 days"
+        },
+        {
             "description": "Disable peer dependency updates to avoid range-only churn",
             "matchDepTypes": [
                 "peerDependencies"
