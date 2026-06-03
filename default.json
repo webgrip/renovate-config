@@ -32,9 +32,9 @@
     "rollbackPrs": true,
     "internalChecksFilter": "strict",
     "prCreation": "not-pending",
-    "prHourlyLimit": 1,
-    "prConcurrentLimit": 3,
-    "branchConcurrentLimit": 3,
+    "prHourlyLimit": 0,
+    "prConcurrentLimit": 5,
+    "branchConcurrentLimit": 10,
     "labels": [
         "dependencies",
         "renovate"
