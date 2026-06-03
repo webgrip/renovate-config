@@ -1,189 +1,192 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Graduated release soak times, per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included.",
-  "extends": [
-    "config:recommended",
-    ":dependencyDashboard",
-    ":semanticCommits",
-    ":separateMultipleMajorReleases",
-    ":enableVulnerabilityAlerts",
-    ":timezone(Europe/Amsterdam)",
-    "abandonments:recommended",
-    "mergeConfidence:all-badges"
-  ],
-  "configMigration": true,
-  "enabled": true,
-  "timezone": "Europe/Amsterdam",
-  "schedule": [
-    "after 3am and before 7am every weekday",
-    "every weekend"
-  ],
-  "updateNotScheduled": true,
-  "fetchChangeLogs": "pr",
-  "rebaseWhen": "behind-base-branch",
-  "recreateWhen": "always",
-  "rangeStrategy": "pin",
-  "pinDigests": true,
-  "separateMajorMinor": true,
-  "separateMinorPatch": true,
-  "separateMultipleMajor": true,
-  "ignoreUnstable": true,
-  "respectLatest": true,
-  "rollbackPrs": true,
-  "internalChecksFilter": "strict",
-  "prCreation": "not-pending",
-  "prHourlyLimit": 1,
-  "prConcurrentLimit": 3,
-  "branchConcurrentLimit": 3,
-  "labels": [
-    "dependencies",
-    "renovate"
-  ],
-  "semanticCommits": "enabled",
-  "semanticCommitType": "chore",
-  "semanticCommitScope": "deps",
-  "automerge": false,
-  "platformAutomerge": false,
-  "assigneesFromCodeOwners": true,
-  "reviewersFromCodeOwners": true,
-  "dependencyDashboard": true,
-  "dependencyDashboardTitle": "Renovate Dependency Dashboard",
-  "dependencyDashboardAutoclose": false,
-  "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
-  "osvVulnerabilityAlerts": true,
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "labels": [
-      "security",
-      "dependencies",
-      "renovate"
-    ],
-    "prCreation": "immediate",
-    "schedule": [
-      "at any time"
-    ],
-    "dependencyDashboardApproval": false
-  },
-  "lockFileMaintenance": {
-    "enabled": true,
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Graduated release soak times, per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included.",
     "extends": [
-      "schedule:monthly"
+        "config:recommended",
+        ":dependencyDashboard",
+        ":semanticCommits",
+        ":separateMultipleMajorReleases",
+        ":enableVulnerabilityAlerts",
+        ":timezone(Europe/Amsterdam)",
+        "abandonments:recommended",
+        "mergeConfidence:all-badges"
     ],
-    "dependencyDashboardApproval": true
-  },
-  "prBodyNotes": [
-    "{{#if isMajor}}⚠️ **Major update**: review upstream migration notes and rollout impact before merging.{{/if}}",
-    "{{#if isVulnerabilityAlert}}🔒 **Security update**: prioritize review and verify the vulnerable component is actually deployed.{{/if}}",
-    "{{#if isGroup}}📦 **Grouped update**: confirm the group is operationally coherent before merging.{{/if}}",
-    "Merge Confidence badges are included where supported — low or neutral confidence warrants a manual impact check before merge."
-  ],
-  "packageRules": [
-    {
-      "description": "Require explicit dashboard approval for all normal updates",
-      "matchUpdateTypes": [
-        "major",
-        "minor",
-        "patch",
-        "pin",
-        "digest",
-        "replacement",
-        "rollback"
-      ],
-      "dependencyDashboardApproval": true
+    "configMigration": true,
+    "enabled": true,
+    "timezone": "Europe/Amsterdam",
+    "schedule": [
+        "after 3am and before 7am every weekday",
+        "every weekend"
+    ],
+    "updateNotScheduled": false,
+    "fetchChangeLogs": "pr",
+    "rebaseWhen": "behind-base-branch",
+    "recreateWhen": "always",
+    "rangeStrategy": "pin",
+    "pinDigests": true,
+    "separateMajorMinor": true,
+    "separateMinorPatch": true,
+    "separateMultipleMajor": true,
+    "ignoreUnstable": true,
+    "respectLatest": true,
+    "rollbackPrs": true,
+    "internalChecksFilter": "strict",
+    "prCreation": "not-pending",
+    "prHourlyLimit": 1,
+    "prConcurrentLimit": 3,
+    "branchConcurrentLimit": 3,
+    "labels": [
+        "dependencies",
+        "renovate"
+    ],
+    "semanticCommits": "enabled",
+    "semanticCommitType": "chore",
+    "semanticCommitScope": "deps",
+    "automerge": false,
+    "platformAutomerge": false,
+    "assigneesFromCodeOwners": true,
+    "reviewersFromCodeOwners": true,
+    "dependencyDashboard": true,
+    "dependencyDashboardTitle": "Renovate Dependency Dashboard",
+    "dependencyDashboardAutoclose": true,
+    "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
+    "osvVulnerabilityAlerts": true,
+    "vulnerabilityAlerts": {
+        "enabled": true,
+        "labels": [
+            "security",
+            "dependencies",
+            "renovate"
+        ],
+        "prCreation": "immediate",
+        "schedule": [
+            "at any time"
+        ],
+        "dependencyDashboardApproval": false
     },
-    {
-      "description": "Major updates — longest soak time, breaking-change label, feat! commits",
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "minimumReleaseAge": "14 days",
-      "automerge": false,
-      "semanticCommitType": "feat",
-      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:",
-      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
-      "addLabels": [
-        "type/major",
-        "breaking-change"
-      ]
+    "lockFileMaintenance": {
+        "enabled": true,
+        "extends": [
+            "schedule:monthly"
+        ],
+        "dependencyDashboardApproval": true
     },
-    {
-      "description": "Minor updates — short soak time, feat commits",
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "minimumReleaseAge": "3 days",
-      "semanticCommitType": "feat",
-      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
-      "addLabels": [
-        "type/minor"
-      ]
-    },
-    {
-      "description": "Patch updates — minimal soak time, fix commits",
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "minimumReleaseAge": "1 day",
-      "semanticCommitType": "fix",
-      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
-      "addLabels": [
-        "type/patch"
-      ]
-    },
-    {
-      "description": "Digest-only updates — no changelog needed, chore commits",
-      "matchUpdateTypes": [
-        "digest"
-      ],
-      "semanticCommitType": "chore",
-      "commitMessageExtra": "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
-      "fetchChangeLogs": "off",
-      "addLabels": [
-        "type/digest"
-      ]
-    },
-    {
-      "description": "Pin Docker image digests and require approval",
-      "matchDatasources": [
-        "docker"
-      ],
-      "pinDigests": true,
-      "dependencyDashboardApproval": true,
-      "addLabels": [
-        "container"
-      ]
-    },
-    {
-      "description": "Pin GitHub Actions to immutable digests and require approval",
-      "matchManagers": [
-        "github-actions"
-      ],
-      "pinDigests": true,
-      "dependencyDashboardApproval": true,
-      "addLabels": [
-        "github-actions"
-      ]
-    },
-    {
-      "description": "Security fixes bypass the normal approval gate and open immediately",
-      "matchUpdateTypes": [
-        "vulnerability"
-      ],
-      "dependencyDashboardApproval": false,
-      "prCreation": "immediate",
-      "schedule": [
-        "at any time"
-      ],
-      "addLabels": [
-        "security"
-      ]
-    },
-    {
-      "description": "Disable peer dependency updates to avoid range-only churn",
-      "matchDepTypes": [
-        "peerDependencies"
-      ],
-      "enabled": false
-    }
-  ]
+    "prBodyNotes": [
+        "{{#if isMajor}}⚠️ **Major update**: review upstream migration notes and rollout impact before merging.{{/if}}",
+        "{{#if isVulnerabilityAlert}}🔒 **Security update**: prioritize review and verify the vulnerable component is actually deployed.{{/if}}",
+        "{{#if isGroup}}📦 **Grouped update**: confirm the group is operationally coherent before merging.{{/if}}",
+        "Merge Confidence badges are included where supported — low or neutral confidence warrants a manual impact check before merge."
+    ],
+    "packageRules": [
+        {
+            "description": "Require explicit dashboard approval for all normal updates",
+            "matchUpdateTypes": [
+                "major",
+                "minor",
+                "patch",
+                "pin",
+                "digest",
+                "replacement",
+                "rollback"
+            ],
+            "dependencyDashboardApproval": true
+        },
+        {
+            "description": "Major updates — longest soak time, breaking-change label, feat! commits",
+            "matchUpdateTypes": [
+                "major"
+            ],
+            "minimumReleaseAge": "14 days",
+            "automerge": false,
+            "semanticCommitType": "feat",
+            "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:",
+            "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
+            "addLabels": [
+                "type/major",
+                "breaking-change"
+            ]
+        },
+        {
+            "description": "Minor updates — short soak time, feat commits",
+            "matchUpdateTypes": [
+                "minor"
+            ],
+            "minimumReleaseAge": "3 days",
+            "semanticCommitType": "feat",
+            "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
+            "addLabels": [
+                "type/minor"
+            ]
+        },
+        {
+            "description": "Patch updates — minimal soak time, fix commits",
+            "matchUpdateTypes": [
+                "patch"
+            ],
+            "minimumReleaseAge": "1 day",
+            "semanticCommitType": "fix",
+            "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
+            "addLabels": [
+                "type/patch"
+            ]
+        },
+        {
+            "description": "Digest-only updates — no changelog needed, chore commits",
+            "matchUpdateTypes": [
+                "digest"
+            ],
+            "semanticCommitType": "chore",
+            "commitMessageExtra": "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
+            "fetchChangeLogs": "off",
+            "addLabels": [
+                "type/digest"
+            ]
+        },
+        {
+            "description": "Pin Docker image digests and require approval",
+            "matchDatasources": [
+                "docker"
+            ],
+            "pinDigests": true,
+            "dependencyDashboardApproval": true,
+            "addLabels": [
+                "container"
+            ]
+        },
+        {
+            "description": "Pin GitHub Actions to immutable digests and treat workflow updates as CI-only",
+            "matchManagers": [
+                "github-actions"
+            ],
+            "pinDigests": true,
+            "dependencyDashboardApproval": true,
+            "semanticCommitType": "ci",
+            "semanticCommitScope": "actions",
+            "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
+            "addLabels": [
+                "github-actions"
+            ]
+        },
+        {
+            "description": "Security fixes bypass the normal approval gate and open immediately",
+            "matchUpdateTypes": [
+                "vulnerability"
+            ],
+            "dependencyDashboardApproval": false,
+            "prCreation": "immediate",
+            "schedule": [
+                "at any time"
+            ],
+            "addLabels": [
+                "security"
+            ]
+        },
+        {
+            "description": "Disable peer dependency updates to avoid range-only churn",
+            "matchDepTypes": [
+                "peerDependencies"
+            ],
+            "enabled": false
+        }
+    ]
 }
