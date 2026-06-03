@@ -6,6 +6,7 @@ on:
       - main
       - next
     paths:
+      - .github/workflows/on_source_change.yml
       - default.json
       - grouped.json
       - safe-automerge.json
