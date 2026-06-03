@@ -1,0 +1,42 @@
+name: Open promotion PR
+
+on:
+  push:
+    branches:
+      - next
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-promotion-pr:
+    name: open next to main PR
+    runs-on: arc-runner-set
+    steps:
+      - name: Open or keep promotion PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          existing="$(gh pr list --base main --head next --state open --json number --jq 'length')"
+          if [ "$existing" != "0" ]; then
+            echo "Promotion PR already open."
+            exit 0
+          fi
+
+          status="$(gh api "repos/${GITHUB_REPOSITORY}/compare/main...next" --jq '.status')"
+          if [ "$status" != "ahead" ] && [ "$status" != "diverged" ]; then
+            echo "next has no changes ahead of main."
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head next \
+            --title "chore(release): promote next to main" \
+            --body "Promotes the tested RC state from \`next\` to \`main\` for a stable release.
+
+          **Merge with a merge commit or rebase merge — do not squash.** semantic-release needs the original semantic commits to determine the stable version."
