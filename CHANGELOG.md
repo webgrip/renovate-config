@@ -11,6 +11,21 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.4.0](https://github.com/webgrip/renovate-config/compare/v1.3.7...v1.4.0) (2026-06-03)
+
+### 🚀 New Preset Rules & Features
+
+* **release:** switch prerelease channel to next branch ([8ac1f5a](https://github.com/webgrip/renovate-config/commit/8ac1f5a5c5ae327d86963cd2a9be5cd642773fa5))
+
+### 🔧 Maintenance
+
+* **renovate:** route github-actions updates to main, others to next ([b1b1238](https://github.com/webgrip/renovate-config/commit/b1b12383d1d0144cc5f3661233e9a606a059b47a))
+
+### ⚙️ CI / CD
+
+* auto-open next to main promotion PR on push to next ([c790f5a](https://github.com/webgrip/renovate-config/commit/c790f5ad0e6141edd8fa5a756d7bcdaa75d76a8f))
+* **workflows:** promote prereleases even when it's just workflow stuff ([c351f7a](https://github.com/webgrip/renovate-config/commit/c351f7aedc317305896c74c461b96b353522fb86))
+
 ## [1.4.0-rc.1](https://github.com/webgrip/renovate-config/compare/v1.3.7...v1.4.0-rc.1) (2026-06-03)
 
 ### 🚀 New Preset Rules & Features
