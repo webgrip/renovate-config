@@ -4,7 +4,11 @@
         "github>webgrip/renovate-config",
         "github>webgrip/renovate-config:grouped"
     ],
-    "baseBranchPatterns": [
-        "next"
+    "baseBranchPatterns": ["next"],
+    "packageRules": [
+        {
+            "matchManagers": ["github-actions"],
+            "baseBranchPatterns": ["main"]
+        }
     ]
 }
