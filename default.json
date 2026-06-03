@@ -32,9 +32,13 @@
     "rollbackPrs": true,
     "internalChecksFilter": "strict",
     "prCreation": "not-pending",
+    "prNotPendingHours": 2,
     "prHourlyLimit": 0,
     "prConcurrentLimit": 5,
     "branchConcurrentLimit": 10,
+    "suppressNotifications": [
+        "prIgnoreNotification"
+    ],
     "labels": [
         "dependencies",
         "renovate"
