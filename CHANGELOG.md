@@ -11,6 +11,16 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.4.2](https://github.com/webgrip/renovate-config/compare/v1.4.1...v1.4.2) (2026-06-03)
+
+### 🐛 Rule Corrections & Fixes
+
+* **renovate:** Unlimited hourly PRs, 5 concurrent, 10 branch concurrent ([80d9acd](https://github.com/webgrip/renovate-config/commit/80d9acd0aba14f3f9e5bfb652223f3a6330b70e9))
+
+### 🔧 Maintenance
+
+* update validate script and add validate:preset for renovate config validation ([407c47d](https://github.com/webgrip/renovate-config/commit/407c47d3825012315ce66051bf98ae8bc260d82d))
+
 ## [1.4.1](https://github.com/webgrip/renovate-config/compare/v1.4.0...v1.4.1) (2026-06-03)
 
 ### 🐛 Rule Corrections & Fixes
