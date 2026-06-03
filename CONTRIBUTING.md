@@ -38,7 +38,7 @@ BREAKING CHANGE: <what changed and how to migrate>
 
 ## Release Process
 
-Releases are **fully automated**. Push (or merge a PR) to `main` and semantic-release will:
+Releases are **fully automated**. Push (or merge a PR) to `main` for a stable release, or to `next` for an RC release, and semantic-release will:
 
 1. Analyse commits since the last tag
 2. Validate all presets (`renovate-config-validator --strict`)
@@ -46,7 +46,7 @@ Releases are **fully automated**. Push (or merge a PR) to `main` and semantic-re
 4. Generate / prepend to `CHANGELOG.md`
 5. Push a `chore(release): vX.Y.Z [skip ci]` commit
 6. Create a `vX.Y.Z` Git tag
-7. Publish a GitHub Release with the three preset files attached as assets
+7. Publish a GitHub Release with the preset files attached as assets
 8. Comment on any issue/PR that ships in the release
 
 ### Pre-release channels
@@ -54,12 +54,13 @@ Releases are **fully automated**. Push (or merge a PR) to `main` and semantic-re
 | Branch | Channel | Tag example |
 |---|---|---|
 | `main` | stable | `v1.2.0` |
-| `beta` | beta | `v1.2.0-beta.1` |
-| `alpha` | alpha | `v1.2.0-alpha.1` |
+| `next` | rc | `v1.2.0-rc.1` |
+
+This repository's Renovate configuration targets `next`, so dependency updates publish RC tags for downstream testing before being promoted to `main`.
 
 ### Required secret
 
-`RELEASE_TOKEN` must be set in the repo (or org) secrets: a fine-grained GitHub PAT with **Contents read/write**, **Issues read/write**, **Pull requests read/write**, and permission to bypass branch protection on `main`. Without it the workflow falls back to `GITHUB_TOKEN`, which cannot push the changelog commit through branch protection.
+`WEBGRIP_CI_APP_ID` and `WEBGRIP_CI_APP_PRIVATE_KEY` must be set in the repo (or org) secrets. The shared semantic-release workflow uses the GitHub App token to push release commits/tags and publish GitHub Releases.
 
 ## Code Owners
 

@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - beta
-      - alpha
+      - next
     paths:
       - default.json
       - grouped.json
@@ -15,7 +14,6 @@ on:
       - package.json
       - package-lock.json
       - .nvmrc
-      - .github/workflows/on_source_change.yml
 
 concurrency:
   group: release-${{ github.ref }}
@@ -58,7 +56,7 @@ jobs:
     needs:
       - validate
       - validate-all
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/alpha'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
     permissions:
       contents: write
       issues: write

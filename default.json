@@ -154,12 +154,15 @@
       ]
     },
     {
-      "description": "Pin GitHub Actions to immutable digests and require approval",
+      "description": "Pin GitHub Actions to immutable digests and treat workflow updates as CI-only",
       "matchManagers": [
         "github-actions"
       ],
       "pinDigests": true,
       "dependencyDashboardApproval": true,
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "actions",
+      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
       "addLabels": [
         "github-actions"
       ]
