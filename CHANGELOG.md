@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.4.4](https://github.com/webgrip/renovate-config/compare/v1.4.3...v1.4.4) (2026-06-03)
+
+### 🐛 Rule Corrections & Fixes
+
+* **config:** set internalChecksFilter to none ([#12](https://github.com/webgrip/renovate-config/issues/12)) ([668da07](https://github.com/webgrip/renovate-config/commit/668da07a59ba32ca5a608299b11a4f242d87cb90))
+
 ## [1.4.3](https://github.com/webgrip/renovate-config/compare/v1.4.2...v1.4.3) (2026-06-03)
 
 ### 🐛 Rule Corrections & Fixes
