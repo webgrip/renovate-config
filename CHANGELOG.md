@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.4.1](https://github.com/webgrip/renovate-config/compare/v1.4.0...v1.4.1) (2026-06-03)
+
+### 🐛 Rule Corrections & Fixes
+
+* **renovate:** skip stability days for preset self-updates ([#10](https://github.com/webgrip/renovate-config/issues/10)) ([4f6e929](https://github.com/webgrip/renovate-config/commit/4f6e92900b873720c6696f36c732692d99947f1e))
+
 ## [1.4.0](https://github.com/webgrip/renovate-config/compare/v1.3.7...v1.4.0) (2026-06-03)
 
 ### 🚀 New Preset Rules & Features
