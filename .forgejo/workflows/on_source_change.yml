@@ -1,0 +1,86 @@
+name: On Source Change
+
+# Forgejo mirror of the former .github/workflows/on_source_change.yml. Adaptations:
+#   - runs-on: docker (the only label the in-cluster runner advertises)
+#   - checkout@v5 (v6 is broken on non-GitHub runners)
+#   - release calls the .forgejo reusable; GitHub-App auth dropped for the webgrip-ci bot's FORGEJO_TOKEN
+#   - semantic-release publishes via the Gitea plugin (the shared .releaserc.js gates on GITEA_ACTIONS)
+
+on:
+  push:
+    branches:
+      - main
+      - next
+    paths:
+      - .forgejo/workflows/on_source_change.yml
+      - default.json
+      - grouped.json
+      - safe-automerge.json
+      - gitops.json
+      - .releaserc.js
+      - package.json
+      - package-lock.json
+      - .nvmrc
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: validate (${{ matrix.preset }})
+    runs-on: docker
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - default.json
+          - grouped.json
+          - safe-automerge.json
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Validate ${{ matrix.preset }}
+        run: npm run validate:preset -- ${{ matrix.preset }}
+
+  validate-all:
+    name: validate all presets
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Validate full preset suite
+        run: npm run validate
+
+  # Normal job (runs-on: docker) + step-level composite action — NOT a job-level `uses:` reusable.
+  # A job-level reusable must omit runs-on, which makes Forgejo v15 flatten its inner jobs into this
+  # graph and stop `needs`/`if` from gating reliably; infra uses this normal-job shape for exactly that
+  # reason. The composite action is pinned to an ABSOLUTE URL (step-level `uses:` otherwise resolves
+  # against data.forgejo.org → 404). It self-checks-out with the bot token and installs the gitea plugin.
+  release:
+    name: Semantic Release
+    needs:
+      - validate
+      - validate-all
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
+    runs-on: docker
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      statuses: write
+    steps:
+      - name: Semantic Release
+        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@main
+        with:
+          token: ${{ secrets.FORGEJO_TOKEN }}

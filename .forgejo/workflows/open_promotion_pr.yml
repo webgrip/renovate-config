@@ -1,0 +1,51 @@
+name: Open promotion PR
+
+# Forgejo mirror of the former .github/workflows/open_promotion_pr.yml.
+# `gh` CLI is GitHub-only — translated to Forgejo REST (server_url is the in-cluster Forgejo the runner
+# sees). Inert until a `next` branch exists; kept for the RC -> stable promotion flow.
+
+on:
+  push:
+    branches:
+      - next
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-promotion-pr:
+    name: open next to main PR
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v5
+      - name: Open or keep promotion PR
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          API: ${{ github.server_url }}/api/v1/repos/${{ github.repository }}
+        run: |
+          set -euo pipefail
+          auth="Authorization: token ${FORGEJO_TOKEN}"
+
+          existing="$(curl -fsS -H "$auth" "${API}/pulls?state=open&base=main" \
+            | python3 -c 'import sys,json; print(sum(1 for p in json.load(sys.stdin) if (p.get("head") or {}).get("ref")=="next"))')"
+          if [ "$existing" != "0" ]; then
+            echo "Promotion PR already open."
+            exit 0
+          fi
+
+          total="$(curl -fsS -H "$auth" "${API}/compare/main...next" \
+            | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("total_commits", len(d.get("commits") or [])))')"
+          if [ "${total:-0}" = "0" ]; then
+            echo "next has no changes ahead of main."
+            exit 0
+          fi
+
+          body='Promotes the tested RC state from `next` to `main` for a stable release.
+
+          **Merge with a merge commit or rebase merge — do not squash.** semantic-release needs the original semantic commits to determine the stable version.'
+
+          curl -fsS -H "$auth" -H "Content-Type: application/json" -X POST "${API}/pulls" \
+            -d "$(python3 -c 'import json,sys; print(json.dumps({"head":"next","base":"main","title":"chore(release): promote next to main","body":sys.argv[1]}))' "$body")"
+          echo "Opened promotion PR."
