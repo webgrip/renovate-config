@@ -11,6 +11,17 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.4.5](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.4.4...v1.4.5) (2026-06-29)
+
+### 🐛 Rule Corrections & Fixes
+
+* **safe-automerge:** use addLabels so automerge PRs keep inherited labels ([44fbffb](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/44fbffba5a221db3c3c6e904b6507817a17f6c77))
+
+### ⚙️ CI / CD
+
+* port CI to Forgejo Actions; gate releaserc on GITEA_ACTIONS ([613e5cc](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/613e5cc068edabc1bc146e3b1a5d9f1201ab9ab0))
+* re-trigger after GITEA_URL fallback fix in shared action ([6c9b22f](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/6c9b22f0146665869b9a8d18242d3d0048b9230b))
+
 ## [1.4.4](https://github.com/webgrip/renovate-config/compare/v1.4.3...v1.4.4) (2026-06-03)
 
 ### 🐛 Rule Corrections & Fixes
