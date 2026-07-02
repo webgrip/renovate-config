@@ -1,0 +1,5 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Forgejo-platform overrides. Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides.",
+  "force": { "prCreation": "immediate" }
+}
