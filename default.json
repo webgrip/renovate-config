@@ -205,6 +205,18 @@
                 "peerDependencies"
             ],
             "enabled": false
+        },
+        {
+            "description": "Never digest-pin mise-managed tools. The mise manager cannot write digests into .mise.toml aqua/backend entries — the replace never applies ('Digest is not updated') and, like the preset-reference case above, the single failed dep aborts the whole grouped branch ('Error updating branch: update failure' on renovate/mise-tools). Version pins remain enabled.",
+            "matchManagers": [
+                "mise"
+            ],
+            "matchUpdateTypes": [
+                "pinDigest",
+                "digest"
+            ],
+            "enabled": false,
+            "pinDigests": false
         }
     ]
 }
