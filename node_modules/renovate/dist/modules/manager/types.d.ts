@@ -1,0 +1,331 @@
+import { Category } from "../../constants/category.js";
+import { AdditionalConstraintName, ConstraintName } from "../../util/exec/types.js";
+import { Timestamp } from "../../util/timestamp.js";
+import { RegistryStrategy } from "../datasource/types.js";
+import { FileChange } from "../../util/git/types.js";
+import { MergeConfidence } from "../../util/merge-confidence/types.js";
+import { ModuleApi } from "../../types/base.js";
+import { SkipReason, StageName } from "../../types/skip-reason.js";
+import { RangeStrategy } from "../../types/versioning.js";
+import { MaybePromise, Nullish } from "../../types/index.js";
+import { CustomExtractConfig } from "./custom/types.js";
+import { MatchStringsStrategy, ToolSettingsOptions, UpdateType, ValidationMessage } from "../../config/types.js";
+import { ReleaseType } from "semver";
+
+//#region lib/modules/manager/types.d.ts
+interface ManagerData<T> {
+  managerData?: T;
+}
+interface ExtractConfig extends CustomExtractConfig {
+  registryAliases?: Record<string, string>;
+  npmrc?: string;
+  npmrcMerge?: boolean;
+  skipInstalls?: boolean | null;
+  repository?: string;
+  currentDigest?: string;
+  newDigest?: string | null;
+}
+interface UpdateArtifactsConfig {
+  isLockFileMaintenance?: boolean;
+  constraints?: Partial<Record<ConstraintName, string>>;
+  composerIgnorePlatformReqs?: string[];
+  goGetDirs?: string[];
+  currentValue?: string;
+  postUpdateOptions?: string[];
+  ignorePlugins?: boolean;
+  ignoreScripts?: boolean;
+  updateType?: UpdateType;
+  newValue?: string;
+  newVersion?: string;
+  newMajor?: number;
+  registryAliases?: Record<string, string>;
+  skipArtifactsUpdate?: boolean;
+  lockFiles?: string[];
+  toolSettings?: ToolSettingsOptions;
+}
+interface RangeConfig<T = Record<string, any>> extends ManagerData<T> {
+  currentValue?: string;
+  depName?: string;
+  depType?: string;
+  manager?: string;
+  rangeStrategy?: RangeStrategy;
+}
+interface PackageFileContent<T = Record<string, any>> extends ManagerData<T> {
+  autoReplaceStringTemplate?: string;
+  extractedConstraints?: Partial<Record<ConstraintName, string>>;
+  /**
+   * Any specific overrides for the versioning for the `AdditionalConstraintName`s.
+   */
+  constraintsVersioning?: Partial<Record<AdditionalConstraintName, string>>;
+  datasource?: string;
+  registryUrls?: string[];
+  additionalRegistryUrls?: string[];
+  deps: PackageDependency<T>[];
+  lockFiles?: string[];
+  npmrc?: string;
+  packageFileVersion?: string;
+  skipInstalls?: boolean | null;
+  matchStrings?: string[];
+  matchStringsStrategy?: MatchStringsStrategy;
+  fileFormat?: string;
+}
+interface PackageFile<T = Record<string, any>> extends PackageFileContent<T> {
+  packageFile: string;
+}
+interface LookupUpdate {
+  bucket?: string;
+  branchName?: string;
+  commitMessageAction?: string;
+  isBump?: boolean;
+  isLockfileUpdate?: boolean;
+  isPin?: boolean;
+  isPinDigest?: boolean;
+  isRange?: boolean;
+  isRollback?: boolean;
+  isReplacement?: boolean;
+  isSingleVersion?: boolean;
+  isVulnerabilityAlert?: boolean;
+  newDigest?: string | null;
+  newMajor?: number;
+  newMinor?: number;
+  newPatch?: number;
+  newName?: string;
+  newNameSanitized?: string;
+  newValue?: string;
+  semanticCommitType?: string;
+  pendingChecks?: boolean;
+  pendingVersions?: string[];
+  newVersion?: string;
+  updateType?: UpdateType;
+  /**
+   *  where this is set?
+   * @deprecated Never set?
+   */
+  updateTypes?: UpdateType[];
+  isBreaking?: boolean;
+  mergeConfidenceLevel?: MergeConfidence | undefined;
+  userStrings?: Record<string, string>;
+  checksumUrl?: string;
+  downloadUrl?: string;
+  releaseTimestamp?: Timestamp;
+  newVersionAgeInDays?: number;
+  registryUrl?: string;
+  libYears?: number;
+  version?: string;
+  /**
+   * Whether the package registry has attestation information for the given update.
+   *
+   * Renovate does NOT validate the attestation, only determine whether the field is present and set to a value.
+   */
+  hasAttestation?: boolean;
+  prBodyNotes?: string[];
+}
+/**
+ * @property {string} depName - Display name of the package. See #16012
+ * @property {string} packageName - The name of the package, used in comparisons. depName is used as fallback if this is not set. See #16012
+ */
+interface PackageDependency<T = Record<string, any>, DepType extends string = string> extends ManagerData<T> {
+  currentValue?: string | null;
+  currentDigest?: string;
+  depName?: string;
+  depType?: DepType;
+  fileReplacePosition?: number;
+  sharedVariableName?: string;
+  lineNumber?: number;
+  packageName?: string;
+  target?: string;
+  versioning?: string;
+  dataType?: string;
+  enabled?: boolean;
+  bumpVersion?: ReleaseType;
+  npmPackageAlias?: boolean;
+  packageFileVersion?: string;
+  gitRef?: boolean;
+  sourceUrl?: string | null;
+  pinDigests?: boolean;
+  currentRawValue?: string;
+  major?: {
+    enabled?: boolean;
+  };
+  prettyDepType?: string;
+  newValue?: string;
+  warnings?: ValidationMessage[];
+  commitMessageTopic?: string;
+  currentDigestShort?: string;
+  datasource?: string;
+  deprecationMessage?: string;
+  digestOneAndOnly?: boolean;
+  fixedVersion?: string;
+  currentVersion?: string;
+  currentVersionTimestamp?: string;
+  lockedVersion?: string;
+  propSource?: string;
+  registryUrls?: string[] | null;
+  rangeStrategy?: RangeStrategy;
+  skipReason?: SkipReason;
+  skipStage?: StageName;
+  sourceLine?: number;
+  newVersion?: string;
+  updates?: LookupUpdate[];
+  replaceString?: string;
+  autoReplaceStringTemplate?: string;
+  editFile?: string;
+  separateMinorPatch?: boolean;
+  extractVersion?: string;
+  isInternal?: boolean;
+  variableName?: string;
+  indentation?: string;
+  /**
+   * override data source's default strategy.
+   */
+  registryStrategy?: RegistryStrategy;
+  mostRecentTimestamp?: Timestamp;
+  isAbandoned?: boolean;
+  /**
+   * Whether the package registry has attestation information for the given update.
+   *
+   * Renovate does NOT validate the attestation, only determine whether the field is present and set to a value.
+   */
+  hasAttestation?: boolean;
+}
+interface Upgrade<T = Record<string, any>, DepType extends string = string> extends PackageDependency<T, DepType> {
+  workspace?: string;
+  isLockfileUpdate?: boolean;
+  currentRawValue?: any;
+  depGroup?: string;
+  lockFiles?: string[];
+  manager?: string;
+  name?: string;
+  newDigest?: string | null;
+  newFrom?: string;
+  newMajor?: number;
+  newName?: string;
+  newValue?: string;
+  packageFile?: string;
+  rangeStrategy?: RangeStrategy;
+  newVersion?: string;
+  updateType?: UpdateType;
+  version?: string;
+  isLockFileMaintenance?: boolean;
+  isRemediation?: boolean;
+  isVulnerabilityAlert?: boolean;
+  vulnerabilitySeverity?: string;
+  registryUrls?: string[] | null;
+  currentVersion?: string;
+  replaceString?: string;
+  replacementApproach?: 'replace' | 'alias';
+}
+interface ArtifactNotice {
+  file: string;
+  message: string;
+}
+interface ArtifactError {
+  fileName?: string;
+  stderr?: string;
+}
+type UpdateArtifactsResult = {
+  file?: FileChange;
+  notice?: ArtifactNotice;
+  artifactError?: undefined;
+} | {
+  file?: undefined;
+  notice?: undefined;
+  artifactError?: ArtifactError;
+};
+interface UpdateArtifact<T = Record<string, unknown>> {
+  packageFileName: string;
+  updatedDeps: Upgrade<T>[];
+  newPackageFileContent: string;
+  config: UpdateArtifactsConfig;
+}
+interface UpdateDependencyConfig<T = Record<string, any>> {
+  fileContent: string;
+  packageFile: string;
+  upgrade: Upgrade<T>;
+}
+interface BumpPackageVersionResult {
+  bumpedContent: string | null;
+}
+interface UpdateLockedConfig {
+  packageFile: string;
+  packageFileContent?: string;
+  lockFile: string;
+  lockFileContent?: string;
+  depName: string;
+  currentVersion: string;
+  newVersion: string;
+  allowParentUpdates?: boolean;
+  allowHigherOrRemoved?: boolean;
+}
+interface UpdateLockedResult {
+  status: 'unsupported' | 'updated' | 'already-updated' | 'update-failed';
+  files?: Record<string, string>;
+}
+interface GlobalManagerConfig {
+  npmrc?: string;
+  npmrcMerge?: boolean;
+}
+interface DepTypeMetadata {
+  /**
+   * The raw depType set on a given PackageDependency
+   *
+   * @see PackageDependency
+   */
+  depType: string;
+  /**
+   * An alternate name for the `depType`, derived from the Manager's `prettyDepType` used.
+   *
+   * For instance, `optionalDependencies` may have a `prettyDepType` of `optionalDependency`
+   *
+   * Not supported by all Managers.
+   * */
+  prettyDepType?: string;
+  /** Human-readable description of what this depType represents */
+  description: string;
+}
+interface ManagerApiBase extends ModuleApi {
+  defaultConfig: Record<string, unknown>;
+  categories?: Category[];
+  knownDepTypes?: readonly DepTypeMetadata[];
+  /** Markdown note about dynamically generated depTypes not covered by `knownDepTypes` */
+  supportsDynamicDepTypesNote?: string;
+  supportsLockFileMaintenance?: boolean;
+  lockFileNames?: string[];
+  supersedesManagers?: string[];
+  supportedDatasources: string[];
+  bumpPackageVersion?(content: string, currentValue: string, bumpVersion: ReleaseType, packageFile: string): MaybePromise<BumpPackageVersionResult>;
+  detectGlobalConfig?(): MaybePromise<GlobalManagerConfig>;
+  extractAllPackageFiles?(config: ExtractConfig, files: string[]): MaybePromise<PackageFile[] | null>;
+  extractPackageFile?(content: string, packageFile?: string, config?: ExtractConfig): MaybePromise<PackageFileContent | null>;
+  getRangeStrategy?(config: RangeConfig): RangeStrategy;
+  updateArtifacts?(updateArtifact: UpdateArtifact): MaybePromise<UpdateArtifactsResult[] | null>;
+  updateDependency?(updateDependencyConfig: UpdateDependencyConfig): MaybePromise<string | null>;
+  updateLockedDependency?(config: UpdateLockedConfig): MaybePromise<UpdateLockedResult>;
+}
+type ManagerApi = ManagerApiBase & ({
+  supportsLockFileMaintenance: true;
+  lockFileNames: string[];
+} | {
+  supportsLockFileMaintenance?: false;
+  lockFileNames?: string[];
+});
+interface PostUpdateConfig<T = Record<string, any>> extends Record<string, any>, ManagerData<T> {
+  constraints?: Partial<Record<ConstraintName, string>> | null;
+  updatedPackageFiles?: FileChange[];
+  postUpdateOptions?: string[];
+  skipArtifactsUpdate?: boolean;
+  skipInstalls?: boolean | null;
+  ignoreScripts?: boolean;
+  packageFile?: string;
+  upgrades: Upgrade[];
+  npmLock?: string;
+  yarnLock?: string;
+  branchName: string;
+  reuseExistingBranch?: boolean;
+  toolSettings?: ToolSettingsOptions;
+  minimumReleaseAge?: Nullish<string>;
+  isLockFileMaintenance?: boolean;
+}
+//#endregion
+export { ArtifactError, ArtifactNotice, BumpPackageVersionResult, DepTypeMetadata, ExtractConfig, GlobalManagerConfig, LookupUpdate, ManagerApi, ManagerData, PackageDependency, PackageFile, PackageFileContent, PostUpdateConfig, RangeConfig, UpdateArtifact, UpdateArtifactsConfig, UpdateArtifactsResult, UpdateDependencyConfig, UpdateLockedConfig, UpdateLockedResult, Upgrade };
+//# sourceMappingURL=types.d.ts.map

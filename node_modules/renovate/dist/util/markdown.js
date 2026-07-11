@@ -1,0 +1,36 @@
+import { regEx } from "./regex.js";
+import { remark } from "remark";
+import gfm from "remark-gfm";
+import github from "remark-github";
+//#region lib/util/markdown.ts
+function sanitizeMarkdown(markdown) {
+	let res = markdown;
+	res = res.replace(regEx(/(\W)#(\d)/gi), "$1#&#8203;$2");
+	res = res.replace(regEx(/@/g), "@&#8203;");
+	res = res.replace(regEx(/(`\[?@)&#8203;/g), "$1");
+	res = res.replace(regEx(/([a-z]@)&#8203;/gi), "$1");
+	res = res.replace(regEx(/\/compare\/@&#8203;/g), "/compare/@");
+	res = res.replace(regEx(/(\(https:\/\/[^)]*?)\.\.\.@&#8203;/g), "$1...@");
+	res = res.replace(regEx(/([\s(])#(\d+)([)\s]?)/g), "$1#&#8203;$2$3");
+	const backTickRe = regEx(/&#x60;([^/]*?)&#x60;/g);
+	res = res.replace(backTickRe, "`$1`");
+	res = res.replace(regEx(/`#&#8203;(\d+)`/g), "`#$1`");
+	res = res.replace(regEx(/(?<before>[^\n]\n)(?<title>#.*)/g), "$<before>\n$<title>");
+	return res;
+}
+/**
+*
+* @param content content to process
+* @param options github options
+* @returns linkified content
+*/
+async function linkify(content, options) {
+	return (await remark().use({ settings: { bullet: "-" } }).use(gfm).use(github, {
+		mentionStrong: false,
+		...options
+	}).process(content)).toString();
+}
+//#endregion
+export { linkify, sanitizeMarkdown };
+
+//# sourceMappingURL=markdown.js.map

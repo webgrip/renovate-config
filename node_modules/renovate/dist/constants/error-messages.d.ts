@@ -1,0 +1,60 @@
+//#region lib/constants/error-messages.d.ts
+declare const SYSTEM_INSUFFICIENT_DISK_SPACE = "disk-space";
+declare const SYSTEM_INSUFFICIENT_MEMORY = "out-of-memory";
+declare const SystemErrors: readonly ["disk-space", "out-of-memory"];
+declare const PLATFORM_AUTHENTICATION_ERROR = "authentication-error";
+declare const PLATFORM_BAD_CREDENTIALS = "bad-credentials";
+declare const PLATFORM_GPG_FAILED = "gpg-failed";
+declare const PLATFORM_INTEGRATION_UNAUTHORIZED = "integration-unauthorized";
+declare const PLATFORM_NOT_FOUND = "platform-not-found";
+declare const PLATFORM_RATE_LIMIT_EXCEEDED = "rate-limit-exceeded";
+declare const PLATFORM_UNKNOWN_ERROR = "platform-unknown-error";
+declare const PlatformErrors: readonly ["authentication-error", "bad-credentials", "gpg-failed", "integration-unauthorized", "platform-not-found", "rate-limit-exceeded", "platform-unknown-error"];
+declare const CONFIG_VALIDATION = "config-validation";
+declare const CONFIG_PRESETS_INVALID = "config-presets-invalid";
+declare const CONFIG_SECRETS_EXPOSED = "config-secrets-exposed";
+declare const CONFIG_SECRETS_INVALID = "config-secrets-invalid";
+declare const CONFIG_VARIABLES_INVALID = "config-variables-invalid";
+declare const CONFIG_GIT_URL_UNAVAILABLE = "config-git-url-unavailable";
+declare const CONFIG_INHERIT_NOT_FOUND = "config-inherit-not-found";
+declare const CONFIG_INHERIT_PARSE_ERROR = "config-inherit-parse-error";
+declare const ConfigErrors: readonly ["config-validation", "config-presets-invalid", "config-secrets-exposed", "config-secrets-invalid", "config-variables-invalid", "config-git-url-unavailable", "config-inherit-not-found", "config-inherit-parse-error"];
+declare const REPOSITORY_ACCESS_FORBIDDEN = "forbidden";
+declare const REPOSITORY_ARCHIVED = "archived";
+declare const REPOSITORY_BLOCKED = "blocked";
+declare const REPOSITORY_CANNOT_FORK = "cannot-fork";
+declare const REPOSITORY_DISABLED = "disabled";
+declare const REPOSITORY_CLOSED_ONBOARDING = "disabled-closed-onboarding";
+declare const REPOSITORY_DISABLED_BY_CONFIG = "disabled-by-config";
+declare const REPOSITORY_NO_CONFIG = "disabled-no-config";
+declare const REPOSITORY_EMPTY = "empty";
+declare const REPOSITORY_FORK_MISSING = "fork-missing";
+declare const REPOSITORY_FORK_MODE_FORKED = "fork-mode-forked";
+declare const REPOSITORY_FORKED = "fork";
+declare const REPOSITORY_MIRRORED = "mirror";
+declare const REPOSITORY_NOT_FOUND = "not-found";
+declare const REPOSITORY_NO_PACKAGE_FILES = "no-package-files";
+declare const REPOSITORY_RENAMED = "renamed";
+declare const REPOSITORY_UNINITIATED = "uninitiated";
+/** cause repo to be considered as disabled */
+declare const RepositoryErrors: readonly ["forbidden", "archived", "blocked", "cannot-fork", "disabled", "disabled-closed-onboarding", "disabled-by-config", "disabled-no-config", "empty", "fork-missing", "fork-mode-forked", "fork", "mirror", "not-found", "no-package-files", "renamed", "uninitiated"];
+declare const REPOSITORY_CHANGED = "repository-changed";
+declare const TEMPORARY_ERROR = "temporary-error";
+declare const NO_VULNERABILITY_ALERTS = "no-vulnerability-alerts";
+declare const TemporaryErrors: readonly ["repository-changed", "temporary-error", "no-vulnerability-alerts"];
+declare const MANAGER_LOCKFILE_ERROR = "lockfile-error";
+declare const FILE_ACCESS_VIOLATION_ERROR = "file-access-violation-error";
+declare const EXTERNAL_HOST_ERROR = "external-host-error";
+declare const IGNORABLE_HOST_ERROR = "ignorable-host-error";
+declare const HOST_DISABLED = "host-disabled";
+declare const WORKER_FILE_UPDATE_FAILED = "update-failure";
+declare const BUNDLER_INVALID_CREDENTIALS = "bundler-credentials";
+declare const UNKNOWN_ERROR = "unknown-error";
+declare const INVALID_PATH = "invalid-path";
+declare const PAGE_NOT_FOUND_ERROR = "page-not-found";
+declare const MISSING_API_CREDENTIALS = "missing-api-credentials";
+/** Logger not initialized */
+declare const LOGGER_NOT_INITIALIZED = "logger-not-initialized";
+//#endregion
+export { BUNDLER_INVALID_CREDENTIALS, CONFIG_GIT_URL_UNAVAILABLE, CONFIG_INHERIT_NOT_FOUND, CONFIG_INHERIT_PARSE_ERROR, CONFIG_PRESETS_INVALID, CONFIG_SECRETS_EXPOSED, CONFIG_SECRETS_INVALID, CONFIG_VALIDATION, CONFIG_VARIABLES_INVALID, ConfigErrors, EXTERNAL_HOST_ERROR, FILE_ACCESS_VIOLATION_ERROR, HOST_DISABLED, IGNORABLE_HOST_ERROR, INVALID_PATH, LOGGER_NOT_INITIALIZED, MANAGER_LOCKFILE_ERROR, MISSING_API_CREDENTIALS, NO_VULNERABILITY_ALERTS, PAGE_NOT_FOUND_ERROR, PLATFORM_AUTHENTICATION_ERROR, PLATFORM_BAD_CREDENTIALS, PLATFORM_GPG_FAILED, PLATFORM_INTEGRATION_UNAUTHORIZED, PLATFORM_NOT_FOUND, PLATFORM_RATE_LIMIT_EXCEEDED, PLATFORM_UNKNOWN_ERROR, PlatformErrors, REPOSITORY_ACCESS_FORBIDDEN, REPOSITORY_ARCHIVED, REPOSITORY_BLOCKED, REPOSITORY_CANNOT_FORK, REPOSITORY_CHANGED, REPOSITORY_CLOSED_ONBOARDING, REPOSITORY_DISABLED, REPOSITORY_DISABLED_BY_CONFIG, REPOSITORY_EMPTY, REPOSITORY_FORKED, REPOSITORY_FORK_MISSING, REPOSITORY_FORK_MODE_FORKED, REPOSITORY_MIRRORED, REPOSITORY_NOT_FOUND, REPOSITORY_NO_CONFIG, REPOSITORY_NO_PACKAGE_FILES, REPOSITORY_RENAMED, REPOSITORY_UNINITIATED, RepositoryErrors, SYSTEM_INSUFFICIENT_DISK_SPACE, SYSTEM_INSUFFICIENT_MEMORY, SystemErrors, TEMPORARY_ERROR, TemporaryErrors, UNKNOWN_ERROR, WORKER_FILE_UPDATE_FAILED };
+//# sourceMappingURL=error-messages.d.ts.map

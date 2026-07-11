@@ -207,6 +207,7 @@
             "enabled": false
         },
         {
+<<<<<<< HEAD
             "description": "Never digest-pin mise-managed tools. The mise manager cannot write digests into .mise.toml aqua/backend entries — the replace never applies ('Digest is not updated') and, like the preset-reference case above, the single failed dep aborts the whole grouped branch ('Error updating branch: update failure' on renovate/mise-tools). Version pins remain enabled.",
             "matchManagers": [
                 "mise"
@@ -217,6 +218,19 @@
             ],
             "enabled": false,
             "pinDigests": false
+=======
+            "description": "Approval IS the gate: update types that require a dashboard tick skip the release-age soak. Renovate does not persist approvals — a tick on a soak-blocked update is consumed and silently discarded, so double-gating just eats clicks. Soak still applies wherever a repo-level rule re-adds minimumReleaseAge on unattended automerge paths (repo config is applied after presets).",
+            "matchUpdateTypes": [
+                "major",
+                "minor",
+                "patch",
+                "pin",
+                "digest",
+                "replacement",
+                "rollback"
+            ],
+            "minimumReleaseAge": "0 days"
+>>>>>>> 96b87b3 (fix(default): approval-gated update types skip the release-age soak)
         }
     ]
 }

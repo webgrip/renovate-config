@@ -1,0 +1,48 @@
+import { fromBase64 } from "../../../../../../util/string.js";
+import { logger } from "../../../../../../logger/index.js";
+import { GiteaHttp } from "../../../../../../util/http/gitea.js";
+import { Releases } from "../../../../../../modules/datasource/gitea-releases/schema.js";
+import { compareChangelogFilePath } from "../common.js";
+import { ContentsListResponse, ContentsResponse } from "../../../../../../modules/platform/gitea/schema.js";
+import changelogFilenameRegex from "changelog-filename-regex";
+const http = new GiteaHttp("gitea-changelog");
+async function getReleaseNotesMd(repository, apiBaseUrl, sourceDirectory) {
+	logger.trace("gitea.getReleaseNotesMd()");
+	const apiPrefix = `${apiBaseUrl}repos/${repository}/contents`;
+	const sourceDir = sourceDirectory ? `/${sourceDirectory}` : "";
+	const allFiles = (await http.getJson(`${apiPrefix}${sourceDir}`, { paginate: false }, ContentsListResponse)).body.filter((f) => f.type === "file");
+	let files = [];
+	if (!files.length) files = allFiles.filter((f) => changelogFilenameRegex.test(f.name));
+	if (!files.length) {
+		logger.trace("no changelog file found");
+		return null;
+	}
+	const { path: changelogFile } = files.sort((a, b) => compareChangelogFilePath(a.path, b.path)).shift();
+	/* istanbul ignore if */
+	if (files.length !== 0) logger.debug(`Multiple candidates for changelog file, using ${changelogFile}`);
+	const fileRes = await http.getJson(`${apiPrefix}/${changelogFile}`, ContentsResponse);
+	// istanbul ignore if: should never happen
+	if (!fileRes.body.content) {
+		logger.debug(`Missing content for changelog file, using ${changelogFile}`);
+		return null;
+	}
+	return {
+		changelogFile,
+		changelogMd: `${fromBase64(fileRes.body.content)}\n#\n##`
+	};
+}
+async function getReleaseList(project, _release) {
+	logger.trace("gitea.getReleaseNotesMd()");
+	const apiUrl = `${project.apiBaseUrl}repos/${project.repository}/releases`;
+	return (await http.getJson(`${apiUrl}?draft=false`, { paginate: true }, Releases)).body.map((release) => ({
+		url: `${project.baseUrl}${project.repository}/releases/tag/${release.tag_name}`,
+		notesSourceUrl: apiUrl,
+		name: release.name,
+		body: release.body,
+		tag: release.tag_name
+	}));
+}
+//#endregion
+export { getReleaseList, getReleaseNotesMd };
+
+//# sourceMappingURL=index.js.map
