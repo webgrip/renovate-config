@@ -21,20 +21,20 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Process Flux OCIRepository tags; digest fields should be refreshed by a repo-local post-upgrade task when used.",
+      "description": "Process Flux OCIRepository tags and (when present) spec.ref.digest, so an upstream tag re-push surfaces as a digest-only update instead of silently drifting from the pinned digest. Digest insertion on new entries is still owned by repo-local post-upgrade tasks.",
       "managerFilePatterns": [
         "/(^|/)kubernetes/apps/.+/ocirepository\\.ya?ml(?:\\.j2)?$/"
       ],
       "matchStrings": [
-        "kind:\\s*OCIRepository[\\s\\S]*?ref:\\s*\\n[\\s\\S]*?tag:\\s*(?<currentValue>\\S+)[\\s\\S]*?url:\\s*oci://(?<depName>\\S+)",
-        "kind:\\s*OCIRepository[\\s\\S]*?url:\\s*oci://(?<depName>\\S+)[\\s\\S]*?ref:\\s*\\n[\\s\\S]*?tag:\\s*(?<currentValue>\\S+)"
+        "kind:\\s*OCIRepository[\\s\\S]*?ref:\\s*\\n[\\s\\S]*?tag:\\s*(?<currentValue>\\S+)(?:\\s+digest:\\s*(?<currentDigest>sha256:[a-f0-9]{64}))?[\\s\\S]*?url:\\s*oci://(?<depName>\\S+)",
+        "kind:\\s*OCIRepository[\\s\\S]*?url:\\s*oci://(?<depName>\\S+)[\\s\\S]*?ref:\\s*\\n[\\s\\S]*?tag:\\s*(?<currentValue>\\S+)(?:\\s+digest:\\s*(?<currentDigest>sha256:[a-f0-9]{64}))?"
       ],
       "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
     {
-      "description": "Manage Flux OCIRepository tags without asking Renovate to calculate digest-only OCI Helm chart updates.",
+      "description": "Manage Flux OCIRepository tags; keep pinDigests off so Renovate never appends @sha256 to the tag field (spec.ref.digest is a separate YAML key).",
       "matchManagers": [
         "custom.regex"
       ],
@@ -50,7 +50,7 @@
       "pinDigests": false
     },
     {
-      "description": "Disable digest-only and pin-digest updates for Flux OCIRepository custom regex deps; repo-local post-upgrade tasks own spec.ref.digest.",
+      "description": "Disable pin-digest updates for Flux OCIRepository custom regex deps (initial digest insertion is owned by repo-local post-upgrade tasks). Digest updates stay enabled: the manager captures currentDigest, so upstream tag re-pushes become reviewable digest-only PRs instead of wedging digest-verification CI.",
       "matchManagers": [
         "custom.regex"
       ],
@@ -62,8 +62,7 @@
         "docker"
       ],
       "matchUpdateTypes": [
-        "pinDigest",
-        "digest"
+        "pinDigest"
       ],
       "enabled": false
     },
