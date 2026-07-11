@@ -11,6 +11,13 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.5.0](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.4.5...v1.5.0) (2026-07-11)
+
+### 🚀 New Preset Rules & Features
+
+* add forgejo platform preset (force prCreation immediate) ([4d22923](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/4d22923ff0f716ad893e42840c9effdb88e06642))
+* **gitops:** manage OCIRepository spec.ref.digest so tag re-pushes self-heal ([4440508](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/444050853904d3dafaab91a6cab97aabaf9687c1))
+
 ## [1.4.5](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.4.4...v1.4.5) (2026-06-29)
 
 ### 🐛 Rule Corrections & Fixes
