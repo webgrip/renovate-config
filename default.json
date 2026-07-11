@@ -193,6 +193,13 @@
             "minimumReleaseAge": "0 days"
         },
         {
+            "description": "Never digest-pin the shared preset reference. It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'github>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run.",
+            "matchPackageNames": [
+                "webgrip/renovate-config"
+            ],
+            "pinDigests": false
+        },
+        {
             "description": "Disable peer dependency updates to avoid range-only churn",
             "matchDepTypes": [
                 "peerDependencies"
