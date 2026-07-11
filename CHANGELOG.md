@@ -11,6 +11,12 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.5.1](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.5.0...v1.5.1) (2026-07-11)
+
+### 🐛 Rule Corrections & Fixes
+
+* **default:** never digest-pin the shared preset reference ([e973e7c](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/e973e7c6ac0d7f630332cf472d12cf1950b9acd4))
+
 ## [1.5.0](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.4.5...v1.5.0) (2026-07-11)
 
 ### 🚀 New Preset Rules & Features
