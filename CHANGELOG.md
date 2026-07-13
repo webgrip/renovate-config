@@ -11,6 +11,17 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
+## [1.5.3](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.5.2...v1.5.3) (2026-07-13)
+
+### 🐛 Rule Corrections & Fixes
+
+* **default:** approval-gated update types skip the release-age soak ([de5d372](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/de5d37275529b4b91423191fdeaf67a62a32a767))
+* **default:** resolve conflict markers committed in de5d372 ([cfdad9e](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/cfdad9eb7df972effc8f1d0d06aa8d313692e8df))
+
+### 🔧 Maintenance
+
+* added .gitignore for node_modules ([eaa1026](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/eaa10264e823bc420e67d0feb611d0bfdd1e723e))
+
 ## [1.5.2](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.5.1...v1.5.2) (2026-07-11)
 
 ### 🐛 Rule Corrections & Fixes
