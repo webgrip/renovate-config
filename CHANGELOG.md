@@ -11,46 +11,46 @@ Consumers should **always pin to a release tag**:
 > **Breaking changes** (`feat!`) bump the major version and include migration notes in the release body.
 > Subscribers to this repo's releases will be notified automatically.
 
-## [1.5.3](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.5.2...v1.5.3) (2026-07-13)
+## [1.5.3](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.5.2...v1.5.3) (2026-07-13)
 
 ### 🐛 Rule Corrections & Fixes
 
-* **default:** approval-gated update types skip the release-age soak ([de5d372](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/de5d37275529b4b91423191fdeaf67a62a32a767))
-* **default:** resolve conflict markers committed in de5d372 ([cfdad9e](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/cfdad9eb7df972effc8f1d0d06aa8d313692e8df))
+* **default:** approval-gated update types skip the release-age soak ([de5d372](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/de5d37275529b4b91423191fdeaf67a62a32a767))
+* **default:** resolve conflict markers committed in de5d372 ([cfdad9e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/cfdad9eb7df972effc8f1d0d06aa8d313692e8df))
 
 ### 🔧 Maintenance
 
-* added .gitignore for node_modules ([eaa1026](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/eaa10264e823bc420e67d0feb611d0bfdd1e723e))
+* added .gitignore for node_modules ([eaa1026](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/eaa10264e823bc420e67d0feb611d0bfdd1e723e))
 
-## [1.5.2](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.5.1...v1.5.2) (2026-07-11)
-
-### 🐛 Rule Corrections & Fixes
-
-* **default:** never digest-pin mise-managed tools ([5c9b218](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/5c9b21875d92a3cb4bbba263e132dca8f8d7c66a))
-
-## [1.5.1](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.5.0...v1.5.1) (2026-07-11)
+## [1.5.2](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.5.1...v1.5.2) (2026-07-11)
 
 ### 🐛 Rule Corrections & Fixes
 
-* **default:** never digest-pin the shared preset reference ([e973e7c](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/e973e7c6ac0d7f630332cf472d12cf1950b9acd4))
+* **default:** never digest-pin mise-managed tools ([5c9b218](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/5c9b21875d92a3cb4bbba263e132dca8f8d7c66a))
 
-## [1.5.0](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.4.5...v1.5.0) (2026-07-11)
+## [1.5.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.5.0...v1.5.1) (2026-07-11)
+
+### 🐛 Rule Corrections & Fixes
+
+* **default:** never digest-pin the shared preset reference ([e973e7c](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/e973e7c6ac0d7f630332cf472d12cf1950b9acd4))
+
+## [1.5.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.4.5...v1.5.0) (2026-07-11)
 
 ### 🚀 New Preset Rules & Features
 
-* add forgejo platform preset (force prCreation immediate) ([4d22923](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/4d22923ff0f716ad893e42840c9effdb88e06642))
-* **gitops:** manage OCIRepository spec.ref.digest so tag re-pushes self-heal ([4440508](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/444050853904d3dafaab91a6cab97aabaf9687c1))
+* add forgejo platform preset (force prCreation immediate) ([4d22923](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/4d22923ff0f716ad893e42840c9effdb88e06642))
+* **gitops:** manage OCIRepository spec.ref.digest so tag re-pushes self-heal ([4440508](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/444050853904d3dafaab91a6cab97aabaf9687c1))
 
-## [1.4.5](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/compare/v1.4.4...v1.4.5) (2026-06-29)
+## [1.4.5](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.4.4...v1.4.5) (2026-06-29)
 
 ### 🐛 Rule Corrections & Fixes
 
-* **safe-automerge:** use addLabels so automerge PRs keep inherited labels ([44fbffb](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/44fbffba5a221db3c3c6e904b6507817a17f6c77))
+* **safe-automerge:** use addLabels so automerge PRs keep inherited labels ([44fbffb](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/44fbffba5a221db3c3c6e904b6507817a17f6c77))
 
 ### ⚙️ CI / CD
 
-* port CI to Forgejo Actions; gate releaserc on GITEA_ACTIONS ([613e5cc](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/613e5cc068edabc1bc146e3b1a5d9f1201ab9ab0))
-* re-trigger after GITEA_URL fallback fix in shared action ([6c9b22f](http://forgejo-http.forgejo.svc.cluster.local:3000/webgrip/renovate-config/commit/6c9b22f0146665869b9a8d18242d3d0048b9230b))
+* port CI to Forgejo Actions; gate releaserc on GITEA_ACTIONS ([613e5cc](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/613e5cc068edabc1bc146e3b1a5d9f1201ab9ab0))
+* re-trigger after GITEA_URL fallback fix in shared action ([6c9b22f](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/6c9b22f0146665869b9a8d18242d3d0048b9230b))
 
 ## [1.4.4](https://github.com/webgrip/renovate-config/compare/v1.4.3...v1.4.4) (2026-06-03)
 
