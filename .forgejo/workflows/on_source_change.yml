@@ -4,7 +4,7 @@ name: On Source Change
 #   - runs-on: docker (the only label the in-cluster runner advertises)
 #   - checkout@v5 (v6 is broken on non-GitHub runners)
 #   - release calls the .forgejo reusable; GitHub-App auth dropped for the webgrip-ci bot's FORGEJO_TOKEN
-#   - semantic-release publishes via the Gitea plugin (the shared .releaserc.js gates on GITEA_ACTIONS)
+#   - semantic-release publishes via the Gitea plugin (the shared .releaserc.cjs gates on GITEA_ACTIONS)
 #   - GITEA_URL comes from the shared composite action (falls back to github.server_url)
 
 on:
@@ -18,7 +18,7 @@ on:
       - grouped.json
       - safe-automerge.json
       - gitops.json
-      - .releaserc.js
+      - .releaserc.cjs
       - package.json
       - package-lock.json
       - .nvmrc
