@@ -1,3 +1,18 @@
+## [1.5.4](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.5.3...v1.5.4) (2026-07-26)
+
+### 🐛 Rule Corrections & Fixes
+
+* **ci:** release and open promotion PRs as the webgrip-ci bot ([a5cb53f](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/a5cb53f2800e3a61e634ce66841efb69ce7f2a1b))
+* stop marking dependency majors as product-breaking commits ([41c52fe](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/41c52fe2b41e4d581ebf34d1e9e1080446bda0a4))
+
+### 📚 Documentation
+
+* **changelog:** use public forge URL for changelog links ([92ddb6b](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/92ddb6b1b8c84b5e1e7a3a20b37597559ab12dde))
+
+### ⚙️ CI / CD
+
+* adopt @webgrip/semantic-release-config ([23501cc](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/23501cc1ea742cdd18d7a41a440bff02a7a3c02a))
+
 # Changelog
 
 All notable changes to the **Webgrip shared Renovate preset** are documented here.
