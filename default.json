@@ -96,18 +96,16 @@
             "dependencyDashboardApproval": true
         },
         {
-            "description": "Major updates — longest soak time, breaking-change label, feat! commits",
+            "description": "Major updates — longest soak time, major label, plain feat commits: a dependency's major is NOT the consuming product's major (a `!` here cut ploeg v1.0.0-rc.1 off a postgres image bump, 2026-07-26); semantic-release-config also guards deps-scoped breaking as minor",
             "matchUpdateTypes": [
                 "major"
             ],
             "minimumReleaseAge": "14 days",
             "automerge": false,
             "semanticCommitType": "feat",
-            "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:",
             "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
             "addLabels": [
-                "type/major",
-                "breaking-change"
+                "type/major"
             ]
         },
         {
