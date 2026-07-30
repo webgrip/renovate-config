@@ -74,6 +74,48 @@ Use for Kubernetes, Flux, or homelab-style GitOps repositories. Extend it after 
 }
 ```
 
+### Go overlay
+
+Use for any repository with a `go.mod`. Extend it after the default preset:
+
+```json
+{
+  "extends": [
+    "github>webgrip/renovate-config#v1.6.0",
+    "github>webgrip/renovate-config:golang#v1.6.0"
+  ]
+}
+```
+
+The overlay exists because Renovate's out-of-the-box `gomod` behavior leaves a Go repository
+partly unmanaged:
+
+- **Indirect modules are disabled by default.** In Go that default is unsafe in a way it is not
+  for lockfile ecosystems: minimal version selection makes the version written in `go.mod` the
+  exact source that links into the binary, and a dependency Renovate never looks up gets no
+  `osvVulnerabilityAlerts` and no `vulnerabilityAlerts` either. `webgrip/ploeg` shipped
+  `golang.org/x/text` v0.29.0 (CVE-2026-56852, High) in `ploegd` 0.2.0-rc.10 on that default —
+  Trivy found it in the image, Renovate had never had it in scope. The overlay enables
+  `matchDepTypes: ["indirect"]` and groups those bumps into one reviewable PR.
+- **`go.mod` and `go.sum` drift inside the branch** without `postUpdateOptions: ["gomodTidy"]`,
+  and a `/vN` major lands uncompilable without `gomodUpdateImportPaths`. Both are set here.
+- **A Go security fix must not sit behind a group.** Vulnerability updates are explicitly
+  ungrouped (`groupName: null`) so one soaking or red sibling cannot hold the fix.
+- **`golang.org/x/*` is grouped** — those modules release in lockstep and share `go.sum` entries.
+- **Toolchain moves are labelled as such.** The `go` directive keeps Renovate's default (no
+  proposals — it is a minimum-compatibility floor, and raising it is a human decision); the
+  `toolchain` directive and the `golang` Docker builder image land as `chore(go)` with a
+  `go-toolchain` label.
+
+Two things the overlay cannot do for you, because they live in the Renovate runtime config
+rather than in a preset:
+
+- `gomod` must be present in `enabledManagers` for the runner that scans the repository. On the
+  Forgejo path that is `renovate-config-forgejo` in `webgrip/homelab-cluster`. Without it none
+  of the above is reachable — Renovate never opens `go.mod` at all.
+- `gomodTidy` and `gomodUpdateImportPaths` need a Go toolchain in the Renovate image. The
+  `renovate/renovate:*-full` images used by the RenovateJobs have one.
+
 The GitOps overlay intentionally extends specific upstream home-operations presets instead of the entire `github>home-operations/renovate-presets` default, so Webgrip keeps its own dashboard, scheduling, approval, concurrency, and automerge policy from the default preset.
 
 The GitOps overlay adds:

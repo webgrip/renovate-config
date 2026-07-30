@@ -7,7 +7,14 @@ const { makeConfig } = require('@webgrip/semantic-release-config');
 
 module.exports = makeConfig({
   verifyReleaseCmd: "npm run validate && echo 'presets validated'",
-  releaseAssets: ['default.json', 'grouped.json', 'safe-automerge.json', 'gitops.json'],
+  releaseAssets: [
+    'default.json',
+    'grouped.json',
+    'safe-automerge.json',
+    'gitops.json',
+    'golang.json',
+    'forgejo.json',
+  ],
   extraNotesTypes: [
     { type: 'feat', section: '🚀 New Preset Rules & Features' },
     { type: 'fix', section: '🐛 Rule Corrections & Fixes' },

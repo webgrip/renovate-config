@@ -1,0 +1,80 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in Go overlay for repositories with a go.mod. Manages the parts of a Go module graph the gomod manager ignores out of the box (indirect requirements, /vN import paths), keeps go.mod and go.sum coherent inside the branch, and makes toolchain moves legible as toolchain moves. Extend after the default org preset.",
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodUpdateImportPaths"
+  ],
+  "packageRules": [
+    {
+      "description": "Manage indirect Go modules. Renovate disables `// indirect` requirements by default, but Go's minimal version selection makes the version written in go.mod the exact source that links into the binary — an unmanaged indirect is an unpatched indirect, and neither osvVulnerabilityAlerts nor vulnerabilityAlerts fire for a dependency that was never looked up. webgrip/ploeg shipped golang.org/x/text v0.29.0 (CVE-2026-56852, High) in ploegd 0.2.0-rc.10 for exactly this reason: Trivy saw it in the image, Renovate never had it in scope.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "indirect"
+      ],
+      "enabled": true,
+      "groupName": "Go indirect modules",
+      "groupSlug": "go-indirect",
+      "addLabels": [
+        "go"
+      ]
+    },
+    {
+      "description": "Group golang.org/x/* regardless of direct/indirect. They cut releases in lockstep, share go.sum entries, and `go mod tidy` resolves them together — one PR per module just rebases the others for no review value.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchPackageNames": [
+        "golang.org/x/**"
+      ],
+      "groupName": "golang.org/x modules",
+      "groupSlug": "golang-x",
+      "addLabels": [
+        "go"
+      ]
+    },
+    {
+      "description": "Never batch a Go security fix behind a group. A grouped branch is only as fast as its slowest member — one red or soaking sibling holds the whole PR, which is the opposite of what a vulnerability update needs.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchUpdateTypes": [
+        "vulnerability"
+      ],
+      "groupName": null,
+      "groupSlug": null
+    },
+    {
+      "description": "Label and scope Go toolchain moves so they are not mistaken for library bumps. The `go` directive stays on Renovate's default (no updates proposed): it is a minimum-compatibility floor, and raising it drops support for older toolchains — a deliberate human decision, not a dependency bump. The `toolchain` directive does get proposals, and lands as chore(go).",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "golang",
+        "toolchain"
+      ],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "go",
+      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
+      "addLabels": [
+        "go-toolchain"
+      ]
+    },
+    {
+      "description": "Treat the golang builder image the same way: a Dockerfile FROM golang:X is a toolchain move, and it is the one that decides what actually compiles the shipped binary.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "golang",
+        "docker.io/golang",
+        "**/golang"
+      ],
+      "addLabels": [
+        "go-toolchain"
+      ]
+    }
+  ]
+}

@@ -20,7 +20,8 @@ Add opt-in overlays when a repository needs them:
     "github>webgrip/renovate-config#v1.2.1",
     "github>webgrip/renovate-config:grouped#v1.2.1",
     "github>webgrip/renovate-config:safe-automerge#v1.2.1",
-    "github>webgrip/renovate-config:gitops#v1.2.1"
+    "github>webgrip/renovate-config:gitops#v1.2.1",
+    "github>webgrip/renovate-config:golang#v1.2.1"
   ]
 }
 ```
@@ -33,6 +34,7 @@ Add opt-in overlays when a repository needs them:
 | `github>webgrip/renovate-config:grouped` | Opt-in overlay to group non-major updates into fewer PRs |
 | `github>webgrip/renovate-config:safe-automerge` | Opt-in overlay to automerge only digest updates and low-risk GitHub Actions updates after checks pass |
 | `github>webgrip/renovate-config:gitops` | Opt-in GitOps overlay that composes selected `home-operations/renovate-presets` for Kubernetes/Flux/OCI/Talos/CNPG/Grafana extraction plus Webgrip-specific GitOps PR polish |
+| `github>webgrip/renovate-config:golang` | Opt-in Go overlay: manages indirect Go modules (off by default in Renovate), tidies go.mod/go.sum in-branch, rewrites `/vN` import paths, and labels toolchain moves |
 
 ## Repo standards
 
