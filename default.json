@@ -75,11 +75,24 @@
         ],
         "dependencyDashboardApproval": true
     },
+    "prBodyColumns": [
+        "Package",
+        "Type",
+        "Update",
+        "Change",
+        "Released",
+        "Age (d)"
+    ],
+    "prBodyDefinitions": {
+        "Released": "{{#if releaseTimestamp}}{{{releaseTimestamp}}}{{else}}—{{/if}}",
+        "Age (d)": "{{#if newVersionAgeInDays}}{{{newVersionAgeInDays}}}d{{else}}—{{/if}}"
+    },
     "prBodyNotes": [
         "{{#if isMajor}}⚠️ **Major update**: review upstream migration notes and rollout impact before merging.{{/if}}",
         "{{#if isVulnerabilityAlert}}🔒 **Security update**: prioritize review and verify the vulnerable component is actually deployed.{{/if}}",
         "{{#if isGroup}}📦 **Grouped update**: confirm the group is operationally coherent before merging.{{/if}}",
-        "Merge Confidence badges are included where supported — low or neutral confidence warrants a manual impact check before merge."
+        "Merge Confidence badges are included where supported — low or neutral confidence warrants a manual impact check before merge.",
+        "`Released` is the upstream publish time. `—` means this datasource reports no release timestamp — normal for ghcr.io, quay.io and private/proxy registries — so `minimumReleaseAge` cannot hold the update back and it is eligible as soon as checks pass. A real date means the soak is enforced: add this update type's `minimumReleaseAge` to `Released` to get the eligibility moment."
     ],
     "packageRules": [
         {
