@@ -1,3 +1,8 @@
+## 1.6.0 (2026-08-05)
+
+* Merge pull request 'feat: show upstream release time in PR bodies' (#14) from feat/pr-body-release-v ([34815f4](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/34815f4)), closes [#14](https://forgejo.webgrip.dev/webgrip/renovate-config/issues/14)
+* feat: show upstream release time in PR bodies ([8f05775](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/8f05775)), closes [pull-throu#proxy](https://forgejo.webgrip.dev/pull-throu/issues/proxy)
+
 ## [1.5.4](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.5.3...v1.5.4) (2026-07-26)
 
 ### 🐛 Rule Corrections & Fixes
