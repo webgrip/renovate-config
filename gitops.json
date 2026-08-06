@@ -34,7 +34,21 @@
   ],
   "packageRules": [
     {
-      "description": "Manage Flux OCIRepository tags; keep pinDigests off so Renovate never appends @sha256 to the tag field (spec.ref.digest is a separate YAML key).",
+      "description": "MECHANISM — do not remove: Flux OCIRepository tags are updated by the custom.regex manager and pinDigests must stay off. Renovate would otherwise append @sha256 to the tag value, but spec.ref.digest is a separate YAML key, refreshed by repo-local post-upgrade tasks. Split from the grouping rule below (2026-08-06) so consumers can change grouping policy without touching this correctness requirement.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "kubernetes/apps/**/ocirepository.yaml",
+        "kubernetes/apps/**/ocirepository.yml"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "pinDigests": false
+    },
+    {
+      "description": "POLICY — override freely: group Flux OCI Helm chart updates into one PR per update type. Trade-off: one grouped PR saves CI (one pipeline run instead of N) at the cost of all-or-nothing rollback and atomic branch failure — one unresolvable chart aborts the whole group's branch and blocks the rest. Consumers with platform-critical charts should re-group those paths into a non-automerging group locally (see homelab-cluster's 'Flux OCI Helm charts (platform)' override) or set groupName to null to ungroup.",
       "matchManagers": [
         "custom.regex"
       ],
@@ -46,8 +60,7 @@
         "docker"
       ],
       "groupName": "Flux OCI Helm charts",
-      "separateMinorPatch": true,
-      "pinDigests": false
+      "separateMinorPatch": true
     },
     {
       "description": "Disable pin-digest updates for Flux OCIRepository custom regex deps (initial digest insertion is owned by repo-local post-upgrade tasks). Digest updates stay enabled: the manager captures currentDigest, so upstream tag re-pushes become reviewable digest-only PRs instead of wedging digest-verification CI.",
