@@ -89,3 +89,4 @@ jobs:
         uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v2.0.0
         with:
           token: ${{ secrets.WEBGRIP_CI_TOKEN }}
+          install-dependencies: "false"
