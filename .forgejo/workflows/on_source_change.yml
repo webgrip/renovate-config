@@ -52,10 +52,6 @@ jobs:
   validate-all:
     name: validate all presets
     runs-on: docker
-    # The v2 composite installs nothing: the release toolchain IS this image
-    # (webgrip/workflows ADR-0005; without it the job fails with instructions).
-    container:
-      image: harbor.webgrip.dev/webgrip/semantic-release:0.3.2
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
@@ -79,6 +75,10 @@ jobs:
       - validate-all
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
     runs-on: docker
+    # The v2 composite installs nothing: the release toolchain IS this image
+    # (webgrip/workflows ADR-0005; without it the job fails with instructions).
+    container:
+      image: harbor.webgrip.dev/webgrip/semantic-release:0.3.2
     permissions:
       contents: write
       issues: write
