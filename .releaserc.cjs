@@ -5,8 +5,11 @@
 // The emoji section names are kept via extraNotesTypes (prepended, so they win over defaults).
 const { makeConfig } = require('@webgrip/semantic-release-config');
 
+// No verifyReleaseCmd: preset validation is the validate/validate-all jobs, which gate the
+// release job via `needs` — the same command ran there moments earlier. Running it again here
+// required the renovate devDependency tree inside the release container, and installing that
+// tree is what broke the release job on the hardened toolchain image (2026-08-28).
 module.exports = makeConfig({
-  verifyReleaseCmd: "npm run validate && echo 'presets validated'",
   releaseAssets: ['default.json', 'grouped.json', 'safe-automerge.json', 'gitops.json'],
   extraNotesTypes: [
     { type: 'feat', section: '🚀 New Preset Rules & Features' },
