@@ -20,6 +20,9 @@ jobs:
           - default.json
           - grouped.json
           - safe-automerge.json
+          - gitops.json
+          - golang.json
+          - forgejo.json
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4

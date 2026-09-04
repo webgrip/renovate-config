@@ -10,7 +10,14 @@ const { makeConfig } = require('@webgrip/semantic-release-config');
 // required the renovate devDependency tree inside the release container, and installing that
 // tree is what broke the release job on the hardened toolchain image (2026-08-28).
 module.exports = makeConfig({
-  releaseAssets: ['default.json', 'grouped.json', 'safe-automerge.json', 'gitops.json'],
+  releaseAssets: [
+    'default.json',
+    'grouped.json',
+    'safe-automerge.json',
+    'gitops.json',
+    'golang.json',
+    'forgejo.json',
+  ],
   extraNotesTypes: [
     { type: 'feat', section: '🚀 New Preset Rules & Features' },
     { type: 'fix', section: '🐛 Rule Corrections & Fixes' },
