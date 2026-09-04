@@ -1,3 +1,20 @@
+## [1.6.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.6.0...v1.6.1) (2026-08-28)
+
+### 🐛 Rule Corrections & Fixes
+
+* **release:** validation is the needs-gate, not a second run inside the release container ([27534c1](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/27534c1a09f638bb5c57ad80f9e6d3a4b8aca56e))
+
+### ⚙️ CI / CD
+
+* **release:** probe — skip the consumer npm ci in the release job ([3e399fd](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/3e399fd9efc43405e70fb53eb4e21d46b1159f6f))
+* **release:** run the release job in the toolchain image; composite to v2.0.0 ([a31bb92](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/a31bb922c6284e83ec92df4f5ae507705584f65b))
+* **release:** the toolchain container belongs on the release job, not validate-all ([4a7256e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/4a7256e1cf425cc813d435114641f46eb903bd84))
+
+## 1.6.0 (2026-08-05)
+
+* Merge pull request 'feat: show upstream release time in PR bodies' (#14) from feat/pr-body-release-v ([34815f4](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/34815f4)), closes [#14](https://forgejo.webgrip.dev/webgrip/renovate-config/issues/14)
+* feat: show upstream release time in PR bodies ([8f05775](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/8f05775)), closes [pull-throu#proxy](https://forgejo.webgrip.dev/pull-throu/issues/proxy)
+
 ## [1.5.4](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.5.3...v1.5.4) (2026-07-26)
 
 ### 🐛 Rule Corrections & Fixes
