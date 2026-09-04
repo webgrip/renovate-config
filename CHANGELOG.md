@@ -1,3 +1,18 @@
+## [1.7.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.6.1...v1.7.0) (2026-09-04)
+
+### 🚀 New Preset Rules & Features
+
+* **golang:** add Go overlay preset that manages indirect modules ([48ee69e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/48ee69ee12ae15d42a96c59fd186a55abcd9ab84))
+
+### 📚 Documentation
+
+* **agents:** AGENTS.md for the preset contract and the validation gate ([df9d109](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/df9d1090a7bc90e1c0ae6e4f9190be8a0ac5f61c))
+* **agents:** AGENTS.md for the preset contract and the validation gate ([b33b95e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/b33b95eb141c8e12e1eda4ec644413701d8579f8))
+
+### ⚙️ CI / CD
+
+* **release:** toolchain image 0.3.3 — complete override set baked (publish-path got 11) ([570d08b](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/570d08b0f039f84d09187c77223741c0eaf9c3b1))
+
 ## [1.6.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.6.0...v1.6.1) (2026-08-28)
 
 ### 🐛 Rule Corrections & Fixes
