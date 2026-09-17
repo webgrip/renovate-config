@@ -56,6 +56,7 @@
     "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
     "osvVulnerabilityAlerts": true,
     "vulnerabilityAlerts": {
+        "description": "Security fixes bypass the dashboard and open immediately. This block is the only thing that does so: \"vulnerability\" is not a valid matchUpdateTypes value, so a packageRule matching on it never fires. A consumer that wants these to merge themselves sets automerge here, not in packageRules, because this layer is applied on top of them. The fix strategy stays lowest on purpose: with automerge downstream, the smallest version that closes the CVE is the one you want, not the newest release.",
         "enabled": true,
         "labels": [
             "security",
@@ -66,7 +67,8 @@
         "schedule": [
             "at any time"
         ],
-        "dependencyDashboardApproval": false
+        "dependencyDashboardApproval": false,
+        "vulnerabilityFixStrategy": "lowest"
     },
     "lockFileMaintenance": {
         "enabled": true,
@@ -180,20 +182,6 @@
             "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
             "addLabels": [
                 "github-actions"
-            ]
-        },
-        {
-            "description": "Security fixes bypass the normal approval gate and open immediately",
-            "matchUpdateTypes": [
-                "vulnerability"
-            ],
-            "dependencyDashboardApproval": false,
-            "prCreation": "immediate",
-            "schedule": [
-                "at any time"
-            ],
-            "addLabels": [
-                "security"
             ]
         },
         {
