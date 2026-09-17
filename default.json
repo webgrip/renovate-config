@@ -27,6 +27,7 @@
     "separateMajorMinor": true,
     "separateMinorPatch": true,
     "separateMultipleMajor": true,
+    "constraintsFiltering": "strict",
     "ignoreUnstable": true,
     "respectLatest": true,
     "rollbackPrs": true,
