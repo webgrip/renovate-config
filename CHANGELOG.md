@@ -1,3 +1,9 @@
+## [1.8.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.7.1...v1.8.0) (2026-09-17)
+
+### 🚀 New Preset Rules & Features
+
+* releases filteren op de engines-ondergrens van de repo ([248f2a9](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/248f2a90e5a30370cb9bda0e95b264208926e976))
+
 ## [1.7.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.7.0...v1.7.1) (2026-09-17)
 
 ### 🐛 Rule Corrections & Fixes
