@@ -1,3 +1,9 @@
+## [1.7.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.7.0...v1.7.1) (2026-09-17)
+
+### 🐛 Rule Corrections & Fixes
+
+* de security-uitzondering zat in een regel die nooit vuurt ([63a0e2f](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/63a0e2f87e959c1afdba50b283c9a8cfcaf733fb))
+
 ## [1.7.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.6.1...v1.7.0) (2026-09-04)
 
 ### 🚀 New Preset Rules & Features
