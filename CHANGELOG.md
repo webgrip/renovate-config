@@ -1,3 +1,10 @@
+## [1.9.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.8.0...v1.9.0) (2026-09-18)
+
+### 🚀 New Preset Rules & Features
+
+* **forgejo:** Forgejo-native `uses:` pins resolven tegen Forgejo, niet tegen github.com ([f17dca0](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/f17dca0a61f68afe5ddd454f37ace3f49352a7b6))
+* het schema staat open, want het vertraagde alleen werk waar al om gevraagd was ([445a565](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/445a565d2e684ff6f3d884f19ad6ea0a1b74a8a5))
+
 ## [1.8.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.7.1...v1.8.0) (2026-09-17)
 
 ### 🚀 New Preset Rules & Features
