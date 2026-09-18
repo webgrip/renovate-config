@@ -1,6 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Graduated release soak times, per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included.",
+    "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Graduated release soak times, per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included. Schedule is 'at any time' since 2026-09-18: with dashboard approval required for every update type, nothing opens unattended anyway, so a window only delayed work a human had already asked for — and Renovate does not persist an approval it cannot act on, so a tick made outside the window could be silently discarded (see rule 12). It also fought the move to hourly runs, which was made to cut exactly this kind of latency. A repo that wants quiet hours can set its own schedule.",
     "extends": [
         "config:recommended",
         ":dependencyDashboard",
@@ -15,8 +15,7 @@
     "enabled": true,
     "timezone": "Europe/Amsterdam",
     "schedule": [
-        "after 3am and before 7am every weekday",
-        "every weekend"
+        "at any time"
     ],
     "updateNotScheduled": false,
     "fetchChangeLogs": "pr",
