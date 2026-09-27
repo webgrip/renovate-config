@@ -1,3 +1,13 @@
+## [1.10.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.9.0...v1.10.0) (2026-09-27)
+
+### 🚀 New Preset Rules & Features
+
+* **forgejo:** track bare-tag webgrip/workflows pins ([96a7ef2](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/96a7ef2bef087b5ce452875a9e9d483a0fa6706d))
+
+### ⚙️ CI / CD
+
+* **release:** release on forgejo.json and golang.json changes ([8ec6100](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/8ec6100dcf9aca84bc883f9131bbb4bcc26c682c))
+
 ## [1.9.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.8.0...v1.9.0) (2026-09-18)
 
 ### 🚀 New Preset Rules & Features
