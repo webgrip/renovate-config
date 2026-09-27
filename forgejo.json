@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Forgejo-platform overrides. Two things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManager below reads webgrip/* reusable-workflow pins from Forgejo instead.",
+  "description": "Forgejo-platform overrides. Two things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManagers below read webgrip/* pins from Forgejo instead, in both shapes consumers write: digest plus version comment, and bare version tag.",
   "force": {
     "prCreation": "immediate"
   },
@@ -13,6 +13,21 @@
       ],
       "matchStrings": [
         "uses:\\s+(?<depName>webgrip/[\\w.-]+)/[^@\\s]+@(?<currentDigest>[0-9a-f]{40})\\s+#\\s+(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "gitea-tags",
+      "registryUrlTemplate": "https://forgejo.webgrip.dev",
+      "versioningTemplate": "semver",
+      "depTypeTemplate": "action"
+    },
+    {
+      "description": "webgrip/* pins written as a bare version tag, with no digest: the step-level composite-action form `uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/<name>@vX.Y.Z` and the job-level `uses: webgrip/workflows/.forgejo/workflows/<file>.yml@vX.Y.Z`. The github-actions manager does extract the absolute-URL form natively, but with packageName webgrip/workflows, so the webgrip/** disable rule below switches it off and the pin freezes; omnigraph-explorer and renovate-config sat on v2.0.0 and de-vloer on v1.2.0 while v2.7.5 shipped. The version must sit directly after the @ and end the token, so a digest pin (`@<40 hex> # vX.Y.Z`) never matches here and stays with the digest manager above.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.forgejo/workflows/.*\\.ya?ml$/",
+        "/^\\.forgejo/(?:actions|composite-actions)/.+/action\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "uses:\\s+[\"']?(?:https://forgejo\\.webgrip\\.dev/)?(?<depName>webgrip/[\\w.-]+)/[^@\\s\"']+@(?<currentValue>v\\d+\\.\\d+\\.\\d+)[\"']?(?:\\s|$)"
       ],
       "datasourceTemplate": "gitea-tags",
       "registryUrlTemplate": "https://forgejo.webgrip.dev",
