@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Forgejo-platform overrides. Two things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManagers below read webgrip/* pins from Forgejo instead, in both shapes consumers write: digest plus version comment, and bare version tag.",
+  "description": "Forgejo-platform overrides. Three things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManagers below read webgrip/* pins from Forgejo instead, in both shapes consumers write: digest plus version comment, and bare version tag. (3) The renovate-config manager skips local> presets, which is how a Forgejo-hosted preset is referenced, so the last customManager tracks those preset pins against Forgejo tags.",
   "force": {
     "prCreation": "immediate"
   },
@@ -33,6 +33,19 @@
       "registryUrlTemplate": "https://forgejo.webgrip.dev",
       "versioningTemplate": "semver",
       "depTypeTemplate": "action"
+    },
+    {
+      "description": "Org preset references written as local>webgrip/renovate-config[:name]#vX.Y.Z in the repository config. The renovate-config manager resolves github>, gitlab> and gitea> presets but skips local>, so every pin froze where it was set: Glide sat on v1.9.0 and homelab-cluster on v1.6.0 while v1.10.0 shipped. forgejo-tags rather than gitea-tags keeps the bump out of the CI-only commit rule for workflow pins below.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^(?:\\.(?:github|gitea|forgejo)/)?(?:renovate\\.json5?|\\.renovaterc(?:\\.json5?)?)$/"
+      ],
+      "matchStrings": [
+        "[\"']local>(?<depName>webgrip/renovate-config)(?::[\\w-]+)?#(?<currentValue>v\\d+\\.\\d+\\.\\d+)[\"']"
+      ],
+      "datasourceTemplate": "forgejo-tags",
+      "registryUrlTemplate": "https://forgejo.webgrip.dev",
+      "versioningTemplate": "semver"
     }
   ],
   "packageRules": [
