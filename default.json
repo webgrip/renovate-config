@@ -218,6 +218,24 @@
             "pinDigests": false
         },
         {
+            "description": "Never digest-pin an action's version input (`with: version:`, depType uses-with). The value is handed to the action, which cannot take a digest. The digest lookup searches for the tag without its v prefix, fails ('Could not determine new digest for update'), and drops the update silently: Glide sat on mise 2026.6.14 while 2026.9.17 shipped.",
+            "matchManagers": [
+                "github-actions"
+            ],
+            "matchDepTypes": [
+                "uses-with"
+            ],
+            "pinDigests": false
+        },
+        {
+            "description": "A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release. This rule sits after the per-update-type rules, which would otherwise make it fix(deps) or feat(deps).",
+            "matchPackageNames": [
+                "webgrip/renovate-config"
+            ],
+            "semanticCommitType": "chore",
+            "semanticCommitScope": "renovate"
+        },
+        {
             "description": "Approval IS the gate: update types that require a dashboard tick skip the release-age soak. Renovate does not persist approvals — a tick on a soak-blocked update is consumed and silently discarded, so double-gating just eats clicks. Soak still applies wherever a repo-level rule re-adds minimumReleaseAge on unattended automerge paths (repo config is applied after presets).",
             "matchUpdateTypes": [
                 "major",
