@@ -1,3 +1,14 @@
+## [1.11.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.10.0...v1.11.0) (2026-09-29)
+
+### 🚀 New Preset Rules & Features
+
+* **default:** stop dropping action version-input updates and releasing preset bumps ([48b1b36](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/48b1b369c46415266192dbf4c5e578ed086e194f))
+* **forgejo:** track local> preset pins against Forgejo tags ([b3f1810](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/b3f1810eb3d6e7920ffcba93e27dff374fd3bb8d))
+
+### 📚 Documentation
+
+* **renovate:** note that gomod needs constraintsFiltering off at runtime ([cd830d9](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/cd830d90e0ade0e26db8c700d7bf16ef257ff522))
+
 ## [1.10.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.9.0...v1.10.0) (2026-09-27)
 
 ### 🚀 New Preset Rules & Features
