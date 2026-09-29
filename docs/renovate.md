@@ -107,7 +107,7 @@ partly unmanaged:
   `toolchain` directive and the `golang` Docker builder image land as `chore(go)` with a
   `go-toolchain` label.
 
-Two things the overlay cannot do for you, because they live in the Renovate runtime config
+Three things the overlay cannot do for you, because they live in the Renovate runtime config
 rather than in a preset:
 
 - `gomod` must be present in `enabledManagers` for the runner that scans the repository. On the
@@ -115,6 +115,11 @@ rather than in a preset:
   of the above is reachable — Renovate never opens `go.mod` at all.
 - `gomodTidy` and `gomodUpdateImportPaths` need a Go toolchain in the Renovate image. The
   `renovate/renovate:*-full` images used by the RenovateJobs have one.
+- `constraintsFiltering` must be `none` for `gomod`. `default.json` sets it to `strict`, which
+  compares each release's `go` directive against the repository's as an exact version, filters
+  out every release that declares one, and proposes a rollback to the last release that did not
+  (`lib/pq` v1.10.9 to v1.5.2 on Glide). `renovate-config-forgejo` carries that rule for `gomod`
+  and `pep621` on the Forgejo path.
 
 The GitOps overlay intentionally extends specific upstream home-operations presets instead of the entire `github>home-operations/renovate-presets` default, so Webgrip keeps its own dashboard, scheduling, approval, concurrency, and automerge policy from the default preset.
 
