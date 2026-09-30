@@ -69,7 +69,6 @@ Use when a repository's CI is the gate and the dashboard should hold only the de
 {
   "extends": [
     "github>webgrip/renovate-config#v1.12.0",
-    "github>webgrip/renovate-config:forgejo#v1.12.0",
     "github>webgrip/renovate-config:automerge-non-major#v1.12.0"
   ]
 }
