@@ -1,3 +1,9 @@
+## [1.12.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.0...v1.12.1) (2026-09-30)
+
+### 🐛 Rule Corrections & Fixes
+
+* **automerge-non-major:** rebase an automerging branch that falls behind ([c61656d](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/c61656dbe0242c3953947d68107a304db64e082b))
+
 ## [1.12.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.11.0...v1.12.0) (2026-09-30)
 
 ### 🚀 New Preset Rules & Features
