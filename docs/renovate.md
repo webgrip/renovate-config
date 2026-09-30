@@ -83,6 +83,8 @@ Use when a repository's CI is the gate and the dashboard should hold only the de
 - `rebaseWhen: conflicted`. With `behind-base-branch`, every push to the base branch rebases every
   open branch and each rebase starts a CI run.
 - Majors, Go toolchain minors and preset bumps keep the dashboard tick.
+- Go keeps minor and patch apart: combined, Renovate would offer only the minor and the patch
+  would never come. Go patches merge themselves in a `Go toolchain patches` branch.
 - One red dependency holds the group. Exclude it with a repo-level rule, or fix it, and the rest
   merges on the next run.
 
