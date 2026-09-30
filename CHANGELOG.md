@@ -1,3 +1,18 @@
+## [1.12.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.11.0...v1.12.0) (2026-09-30)
+
+### 🚀 New Preset Rules & Features
+
+* **automerge-non-major:** opt-in overlay that merges non-major updates on green ([1118edf](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/1118edf83e99056935f17d6d1e358ab8b4f19e55))
+
+### 🐛 Rule Corrections & Fixes
+
+* **automerge-non-major:** keep proposing Go toolchain patches while the minor waits ([316165f](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/316165f0193815f464815de66449b7c09ca1a910))
+* **automerge-non-major:** match the Go toolchain rules on depName ([ba5a69a](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/ba5a69a5558d4de226b5610ece351a20adf8fc41)), references [webgrip/glide#53](https://forgejo.webgrip.dev/webgrip/glide/issues/53)
+
+### 📚 Documentation
+
+* **automerge-non-major:** drop the forgejo overlay from the consumer snippets ([bcb3882](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/bcb3882766d5f7c6a59527ef3f65705e88c4c420))
+
 ## [1.11.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.10.0...v1.11.0) (2026-09-29)
 
 ### 🚀 New Preset Rules & Features
