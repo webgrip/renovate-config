@@ -61,6 +61,32 @@ Use when a repository has mature CI and wants the lowest-risk updates merged aut
 }
 ```
 
+### Automerge non-major overlay
+
+Use when a repository's CI is the gate and the dashboard should hold only the decisions:
+
+```json
+{
+  "extends": [
+    "github>webgrip/renovate-config#v1.12.0",
+    "github>webgrip/renovate-config:forgejo#v1.12.0",
+    "github>webgrip/renovate-config:automerge-non-major#v1.12.0"
+  ]
+}
+```
+
+- Minor, patch, digest and pin updates skip the dashboard tick and land in one
+  `all non-major dependencies` branch, which Renovate merges once its pull request checks are
+  green. Lock-file maintenance and vulnerability fixes merge themselves too.
+- The default preset's approval-means-no-soak rule is undone for these: three days for a minor,
+  one for a patch. `internalChecksFilter: strict` leaves an unsoaked update out of the group so
+  it cannot hold the rest.
+- `rebaseWhen: conflicted`. With `behind-base-branch`, every push to the base branch rebases every
+  open branch and each rebase starts a CI run.
+- Majors, Go toolchain minors and preset bumps keep the dashboard tick.
+- One red dependency holds the group. Exclude it with a repo-level rule, or fix it, and the rest
+  merges on the next run.
+
 ### GitOps overlay
 
 Use for Kubernetes, Flux, or homelab-style GitOps repositories. Extend it after the default preset so repo-local rules can still override operational choices:

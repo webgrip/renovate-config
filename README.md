@@ -32,6 +32,7 @@ Add opt-in overlays when a repository needs them:
 | --- | --- |
 | `github>webgrip/renovate-config` | Strict default: dashboard approval, pinned ranges, low concurrency, delayed releases, no automerge |
 | `github>webgrip/renovate-config:grouped` | Opt-in overlay to group non-major updates into fewer PRs |
+| `github>webgrip/renovate-config:automerge-non-major` | Opt-in overlay for repositories whose CI is the gate: minor, patch, digest and pin updates in one branch that merges itself once checks are green, with the release-age soak restored; majors, Go toolchain minors and preset bumps keep the dashboard tick |
 | `github>webgrip/renovate-config:safe-automerge` | Opt-in overlay to automerge only digest updates and low-risk GitHub Actions updates after checks pass |
 | `github>webgrip/renovate-config:gitops` | Opt-in GitOps overlay that composes selected `home-operations/renovate-presets` for Kubernetes/Flux/OCI/Talos/CNPG/Grafana extraction plus Webgrip-specific GitOps PR polish |
 | `github>webgrip/renovate-config:golang` | Opt-in Go overlay: manages indirect Go modules (off by default in Renovate), tidies go.mod/go.sum in-branch, rewrites `/vN` import paths, and labels toolchain moves |

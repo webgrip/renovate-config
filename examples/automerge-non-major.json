@@ -1,0 +1,9 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>webgrip/renovate-config#v1.12.0",
+    "github>webgrip/renovate-config:golang#v1.12.0",
+    "github>webgrip/renovate-config:forgejo#v1.12.0",
+    "github>webgrip/renovate-config:automerge-non-major#v1.12.0"
+  ]
+}

@@ -23,6 +23,7 @@ jobs:
           - gitops.json
           - golang.json
           - forgejo.json
+          - automerge-non-major.json
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4

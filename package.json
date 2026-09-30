@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "validate": "renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json golang.json forgejo.json",
+    "validate": "renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json golang.json forgejo.json automerge-non-major.json",
     "validate:preset": "renovate-config-validator --strict",
     "release": "semantic-release"
   },

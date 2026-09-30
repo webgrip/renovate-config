@@ -1,0 +1,75 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay for repositories whose CI is the gate: minor, patch, digest and pin updates skip the dashboard tick, share one branch and merge themselves once the pull request checks are green. Majors and Go toolchain minors keep the tick. Extend after the default preset and after golang when the repository has one. Renovate merges on its own green read of the combined commit status, so no branch protection is required.",
+  "rebaseWhen": "conflicted",
+  "internalChecksFilter": "strict",
+  "separateMinorPatch": false,
+  "platformAutomerge": false,
+  "lockFileMaintenance": {
+    "automerge": true,
+    "dependencyDashboardApproval": false
+  },
+  "vulnerabilityAlerts": {
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "description": "Non-major updates share one branch and merge themselves once its checks are green. One grouped branch per run instead of one per dependency: every open branch costs a full CI run each time it is rebased, and a small runner pool cannot absorb twenty of them per push.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ]
+    },
+    {
+      "description": "The default preset drops the release-age soak because the dashboard tick was the gate. Unattended merges get the soak back; internalChecksFilter strict keeps an unsoaked update out of the group instead of holding the whole branch.",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Patch soak for unattended merges.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "description": "A Go toolchain minor decides what compiles the shipped binaries and raises the floor for contributors. It stays a deliberate, dashboard-approved change outside the group; toolchain patches still merge themselves.",
+      "matchPackageNames": [
+        "go",
+        "golang",
+        "docker.io/golang",
+        "**/golang"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "A preset bump changes how Renovate treats the repository and can widen what merges unattended, so it keeps the dashboard tick and its own branch.",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    }
+  ]
+}

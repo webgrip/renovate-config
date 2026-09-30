@@ -17,6 +17,7 @@ module.exports = makeConfig({
     'gitops.json',
     'golang.json',
     'forgejo.json',
+    'automerge-non-major.json',
   ],
   extraNotesTypes: [
     { type: 'feat', section: '🚀 New Preset Rules & Features' },
