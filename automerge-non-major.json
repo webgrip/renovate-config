@@ -7,14 +7,15 @@
   "platformAutomerge": false,
   "lockFileMaintenance": {
     "automerge": true,
-    "dependencyDashboardApproval": false
+    "dependencyDashboardApproval": false,
+    "rebaseWhen": "behind-base-branch"
   },
   "vulnerabilityAlerts": {
     "automerge": true
   },
   "packageRules": [
     {
-      "description": "Non-major updates share one branch and merge themselves once its checks are green. One grouped branch per run instead of one per dependency: every open branch costs a full CI run each time it is rebased, and a small runner pool cannot absorb twenty of them per push.",
+      "description": "Non-major updates share one branch and merge themselves once its checks are green. One grouped branch per run instead of one per dependency: every open branch costs a full CI run each time it is rebased, and a small runner pool cannot absorb twenty of them per push. An automerging branch rebases when it falls behind: with rebaseWhen conflicted it would keep a red result from an old base forever, and one branch rebased once per Renovate run costs at most one CI run an hour.",
       "matchUpdateTypes": [
         "minor",
         "patch",
@@ -29,7 +30,8 @@
       "automergeType": "pr",
       "addLabels": [
         "automerge"
-      ]
+      ],
+      "rebaseWhen": "behind-base-branch"
     },
     {
       "description": "The default preset drops the release-age soak because the dashboard tick was the gate. Unattended merges get the soak back; internalChecksFilter strict keeps an unsoaked update out of the group instead of holding the whole branch.",
@@ -83,7 +85,8 @@
         "golang",
         "docker.io/golang",
         "**/golang"
-      ]
+      ],
+      "rebaseWhen": "behind-base-branch"
     },
     {
       "description": "A preset bump changes how Renovate treats the repository and can widen what merges unattended, so it keeps the dashboard tick and its own branch.",

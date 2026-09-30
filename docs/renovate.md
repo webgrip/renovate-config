@@ -80,8 +80,11 @@ Use when a repository's CI is the gate and the dashboard should hold only the de
 - The default preset's approval-means-no-soak rule is undone for these: three days for a minor,
   one for a patch. `internalChecksFilter: strict` leaves an unsoaked update out of the group so
   it cannot hold the rest.
-- `rebaseWhen: conflicted`. With `behind-base-branch`, every push to the base branch rebases every
-  open branch and each rebase starts a CI run.
+- `rebaseWhen: conflicted` for every branch that waits for a person. With `behind-base-branch`,
+  every open branch would be rebased after each push to the base branch, each rebase a CI run.
+  The automerging branches (the group, Go patches, lock-file maintenance) do rebase when behind:
+  otherwise a red result from an old base, say a test fixed on the base since, keeps them from
+  ever merging. That is at most one rebase per Renovate run.
 - Majors, Go toolchain minors and preset bumps keep the dashboard tick.
 - Go keeps minor and patch apart: combined, Renovate would offer only the minor and the patch
   would never come. Go patches merge themselves in a `Go toolchain patches` branch.
