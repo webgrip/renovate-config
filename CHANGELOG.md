@@ -1,3 +1,13 @@
+## [1.12.2](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.1...v1.12.2) (2026-10-01)
+
+### 🐛 Rule Corrections & Fixes
+
+* **default:** propose updates from registries that report no release timestamp ([ffb8dcf](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/ffb8dcff8b6c20a1bcb1045de5235c0b080a1bb6))
+
+### 📚 Documentation
+
+* **agents:** drop the disproven checkout v6 rule ([bc4129b](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/bc4129bfacac374020ea99e13e0ad36b860fb564))
+
 ## [1.12.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.0...v1.12.1) (2026-09-30)
 
 ### 🐛 Rule Corrections & Fixes
