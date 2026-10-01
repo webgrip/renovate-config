@@ -57,7 +57,7 @@ renamed fails here rather than silently doing nothing in a consumer.
   `secrets.FORGEJO_TOKEN`, which resolves to the built-in per-job token.
 - `open_promotion_pr.yml` is inert until a `next` branch exists; it talks to the Forgejo REST
   API because `gh` is GitHub-only.
-- **`actions/checkout@v5`, never `@v6`** — v6 is broken on non-GitHub runners.
+- **checkout and setup-node majors move deliberately, never on automerge.** The old "v6 is broken on non-GitHub runners" rule was disproven on 2026-09-18 by a canary on the real Forgejo runner ([homelab-cluster run 1710](https://forgejo.webgrip.dev/webgrip/homelab-cluster/actions/runs/1710)): checkout v6 and v7 and setup-node v5, v6 and v7 all pass.
 
 ## Repo rules
 
