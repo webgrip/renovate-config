@@ -89,14 +89,18 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "A preset bump changes how Renovate treats the repository and can widen what merges unattended, so it keeps the dashboard tick and its own branch.",
+      "description": "Repeats the default preset's preset-bump rule after this overlay's soak and grouping rules, which would otherwise put the bump back in the grouped branch and hold it a day.",
       "matchPackageNames": [
         "webgrip/renovate-config"
       ],
       "groupName": null,
       "groupSlug": null,
-      "automerge": false,
-      "dependencyDashboardApproval": true
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "rebaseWhen": "behind-base-branch"
     }
   ]
 }
