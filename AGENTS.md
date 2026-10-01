@@ -32,7 +32,9 @@ renamed fails here rather than silently doing nothing in a consumer.
 
 - **`default.json` is deliberately strict**: dashboard approval, pinned ranges, low concurrency,
   delayed releases, no automerge. Loosening it changes every consuming repo at once; loosen in
-  an overlay instead.
+  an overlay instead. The one exception is this preset itself: a `webgrip/renovate-config` bump
+  merges on green with no tick and no soak, because a consumer waiting on a tick is a policy fix
+  that has not landed.
 - **`forgejo.json` uses `force:`, which is admin-level, and that is intentional.** Forgejo
   Actions run on `pull_request`, so a Renovate branch commit that has no pull request yet has no
   commit status: `GET /commits/{sha}/status` comes back empty, `not-pending` never resolves, and
@@ -46,8 +48,8 @@ renamed fails here rather than silently doing nothing in a consumer.
 - **`automerge-non-major.json` is that decision, made opt-in**: every minor, patch, digest and
   pin update in one branch that merges itself on green, with the release-age soak restored and
   `rebaseWhen: conflicted`. It uses Renovate's own automerge, not the platform's, because
-  Forgejo's merge-when-checks-succeed merges at once on a branch without required checks. Preset
-  bumps stay dashboard-approved in it: a policy that can widen itself does not merge itself.
+  Forgejo's merge-when-checks-succeed merges at once on a branch without required checks. It
+  repeats the default preset's preset-bump rule last, so its soak and grouping do not catch it.
 
 ## Release traps
 

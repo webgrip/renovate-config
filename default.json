@@ -258,6 +258,19 @@
                 "!/^(docker\\.io|index\\.docker\\.io|registry-1\\.docker\\.io)\\//"
             ],
             "minimumReleaseAgeBehaviour": "timestamp-optional"
+        },
+        {
+            "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once.",
+            "matchPackageNames": [
+                "webgrip/renovate-config"
+            ],
+            "groupName": null,
+            "groupSlug": null,
+            "dependencyDashboardApproval": false,
+            "minimumReleaseAge": "0 days",
+            "automerge": true,
+            "automergeType": "pr",
+            "platformAutomerge": false
         }
     ]
 }
