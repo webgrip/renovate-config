@@ -1,3 +1,9 @@
+## [1.13.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.2...v1.13.0) (2026-10-01)
+
+### 🚀 New Preset Rules & Features
+
+* **default:** merge shared preset bumps on green without a tick ([824a015](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/824a01508e43e3e0f0b7e9f93e2183faa746ad07))
+
 ## [1.12.2](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.1...v1.12.2) (2026-10-01)
 
 ### 🐛 Rule Corrections & Fixes
