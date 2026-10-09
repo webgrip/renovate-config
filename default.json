@@ -1,6 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Graduated release soak times, per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included.",
+    "description": "Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Graduated release soak times, per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included. Schedule is 'at any time' since 2026-09-18: with dashboard approval required for every update type, nothing opens unattended anyway, so a window only delayed work a human had already asked for — and Renovate does not persist an approval it cannot act on, so a tick made outside the window could be silently discarded (see rule 12). It also fought the move to hourly runs, which was made to cut exactly this kind of latency. A repo that wants quiet hours can set its own schedule.",
     "extends": [
         "config:recommended",
         ":dependencyDashboard",
@@ -15,8 +15,7 @@
     "enabled": true,
     "timezone": "Europe/Amsterdam",
     "schedule": [
-        "after 3am and before 7am every weekday",
-        "every weekend"
+        "at any time"
     ],
     "updateNotScheduled": false,
     "fetchChangeLogs": "pr",
@@ -27,6 +26,7 @@
     "separateMajorMinor": true,
     "separateMinorPatch": true,
     "separateMultipleMajor": true,
+    "constraintsFiltering": "strict",
     "ignoreUnstable": true,
     "respectLatest": true,
     "rollbackPrs": true,
@@ -56,6 +56,7 @@
     "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
     "osvVulnerabilityAlerts": true,
     "vulnerabilityAlerts": {
+        "description": "Security fixes bypass the dashboard and open immediately. This block is the only thing that does so: \"vulnerability\" is not a valid matchUpdateTypes value, so a packageRule matching on it never fires. A consumer that wants these to merge themselves sets automerge here, not in packageRules, because this layer is applied on top of them. The fix strategy stays lowest on purpose: with automerge downstream, the smallest version that closes the CVE is the one you want, not the newest release.",
         "enabled": true,
         "labels": [
             "security",
@@ -66,7 +67,8 @@
         "schedule": [
             "at any time"
         ],
-        "dependencyDashboardApproval": false
+        "dependencyDashboardApproval": false,
+        "vulnerabilityFixStrategy": "lowest"
     },
     "lockFileMaintenance": {
         "enabled": true,
@@ -92,7 +94,7 @@
         "{{#if isVulnerabilityAlert}}🔒 **Security update**: prioritize review and verify the vulnerable component is actually deployed.{{/if}}",
         "{{#if isGroup}}📦 **Grouped update**: confirm the group is operationally coherent before merging.{{/if}}",
         "Merge Confidence badges are included where supported — low or neutral confidence warrants a manual impact check before merge.",
-        "`Released` is the upstream publish time. `—` means this datasource reports no release timestamp — normal for ghcr.io, quay.io and private/proxy registries — so `minimumReleaseAge` cannot hold the update back and it is eligible as soon as checks pass. A real date means the soak is enforced: add this update type's `minimumReleaseAge` to `Released` to get the eligibility moment."
+        "`Released` is the upstream publish time. `—` means the datasource reports no release timestamp. Docker Hub is the only Docker registry that reports one, so this preset treats every other Docker registry (ghcr.io, quay.io, Harbor and its proxies, dhi.io) as `timestamp-optional`: `minimumReleaseAge` cannot hold those updates back and they are eligible as soon as checks pass. For any other datasource, a missing timestamp holds the update for as long as a soak applies. A real date means the soak is enforced: add this update type's `minimumReleaseAge` to `Released` to get the eligibility moment."
     ],
     "packageRules": [
         {
@@ -183,20 +185,6 @@
             ]
         },
         {
-            "description": "Security fixes bypass the normal approval gate and open immediately",
-            "matchUpdateTypes": [
-                "vulnerability"
-            ],
-            "dependencyDashboardApproval": false,
-            "prCreation": "immediate",
-            "schedule": [
-                "at any time"
-            ],
-            "addLabels": [
-                "security"
-            ]
-        },
-        {
             "description": "Do not apply stability-days soak time to shared Renovate preset updates",
             "matchPackageNames": [
                 "webgrip/renovate-config"
@@ -230,6 +218,24 @@
             "pinDigests": false
         },
         {
+            "description": "Never digest-pin an action's version input (`with: version:`, depType uses-with). The value is handed to the action, which cannot take a digest. The digest lookup searches for the tag without its v prefix, fails ('Could not determine new digest for update'), and drops the update silently: Glide sat on mise 2026.6.14 while 2026.9.17 shipped.",
+            "matchManagers": [
+                "github-actions"
+            ],
+            "matchDepTypes": [
+                "uses-with"
+            ],
+            "pinDigests": false
+        },
+        {
+            "description": "A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release. This rule sits after the per-update-type rules, which would otherwise make it fix(deps) or feat(deps).",
+            "matchPackageNames": [
+                "webgrip/renovate-config"
+            ],
+            "semanticCommitType": "chore",
+            "semanticCommitScope": "renovate"
+        },
+        {
             "description": "Approval IS the gate: update types that require a dashboard tick skip the release-age soak. Renovate does not persist approvals — a tick on a soak-blocked update is consumed and silently discarded, so double-gating just eats clicks. Soak still applies wherever a repo-level rule re-adds minimumReleaseAge on unattended automerge paths (repo config is applied after presets).",
             "matchUpdateTypes": [
                 "major",
@@ -241,6 +247,30 @@
                 "rollback"
             ],
             "minimumReleaseAge": "0 days"
+        },
+        {
+            "description": "Renovate defaults to minimumReleaseAgeBehaviour timestamp-required, which silently keeps an update without a release timestamp out of every branch for as long as a soak applies. Only Docker Hub reports Docker release timestamps, so images from any other registry were detected and never proposed wherever an overlay restores the soak. These registries cannot report a timestamp; the soak is skipped for them because it cannot be measured, not because it is unwanted.",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "/^[^/]+\\.[^/]+\\//",
+                "!/^(docker\\.io|index\\.docker\\.io|registry-1\\.docker\\.io)\\//"
+            ],
+            "minimumReleaseAgeBehaviour": "timestamp-optional"
+        },
+        {
+            "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once.",
+            "matchPackageNames": [
+                "webgrip/renovate-config"
+            ],
+            "groupName": null,
+            "groupSlug": null,
+            "dependencyDashboardApproval": false,
+            "minimumReleaseAge": "0 days",
+            "automerge": true,
+            "automergeType": "pr",
+            "platformAutomerge": false
         }
     ]
 }

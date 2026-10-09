@@ -18,6 +18,9 @@ on:
       - grouped.json
       - safe-automerge.json
       - gitops.json
+      - golang.json
+      - forgejo.json
+      - automerge-non-major.json
       - .releaserc.cjs
       - package.json
       - package-lock.json
@@ -38,6 +41,10 @@ jobs:
           - default.json
           - grouped.json
           - safe-automerge.json
+          - gitops.json
+          - golang.json
+          - forgejo.json
+          - automerge-non-major.json
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
@@ -75,6 +82,10 @@ jobs:
       - validate-all
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
     runs-on: docker
+    # The v2 composite installs nothing: the release toolchain IS this image
+    # (webgrip/workflows ADR-0005; without it the job fails with instructions).
+    container:
+      image: harbor.webgrip.dev/webgrip/semantic-release:0.3.3
     permissions:
       contents: write
       issues: write
@@ -82,6 +93,7 @@ jobs:
       statuses: write
     steps:
       - name: Semantic Release
-        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@main
+        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v2.0.0
         with:
           token: ${{ secrets.WEBGRIP_CI_TOKEN }}
+          install-dependencies: "false"

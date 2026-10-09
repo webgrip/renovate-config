@@ -1,5 +1,82 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Forgejo-platform overrides. Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides.",
-  "force": { "prCreation": "immediate" }
+  "description": "Forgejo-platform overrides. Three things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManagers below read webgrip/* pins from Forgejo instead, in both shapes consumers write: digest plus version comment, and bare version tag. (3) The renovate-config manager skips local> presets, which is how a Forgejo-hosted preset is referenced, so the last customManager tracks those preset pins against Forgejo tags.",
+  "force": {
+    "prCreation": "immediate"
+  },
+  "customManagers": [
+    {
+      "description": "webgrip/* job-level reusable workflows resolve against Forgejo, not github.com. gitea-tags implements getDigest, so a tag resolves to its commit and both halves of the pin — the digest and the `# vX.Y.Z` comment — move together. Discovered in twente.dev 2026-09-18, where seven pins had been unresolvable for months and three lanes sat on v1.6.0/v2.1.0 while v2.7.2 shipped; see that repo's ADR 0022.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.forgejo/workflows/.*\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "uses:\\s+(?<depName>webgrip/[\\w.-]+)/[^@\\s]+@(?<currentDigest>[0-9a-f]{40})\\s+#\\s+(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "gitea-tags",
+      "registryUrlTemplate": "https://forgejo.webgrip.dev",
+      "versioningTemplate": "semver",
+      "depTypeTemplate": "action"
+    },
+    {
+      "description": "webgrip/* pins written as a bare version tag, with no digest: the step-level composite-action form `uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/<name>@vX.Y.Z` and the job-level `uses: webgrip/workflows/.forgejo/workflows/<file>.yml@vX.Y.Z`. The github-actions manager does extract the absolute-URL form natively, but with packageName webgrip/workflows, so the webgrip/** disable rule below switches it off and the pin freezes; omnigraph-explorer and renovate-config sat on v2.0.0 and de-vloer on v1.2.0 while v2.7.5 shipped. The version must sit directly after the @ and end the token, so a digest pin (`@<40 hex> # vX.Y.Z`) never matches here and stays with the digest manager above.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.forgejo/workflows/.*\\.ya?ml$/",
+        "/^\\.forgejo/(?:actions|composite-actions)/.+/action\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "uses:\\s+[\"']?(?:https://forgejo\\.webgrip\\.dev/)?(?<depName>webgrip/[\\w.-]+)/[^@\\s\"']+@(?<currentValue>v\\d+\\.\\d+\\.\\d+)[\"']?(?:\\s|$)"
+      ],
+      "datasourceTemplate": "gitea-tags",
+      "registryUrlTemplate": "https://forgejo.webgrip.dev",
+      "versioningTemplate": "semver",
+      "depTypeTemplate": "action"
+    },
+    {
+      "description": "Org preset references written as local>webgrip/renovate-config[:name]#vX.Y.Z in the repository config. The renovate-config manager resolves github>, gitlab> and gitea> presets but skips local>, so every pin froze where it was set: Glide sat on v1.9.0 and homelab-cluster on v1.6.0 while v1.10.0 shipped. forgejo-tags rather than gitea-tags keeps the bump out of the CI-only commit rule for workflow pins below.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^(?:\\.(?:github|gitea|forgejo)/)?(?:renovate\\.json5?|\\.renovaterc(?:\\.json5?)?)$/"
+      ],
+      "matchStrings": [
+        "[\"']local>(?<depName>webgrip/renovate-config)(?::[\\w-]+)?#(?<currentValue>v\\d+\\.\\d+\\.\\d+)[\"']"
+      ],
+      "datasourceTemplate": "forgejo-tags",
+      "registryUrlTemplate": "https://forgejo.webgrip.dev",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "The github-actions manager still parses these files. Without this it proposes the same webgrip/* deps against github.com alongside the customManager and re-raises the lookup failures. custom.regex owns webgrip/* on the Forgejo path.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "webgrip/**"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Keep those pins on the github-actions shape the default preset gives them: a CI-only commit that releases nothing. Matching by manager no longer reaches them, so restate it by datasource.",
+      "matchDatasources": [
+        "gitea-tags"
+      ],
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "actions",
+      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
+      "addLabels": [
+        "github-actions"
+      ]
+    },
+    {
+      "description": "A custom manager captures a version but no digest, so the global pinDigests tries to append one, the replacement never applies, and one failed dep aborts the whole branch with 'Error updating branch: update failure' — the same way it does for the preset reference and for mise aqua entries (default.json rules 9 and 12).",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "pinDigests": false
+    }
+  ]
 }

@@ -1,3 +1,107 @@
+## [1.13.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.2...v1.13.0) (2026-10-01)
+
+### 🚀 New Preset Rules & Features
+
+* **default:** merge shared preset bumps on green without a tick ([824a015](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/824a01508e43e3e0f0b7e9f93e2183faa746ad07))
+
+## [1.12.2](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.1...v1.12.2) (2026-10-01)
+
+### 🐛 Rule Corrections & Fixes
+
+* **default:** propose updates from registries that report no release timestamp ([ffb8dcf](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/ffb8dcff8b6c20a1bcb1045de5235c0b080a1bb6))
+
+### 📚 Documentation
+
+* **agents:** drop the disproven checkout v6 rule ([bc4129b](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/bc4129bfacac374020ea99e13e0ad36b860fb564))
+
+## [1.12.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.0...v1.12.1) (2026-09-30)
+
+### 🐛 Rule Corrections & Fixes
+
+* **automerge-non-major:** rebase an automerging branch that falls behind ([c61656d](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/c61656dbe0242c3953947d68107a304db64e082b))
+
+## [1.12.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.11.0...v1.12.0) (2026-09-30)
+
+### 🚀 New Preset Rules & Features
+
+* **automerge-non-major:** opt-in overlay that merges non-major updates on green ([1118edf](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/1118edf83e99056935f17d6d1e358ab8b4f19e55))
+
+### 🐛 Rule Corrections & Fixes
+
+* **automerge-non-major:** keep proposing Go toolchain patches while the minor waits ([316165f](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/316165f0193815f464815de66449b7c09ca1a910))
+* **automerge-non-major:** match the Go toolchain rules on depName ([ba5a69a](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/ba5a69a5558d4de226b5610ece351a20adf8fc41)), references [webgrip/glide#53](https://forgejo.webgrip.dev/webgrip/glide/issues/53)
+
+### 📚 Documentation
+
+* **automerge-non-major:** drop the forgejo overlay from the consumer snippets ([bcb3882](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/bcb3882766d5f7c6a59527ef3f65705e88c4c420))
+
+## [1.11.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.10.0...v1.11.0) (2026-09-29)
+
+### 🚀 New Preset Rules & Features
+
+* **default:** stop dropping action version-input updates and releasing preset bumps ([48b1b36](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/48b1b369c46415266192dbf4c5e578ed086e194f))
+* **forgejo:** track local> preset pins against Forgejo tags ([b3f1810](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/b3f1810eb3d6e7920ffcba93e27dff374fd3bb8d))
+
+### 📚 Documentation
+
+* **renovate:** note that gomod needs constraintsFiltering off at runtime ([cd830d9](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/cd830d90e0ade0e26db8c700d7bf16ef257ff522))
+
+## [1.10.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.9.0...v1.10.0) (2026-09-27)
+
+### 🚀 New Preset Rules & Features
+
+* **forgejo:** track bare-tag webgrip/workflows pins ([96a7ef2](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/96a7ef2bef087b5ce452875a9e9d483a0fa6706d))
+
+### ⚙️ CI / CD
+
+* **release:** release on forgejo.json and golang.json changes ([8ec6100](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/8ec6100dcf9aca84bc883f9131bbb4bcc26c682c))
+
+## [1.9.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.8.0...v1.9.0) (2026-09-18)
+
+### 🚀 New Preset Rules & Features
+
+* **forgejo:** Forgejo-native `uses:` pins resolven tegen Forgejo, niet tegen github.com ([f17dca0](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/f17dca0a61f68afe5ddd454f37ace3f49352a7b6))
+* het schema staat open, want het vertraagde alleen werk waar al om gevraagd was ([445a565](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/445a565d2e684ff6f3d884f19ad6ea0a1b74a8a5))
+
+## [1.8.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.7.1...v1.8.0) (2026-09-17)
+
+### 🚀 New Preset Rules & Features
+
+* releases filteren op de engines-ondergrens van de repo ([248f2a9](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/248f2a90e5a30370cb9bda0e95b264208926e976))
+
+## [1.7.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.7.0...v1.7.1) (2026-09-17)
+
+### 🐛 Rule Corrections & Fixes
+
+* de security-uitzondering zat in een regel die nooit vuurt ([63a0e2f](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/63a0e2f87e959c1afdba50b283c9a8cfcaf733fb))
+
+## [1.7.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.6.1...v1.7.0) (2026-09-04)
+
+### 🚀 New Preset Rules & Features
+
+* **golang:** add Go overlay preset that manages indirect modules ([48ee69e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/48ee69ee12ae15d42a96c59fd186a55abcd9ab84))
+
+### 📚 Documentation
+
+* **agents:** AGENTS.md for the preset contract and the validation gate ([df9d109](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/df9d1090a7bc90e1c0ae6e4f9190be8a0ac5f61c))
+* **agents:** AGENTS.md for the preset contract and the validation gate ([b33b95e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/b33b95eb141c8e12e1eda4ec644413701d8579f8))
+
+### ⚙️ CI / CD
+
+* **release:** toolchain image 0.3.3 — complete override set baked (publish-path got 11) ([570d08b](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/570d08b0f039f84d09187c77223741c0eaf9c3b1))
+
+## [1.6.1](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.6.0...v1.6.1) (2026-08-28)
+
+### 🐛 Rule Corrections & Fixes
+
+* **release:** validation is the needs-gate, not a second run inside the release container ([27534c1](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/27534c1a09f638bb5c57ad80f9e6d3a4b8aca56e))
+
+### ⚙️ CI / CD
+
+* **release:** probe — skip the consumer npm ci in the release job ([3e399fd](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/3e399fd9efc43405e70fb53eb4e21d46b1159f6f))
+* **release:** run the release job in the toolchain image; composite to v2.0.0 ([a31bb92](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/a31bb922c6284e83ec92df4f5ae507705584f65b))
+* **release:** the toolchain container belongs on the release job, not validate-all ([4a7256e](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/4a7256e1cf425cc813d435114641f46eb903bd84))
+
 ## 1.6.0 (2026-08-05)
 
 * Merge pull request 'feat: show upstream release time in PR bodies' (#14) from feat/pr-body-release-v ([34815f4](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/34815f4)), closes [#14](https://forgejo.webgrip.dev/webgrip/renovate-config/issues/14)
