@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Keeps the git pins in apm.yml current for agent packages from webgrip's Forgejo.",
+    "Renovate's built-in apm manager only reads the string form (host/owner/repo#ref), and on a non-GitHub host APM itself only splits a subdirectory off that form at prompts/, instructions/ or collections/. webgrip pins packages and skills by subdirectory (packages/<name>, skills/<name>) in the object form (git, path, ref), so these regex managers read that form instead.",
+    "Renovate cannot refresh apm.lock.yaml without the apm CLI, so after merging run `apm install && apm compile` (mise run agents-install) and commit the result, or the repository's agents-check fails."
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "A skill from webgrip/ai-skills, pinned by its per-skill tag <skill>-vX.Y.Z.",
+      "managerFilePatterns": ["/(^|/)apm\\.ya?ml$/"],
+      "matchStrings": [
+        "git:\\s*https://forgejo\\.webgrip\\.dev/webgrip/ai-skills\\.git\\s*\\n\\s*path:\\s*skills/(?<depName>[a-z0-9-]+)\\s*\\n\\s*ref:\\s*[a-z0-9-]+-v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "git-tags",
+      "packageNameTemplate": "https://forgejo.webgrip.dev/webgrip/ai-skills.git",
+      "extractVersionTemplate": "^{{{depName}}}-v(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "A package from another webgrip repository, such as agent-standards, pinned by a vX.Y.Z tag.",
+      "managerFilePatterns": ["/(^|/)apm\\.ya?ml$/"],
+      "matchStrings": [
+        "git:\\s*https://forgejo\\.webgrip\\.dev/webgrip/(?<repo>[a-z0-9._-]+?)(?:\\.git)?\\s*\\n\\s*path:\\s*\\S+\\s*\\n\\s*ref:\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "webgrip/{{{repo}}}",
+      "datasourceTemplate": "git-tags",
+      "packageNameTemplate": "https://forgejo.webgrip.dev/webgrip/{{{repo}}}.git",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "One pull request per repository bumps every pin of the same package together, so the managed block and the lockfile move in one step.",
+      "matchFileNames": ["**/apm.yml", "apm.yml"],
+      "matchDatasources": ["git-tags"],
+      "groupName": "{{depName}} agent package",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "agents"
+    }
+  ]
+}
