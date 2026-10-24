@@ -2,7 +2,8 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "local>webgrip/renovate-config",
-        "local>webgrip/renovate-config:grouped"
+        "local>webgrip/renovate-config:grouped",
+        "local>webgrip/renovate-config:apm"
     ],
     "baseBranchPatterns": ["next"],
     "packageRules": [
