@@ -1,3 +1,19 @@
+## [1.14.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.13.0...v1.14.0) (2026-10-24)
+
+### 🚀 New Preset Rules & Features
+
+* add an apm preset that bumps agent package pins in apm.yml ([fb651dc](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/fb651dcb16da3eae07dc05cbc1dbd4a0ace64634))
+* **apm:** reinstall after an agent-standards bump and move the agentstd tag with it ([46cc448](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/46cc4483fb24791e4f1922dab62cdbbb7c74dbfc))
+
+### 🐛 Rule Corrections & Fixes
+
+* release and validate the apm preset when it changes ([0a15503](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/0a155030b7f6292af66c1006ff2b5f83a965df24))
+
+### 🔧 Maintenance
+
+* **renovate:** read this repository's own presets from Forgejo ([a3294fb](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/a3294fb6e602385142844b2de922bd789c210ba9))
+* split the OCI grouping decision out of the pinDigests mechanism rule ([3e5999b](https://forgejo.webgrip.dev/webgrip/renovate-config/commit/3e5999bbbf2e687104d1bb05e0a8ed606a301d87))
+
 ## [1.13.0](https://forgejo.webgrip.dev/webgrip/renovate-config/compare/v1.12.2...v1.13.0) (2026-10-01)
 
 ### 🚀 New Preset Rules & Features
