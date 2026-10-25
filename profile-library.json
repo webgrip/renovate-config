@@ -131,12 +131,12 @@
       ]
     },
     {
-      "description": "Minor updates — short soak time, feat commits",
+      "description": "Minor updates — short soak time, fix commits: a dependency's minor is not a feature of the consuming product, so it cuts a patch release, the same as a patch update.",
       "matchUpdateTypes": [
         "minor"
       ],
       "minimumReleaseAge": "3 days",
-      "semanticCommitType": "feat",
+      "semanticCommitType": "fix",
       "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
       "addLabels": [
         "type/minor"

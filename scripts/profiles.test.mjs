@@ -15,6 +15,7 @@ async function effective(profile, update) {
     group: upgrade.groupName ?? null,
     automerge: upgrade.automerge === true,
     approval: upgrade.dependencyDashboardApproval === true,
+    commitType: upgrade.semanticCommitType,
   };
 }
 
@@ -27,7 +28,8 @@ for (const profile of Object.keys(profiles)) {
   });
 
   test(`${profile}: a major waits for a dashboard tick and does not merge itself`, async () => {
-    assert.deepEqual(await effective(profile, { ...npm, updateType: 'major' }), { group: null, automerge: false, approval: true });
+    const major = await effective(profile, { ...npm, updateType: 'major' });
+    assert.deepEqual({ group: major.group, automerge: major.automerge, approval: major.approval }, { group: null, automerge: false, approval: true });
   });
 
   test(`${profile}: a security fix opens without a tick and merges itself`, async () => {
@@ -76,3 +78,10 @@ test('profile-image-set reads Dockerfile ARG pins under a renovate directive', (
   assert.equal(found[0]?.groups.currentValue, '24-alpine');
   assert.equal(found[0]?.groups.currentDigest, `sha256:${'a'.repeat(64)}`);
 });
+
+for (const profile of Object.keys(profiles)) {
+  test(`${profile}: a minor or patch dependency update is a fix, so it cuts a patch release`, async () => {
+    assert.equal((await effective(profile, { ...npm, updateType: 'minor' })).commitType, 'fix');
+    assert.equal((await effective(profile, { ...npm, updateType: 'patch' })).commitType, 'fix');
+  });
+}
