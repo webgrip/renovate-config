@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay for repositories where a person reviews dependency updates but should not tick them one by one: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge. Digests are left to safe-automerge, majors keep the tick. Extend after the default preset.",
+  "separateMinorPatch": false,
+  "packageRules": [
+    {
+      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major",
+      "dependencyDashboardApproval": false
+    },
+    {
+      "description": "The default preset drops the release-age soak because the dashboard tick was the gate. Without the tick the soak returns, so a freshly published release is not proposed the hour it appears.",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Patch soak without the tick.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "description": "Repeats the default preset's preset-bump rule after the grouping above, which would otherwise put the bump in the grouped branch and hold it a day.",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "rebaseWhen": "behind-base-branch"
+    }
+  ]
+}

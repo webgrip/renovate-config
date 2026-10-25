@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay for repositories that build container images: base and tool images pinned in a Dockerfile ARG under a `# renovate: datasource=… depName=…` line, by tag and digest or by tag alone.",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "A Dockerfile ARG carrying an image or version under a renovate directive line.",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s*\\nARG \\S+=\"?(?:\\S*?[:/])?(?<currentValue>[^@:/\\s\"]+)@(?<currentDigest>sha256:[a-f0-9]{64})",
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s*\\nARG \\S+=\"?(?<currentValue>[^@\\s\"]+)\"?\\s"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ]
+}

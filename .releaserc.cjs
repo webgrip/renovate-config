@@ -18,6 +18,13 @@ module.exports = makeConfig({
     'golang.json',
     'forgejo.json',
     'automerge-non-major.json',
+    'review-non-major.json',
+    'security-automerge.json',
+    'docker-arg-pins.json',
+    'profile-app.json',
+    'profile-site.json',
+    'profile-library.json',
+    'profile-image-set.json',
   ],
   extraNotesTypes: [
     { type: 'feat', section: '🚀 New Preset Rules & Features' },

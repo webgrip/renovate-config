@@ -1,0 +1,463 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Profile for a repository of container images. Like profile-library, plus base and tool images pinned in Dockerfile ARG lines under a renovate directive.",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":separateMultipleMajorReleases",
+    ":enableVulnerabilityAlerts",
+    ":timezone(Europe/Amsterdam)",
+    "abandonments:recommended",
+    "mergeConfidence:all-badges"
+  ],
+  "configMigration": true,
+  "enabled": true,
+  "timezone": "Europe/Amsterdam",
+  "schedule": [
+    "at any time"
+  ],
+  "updateNotScheduled": false,
+  "fetchChangeLogs": "pr",
+  "rebaseWhen": "conflicted",
+  "recreateWhen": "always",
+  "rangeStrategy": "pin",
+  "pinDigests": true,
+  "separateMajorMinor": true,
+  "separateMinorPatch": false,
+  "separateMultipleMajor": true,
+  "constraintsFiltering": "strict",
+  "ignoreUnstable": true,
+  "respectLatest": true,
+  "rollbackPrs": true,
+  "internalChecksFilter": "strict",
+  "prCreation": "not-pending",
+  "prNotPendingHours": 2,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 5,
+  "branchConcurrentLimit": 10,
+  "suppressNotifications": [
+    "prIgnoreNotification"
+  ],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "automerge": false,
+  "platformAutomerge": false,
+  "assigneesFromCodeOwners": true,
+  "reviewersFromCodeOwners": true,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate Dependency Dashboard",
+  "dependencyDashboardAutoclose": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "unresolved",
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "description": "Security fixes bypass the dashboard and open immediately. This block is the only thing that does so: \"vulnerability\" is not a valid matchUpdateTypes value, so a packageRule matching on it never fires. A consumer that wants these to merge themselves sets automerge here, not in packageRules, because this layer is applied on top of them. The fix strategy stays lowest on purpose: with automerge downstream, the smallest version that closes the CVE is the one you want, not the newest release.",
+    "enabled": true,
+    "labels": [
+      "security",
+      "dependencies",
+      "renovate"
+    ],
+    "prCreation": "immediate",
+    "schedule": [
+      "at any time"
+    ],
+    "dependencyDashboardApproval": false,
+    "vulnerabilityFixStrategy": "lowest",
+    "automerge": true,
+    "automergeType": "pr",
+    "addLabels": [
+      "automerge"
+    ]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "extends": [
+      "schedule:monthly"
+    ],
+    "dependencyDashboardApproval": false,
+    "automerge": true,
+    "rebaseWhen": "behind-base-branch"
+  },
+  "prBodyColumns": [
+    "Package",
+    "Type",
+    "Update",
+    "Change",
+    "Released",
+    "Age (d)"
+  ],
+  "prBodyDefinitions": {
+    "Released": "{{#if releaseTimestamp}}{{{releaseTimestamp}}}{{else}}—{{/if}}",
+    "Age (d)": "{{#if newVersionAgeInDays}}{{{newVersionAgeInDays}}}d{{else}}—{{/if}}"
+  },
+  "prBodyNotes": [
+    "{{#if isMajor}}⚠️ **Major update**: review upstream migration notes and rollout impact before merging.{{/if}}",
+    "{{#if isVulnerabilityAlert}}🔒 **Security update**: prioritize review and verify the vulnerable component is actually deployed.{{/if}}",
+    "{{#if isGroup}}📦 **Grouped update**: confirm the group is operationally coherent before merging.{{/if}}",
+    "Merge Confidence badges are included where supported — low or neutral confidence warrants a manual impact check before merge.",
+    "`Released` is the upstream publish time. `—` means the datasource reports no release timestamp. Docker Hub is the only Docker registry that reports one, so this preset treats every other Docker registry (ghcr.io, quay.io, Harbor and its proxies, dhi.io) as `timestamp-optional`: `minimumReleaseAge` cannot hold those updates back and they are eligible as soon as checks pass. For any other datasource, a missing timestamp holds the update for as long as a soak applies. A real date means the soak is enforced: add this update type's `minimumReleaseAge` to `Released` to get the eligibility moment."
+  ],
+  "packageRules": [
+    {
+      "description": "Require explicit dashboard approval for all normal updates",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "replacement",
+        "rollback"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Major updates — longest soak time, major label, plain feat commits: a dependency's major is NOT the consuming product's major (a `!` here cut ploeg v1.0.0-rc.1 off a postgres image bump, 2026-07-26); semantic-release-config also guards deps-scoped breaking as minor",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "minimumReleaseAge": "14 days",
+      "automerge": false,
+      "semanticCommitType": "feat",
+      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
+      "addLabels": [
+        "type/major"
+      ]
+    },
+    {
+      "description": "Minor updates — short soak time, feat commits",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "3 days",
+      "semanticCommitType": "feat",
+      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
+      "addLabels": [
+        "type/minor"
+      ]
+    },
+    {
+      "description": "Patch updates — minimal soak time, fix commits",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "1 day",
+      "semanticCommitType": "fix",
+      "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
+      "addLabels": [
+        "type/patch"
+      ]
+    },
+    {
+      "description": "Digest-only updates — no changelog needed, chore commits",
+      "matchUpdateTypes": [
+        "digest"
+      ],
+      "semanticCommitType": "chore",
+      "commitMessageExtra": "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
+      "fetchChangeLogs": "off",
+      "addLabels": [
+        "type/digest"
+      ]
+    },
+    {
+      "description": "Pin Docker image digests and require approval",
+      "matchDatasources": [
+        "docker"
+      ],
+      "pinDigests": true,
+      "dependencyDashboardApproval": true,
+      "addLabels": [
+        "container"
+      ]
+    },
+    {
+      "description": "Pin GitHub Actions to immutable digests and treat workflow updates as CI-only",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "pinDigests": true,
+      "dependencyDashboardApproval": true,
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "actions",
+      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
+      "addLabels": [
+        "github-actions"
+      ]
+    },
+    {
+      "description": "Do not apply stability-days soak time to shared Renovate preset updates",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "minimumReleaseAge": "0 days"
+    },
+    {
+      "description": "Never digest-pin the shared preset reference. It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'github>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run.",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "pinDigests": false
+    },
+    {
+      "description": "Disable peer dependency updates to avoid range-only churn",
+      "matchDepTypes": [
+        "peerDependencies"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Never digest-pin mise-managed tools. The mise manager cannot write digests into .mise.toml aqua/backend entries — the replace never applies ('Digest is not updated') and, like the preset-reference case above, the single failed dep aborts the whole grouped branch ('Error updating branch: update failure' on renovate/mise-tools). Version pins remain enabled.",
+      "matchManagers": [
+        "mise"
+      ],
+      "matchUpdateTypes": [
+        "pinDigest",
+        "digest"
+      ],
+      "enabled": false,
+      "pinDigests": false
+    },
+    {
+      "description": "Never digest-pin an action's version input (`with: version:`, depType uses-with). The value is handed to the action, which cannot take a digest. The digest lookup searches for the tag without its v prefix, fails ('Could not determine new digest for update'), and drops the update silently: Glide sat on mise 2026.6.14 while 2026.9.17 shipped.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepTypes": [
+        "uses-with"
+      ],
+      "pinDigests": false
+    },
+    {
+      "description": "A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release. This rule sits after the per-update-type rules, which would otherwise make it fix(deps) or feat(deps).",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "renovate"
+    },
+    {
+      "description": "Approval IS the gate: update types that require a dashboard tick skip the release-age soak. Renovate does not persist approvals — a tick on a soak-blocked update is consumed and silently discarded, so double-gating just eats clicks. Soak still applies wherever a repo-level rule re-adds minimumReleaseAge on unattended automerge paths (repo config is applied after presets).",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "replacement",
+        "rollback"
+      ],
+      "minimumReleaseAge": "0 days"
+    },
+    {
+      "description": "Renovate defaults to minimumReleaseAgeBehaviour timestamp-required, which silently keeps an update without a release timestamp out of every branch for as long as a soak applies. Only Docker Hub reports Docker release timestamps, so images from any other registry were detected and never proposed wherever an overlay restores the soak. These registries cannot report a timestamp; the soak is skipped for them because it cannot be measured, not because it is unwanted.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "/^[^/]+\\.[^/]+\\//",
+        "!/^(docker\\.io|index\\.docker\\.io|registry-1\\.docker\\.io)\\//"
+      ],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
+      "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once.",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false
+    },
+    {
+      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "groupName": "{{depName}} agent package",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "agents"
+    },
+    {
+      "description": "A bump of agent-standards reinstalls from the new tag, so the lockfile and the generated agent files match it in the same pull request.",
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchDepNames": [
+        "webgrip/agent-standards"
+      ],
+      "postUpgradeTasks": {
+        "commands": [
+          "install-tool uv",
+          "uvx --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@{{{newValue}}}#subdirectory=cli agentstd install"
+        ],
+        "fileFilters": [
+          "**/*",
+          "**/.*",
+          "**/.*/**"
+        ],
+        "executionMode": "branch"
+      }
+    },
+    {
+      "description": "Non-major updates share one branch and merge themselves once its checks are green. One grouped branch per run instead of one per dependency: every open branch costs a full CI run each time it is rebased, and a small runner pool cannot absorb twenty of them per push. An automerging branch rebases when it falls behind: with rebaseWhen conflicted it would keep a red result from an old base forever, and one branch rebased once per Renovate run costs at most one CI run an hour.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "The default preset drops the release-age soak because the dashboard tick was the gate. Unattended merges get the soak back; internalChecksFilter strict keeps an unsoaked update out of the group instead of holding the whole branch.",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Patch soak for unattended merges.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "description": "With minor and patch combined, Renovate offers only the highest non-major Go version, a minor that waits for approval, so the toolchain patch would never be proposed. Go keeps them apart.",
+      "separateMinorPatch": true,
+      "matchDepNames": [
+        "go",
+        "golang",
+        "docker.io/golang",
+        "**/golang"
+      ]
+    },
+    {
+      "description": "A Go toolchain minor decides what compiles the shipped binaries and raises the floor for contributors. It stays a deliberate, dashboard-approved change outside the group; toolchain patches still merge themselves.",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "matchDepNames": [
+        "go",
+        "golang",
+        "docker.io/golang",
+        "**/golang"
+      ]
+    },
+    {
+      "description": "Go toolchain patches merge themselves in their own branch: kept apart from minors, they cannot share the non-major group's branch.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "Go toolchain patches",
+      "groupSlug": "go-toolchain-patches",
+      "matchDepNames": [
+        "go",
+        "golang",
+        "docker.io/golang",
+        "**/golang"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Repeats the default preset's preset-bump rule after this overlay's soak and grouping rules, which would otherwise put the bump back in the grouped branch and hold it a day.",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "rebaseWhen": "behind-base-branch"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "A skill from webgrip/ai-skills, pinned by its per-skill tag <skill>-vX.Y.Z.",
+      "managerFilePatterns": [
+        "/(^|/)apm\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "git:\\s*https://forgejo\\.webgrip\\.dev/webgrip/ai-skills\\.git\\s*\\n\\s*path:\\s*skills/(?<depName>[a-z0-9-]+)\\s*\\n\\s*ref:\\s*[a-z0-9-]+-v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "git-tags",
+      "packageNameTemplate": "https://forgejo.webgrip.dev/webgrip/ai-skills.git",
+      "extractVersionTemplate": "^{{{depName}}}-v(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "A package from another webgrip repository, such as agent-standards, pinned by a vX.Y.Z tag.",
+      "managerFilePatterns": [
+        "/(^|/)apm\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "git:\\s*https://forgejo\\.webgrip\\.dev/webgrip/(?<repo>[a-z0-9._-]+?)(?:\\.git)?\\s*\\n\\s*path:\\s*\\S+\\s*\\n\\s*ref:\\s*(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "webgrip/{{{repo}}}",
+      "datasourceTemplate": "git-tags",
+      "packageNameTemplate": "https://forgejo.webgrip.dev/webgrip/{{{repo}}}.git",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "The agentstd CLI pinned to an agent-standards tag in mise.toml tasks, so the tool moves with the packages.",
+      "managerFilePatterns": [
+        "/(^|/)mise\\.toml$/"
+      ],
+      "matchStrings": [
+        "git\\+https://forgejo\\.webgrip\\.dev/webgrip/agent-standards\\.git@(?<currentValue>v\\d+\\.\\d+\\.\\d+)#subdirectory=cli"
+      ],
+      "depNameTemplate": "webgrip/agent-standards",
+      "datasourceTemplate": "git-tags",
+      "packageNameTemplate": "https://forgejo.webgrip.dev/webgrip/agent-standards.git",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "A Dockerfile ARG carrying an image or version under a renovate directive line.",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s*\\nARG \\S+=\"?(?:\\S*?[:/])?(?<currentValue>[^@:/\\s\"]+)@(?<currentDigest>sha256:[a-f0-9]{64})",
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s*\\nARG \\S+=\"?(?<currentValue>[^@\\s\"]+)\"?\\s"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ]
+}
