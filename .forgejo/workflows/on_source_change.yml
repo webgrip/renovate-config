@@ -22,6 +22,14 @@ on:
       - forgejo.json
       - automerge-non-major.json
       - apm.json
+      - review-non-major.json
+      - security-automerge.json
+      - docker-arg-pins.json
+      - profile-app.json
+      - profile-site.json
+      - profile-library.json
+      - profile-image-set.json
+      - scripts/**
       - .releaserc.cjs
       - package.json
       - package-lock.json
@@ -47,6 +55,13 @@ jobs:
           - forgejo.json
           - automerge-non-major.json
           - apm.json
+          - review-non-major.json
+          - security-automerge.json
+          - docker-arg-pins.json
+          - profile-app.json
+          - profile-site.json
+          - profile-library.json
+          - profile-image-set.json
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
@@ -72,6 +87,20 @@ jobs:
       - name: Validate full preset suite
         run: npm run validate
 
+  profiles:
+    name: profiles are generated and behave
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Profiles match their parts and apply the intended policy
+        run: npm test
+
   # Normal job (runs-on: docker) + step-level composite action — NOT a job-level `uses:` reusable.
   # A job-level reusable must omit runs-on, which makes Forgejo v15 flatten its inner jobs into this
   # graph and stop `needs`/`if` from gating reliably; infra uses this normal-job shape for exactly that
@@ -82,6 +111,7 @@ jobs:
     needs:
       - validate
       - validate-all
+      - profiles
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
     runs-on: docker
     # The v2 composite installs nothing: the release toolchain IS this image
