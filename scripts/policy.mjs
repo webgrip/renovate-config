@@ -32,6 +32,7 @@ export async function effective(stack, update) {
     soak: upgrade.minimumReleaseAge ?? null,
     commitType: upgrade.semanticCommitType,
     commitScope: upgrade.semanticCommitScope,
+    install: upgrade.postUpgradeTasks?.commands?.at(-1) ?? null,
   };
 }
 
@@ -55,6 +56,9 @@ export const deps = {
   webgripAction: dep('github-actions', 'gitea-tags', 'webgrip/workflows', 'action'),
   webgripGitTag: dep('mise', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', 'tools', 'webgrip/agent-standards'),
   webgripNpm: dep('npm', 'npm', '@webgrip/ui', 'dependencies'),
+  agentPackage: { ...dep('regex', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', undefined, 'webgrip/agent-standards'), packageFile: 'apm.yml' },
+  agentCli: { ...dep('regex', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', undefined, 'webgrip/agent-standards'), packageFile: 'mise.toml' },
+  agentSkill: { ...dep('regex', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/ai-skills.git', undefined, 'guard-secrets'), packageFile: 'apm.yml' },
   presetBump: dep('renovate-config-presets', 'gitea-tags', 'webgrip/renovate-config', undefined),
 };
 
@@ -95,7 +99,10 @@ export const rows = [
   ['Webgrip image minor', { ...deps.webgripImage, updateType: 'minor' }],
   ['Webgrip image digest', { ...deps.webgripImage, updateType: 'digest' }],
   ['Webgrip action patch', { ...deps.webgripAction, updateType: 'patch' }],
-  ['Webgrip agent package minor', { ...deps.webgripGitTag, updateType: 'minor' }],
+  ['Webgrip git-tag tool minor', { ...deps.webgripGitTag, updateType: 'minor' }],
+  ['Webgrip agent package major', { ...deps.agentPackage, updateType: 'major' }],
+  ['Webgrip agent package minor', { ...deps.agentPackage, updateType: 'minor' }],
+  ['Webgrip skill patch', { ...deps.agentSkill, updateType: 'patch' }],
   ['Webgrip npm package patch', { ...deps.webgripNpm, updateType: 'patch' }],
   ['Webgrip devDependency patch', { ...deps.webgripDevDependency, updateType: 'patch' }],
   ['`webgrip/renovate-config` bump', { ...deps.presetBump, updateType: 'minor' }],
@@ -113,7 +120,7 @@ export function describe({ enabled, group, automerge, approval, soak, commitType
 async function column(stack) {
   const outcomes = [];
   for (const [, update] of rows) outcomes.push(await effective(stack, update));
-  const heldGroups = new Set(outcomes.filter(outcome => outcome.enabled && outcome.group && !outcome.automerge).map(outcome => outcome.group));
+  const heldGroups = new Set(outcomes.filter((outcome, row) => outcome.enabled && outcome.group && !outcome.automerge && rows[row][1].updateType !== 'major').map(outcome => outcome.group));
   return outcomes.map(outcome => describe(outcome, !heldGroups.has(outcome.group)));
 }
 

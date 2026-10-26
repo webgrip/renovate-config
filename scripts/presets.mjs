@@ -6,17 +6,17 @@ export const policyKeys = ['groupName', 'groupSlug', 'automerge', 'dependencyDas
 
 const strict = ['parts/base.json', 'parts/approval.json'];
 const groups = ['parts/agent-package-group.json', 'parts/go-module-groups.json'];
-const gated = gate => [...strict, 'apm.json', 'parts/agent-package-group.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'parts/risk-tiers.json', 'security-automerge.json', 'parts/first-party.json'];
+const gated = gate => [...strict, 'apm.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'parts/risk-tiers.json', 'security-automerge.json', 'parts/first-party.json', 'parts/agent-package-group.json'];
 
 const gates = {
   reviewed: {
     description:
-      'Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, dependencies that never ship (devDependencies, require-dev, @types), Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick.',
+      'Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, dependencies that never ship (devDependencies, require-dev, @types), Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; third-party majors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick; Webgrip’s own majors open a pull request a person merges.',
     parts: gated('parts/digests-and-actions.json'),
   },
   unattended: {
     description:
-      'Gate for a repository whose CI is a sufficient gate because its consumers take each release through their own pull request, such as a package, a preset, a reusable workflow, an action or a set of images: third-party minor, patch, digest and pin updates share one branch that merges itself on green after a release-age soak. Dependencies that never ship (devDependencies, require-dev, @types) merge themselves in a branch of their own after the same soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors, Go toolchain minors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick.',
+      'Gate for a repository whose CI is a sufficient gate because its consumers take each release through their own pull request, such as a package, a preset, a reusable workflow, an action or a set of images: third-party minor, patch, digest and pin updates share one branch that merges itself on green after a release-age soak. Dependencies that never ship (devDependencies, require-dev, @types) merge themselves in a branch of their own after the same soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; third-party majors, Go toolchain minors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick; Webgrip’s own majors open a pull request a person merges.',
     parts: gated('parts/automerge.json'),
   },
 };
@@ -44,12 +44,12 @@ export const generated = {
   'review-non-major': {
     description:
       'Opt-in overlay for repositories where a person reviews dependency updates but should not tick them one by one: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge, after a release-age soak. Digests are left to safe-automerge, majors keep the tick. Extend after the default preset.',
-    parts: ['parts/non-major.json'],
+    parts: ['parts/non-major.json', 'parts/agent-package-group.json'],
   },
   'automerge-non-major': {
     description:
       'Opt-in overlay for repositories whose CI is the gate: minor, patch, digest and pin updates skip the dashboard tick, share one branch and merge themselves once the pull request checks are green, after a release-age soak. Majors and Go toolchain minors keep the tick. Extend after the default preset and after golang when the repository has one.',
-    parts: ['parts/non-major.json', 'parts/automerge.json'],
+    parts: ['parts/non-major.json', 'parts/automerge.json', 'parts/agent-package-group.json'],
   },
   grouped: {
     description:
@@ -58,8 +58,8 @@ export const generated = {
   },
   'first-party': {
     description:
-      'Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Every profile includes it. Extend after the default preset and the non-major overlay.',
-    parts: ['parts/first-party.json'],
+      'Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green; their majors open a pull request without a tick and a person merges it. Every profile includes it. Extend after the default preset and the non-major overlay.',
+    parts: ['parts/first-party.json', 'parts/agent-package-group.json'],
   },
   ...gates,
   ...Object.fromEntries(Object.entries(aliases).map(([name, definition]) => [name, alias(definition)])),

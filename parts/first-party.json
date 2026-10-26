@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Webgrip's own packages: minor, patch, digest and pin updates of anything Webgrip publishes (Harbor's webgrip project, ghcr.io/webgrip, @webgrip npm packages, webgrip repositories as actions or git tags) share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Webgrip's release pipeline is the gate for these and semantic versioning is ours to keep, so a soak only delays them, and a separate branch keeps a red third-party update from holding them back. Majors keep the tick.",
+  "description": "Webgrip's own packages: minor, patch, digest and pin updates of anything Webgrip publishes (Harbor's webgrip project, ghcr.io/webgrip, @webgrip npm packages, webgrip repositories as actions or git tags) share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Webgrip's release pipeline is the gate for these and semantic versioning is ours to keep, so a soak only delays them, and a separate branch keeps a red third-party update from holding them back. Majors open their pull request without a tick and wait for a person to merge it: a major is ours to break, so it never merges itself, but nobody should have to ask for it either.",
   "packageRules": [
     {
       "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
@@ -29,6 +29,22 @@
         "automerge"
       ],
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "A major of Webgrip's own packages opens its pull request without a dashboard tick and never merges itself. The approval part ticks every major and this part comes after it, so this rule lifts that tick for Webgrip's own packages only; the major's own branch, commit type and zero soak stay as the earlier parts set them.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": false,
+      "automerge": false
     }
   ]
 }

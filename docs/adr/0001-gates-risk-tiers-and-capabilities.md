@@ -104,8 +104,10 @@ moved into the policy layer:
 
 - `parts/go-module-groups.json`: the `golang.org/x` and indirect-module groups, carried by
   `default` and both gates at the position the golang overlay used to reach after a profile.
-- `parts/agent-package-group.json`: the per-package agent group, carried by `default` and both
-  gates right after `apm.json`.
+- `parts/agent-package-group.json`: a branch per agent package and one for all
+  `webgrip/ai-skills` skills, carried by `default`, by the hand-composed overlays as their last
+  part, and by both gates after `parts/first-party.json`, so an agent package keeps a branch of
+  its own and its post-upgrade install runs with the right tag.
 
 `golang.json` also lost a rule that matched update type `vulnerability`, which Renovate does not
 have; Renovate's `vulnerabilityAlerts` defaults already set `groupName: null`.

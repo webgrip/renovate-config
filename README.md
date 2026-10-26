@@ -51,7 +51,7 @@ A preset answers three questions apart ([ADR 0001](docs/adr/0001-gates-risk-tier
 
 | Gate | For | Third-party minor, patch, pin | Digests, CI actions | Never ships: devDependencies, `require-dev`, `@types` | Always review: token, OIDC and database libraries | Webgrip's own minor, patch, digest, pin | Security fixes | Majors |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `reviewed` | repositories that ship what merges: services, products, sites | one grouped pull request after a soak, a person merges | one branch of their own, merges itself on green | one branch of their own, merges itself on green after a soak | dashboard tick, own branch | one branch of their own, no soak, merges itself on green | merge themselves on green | dashboard tick |
+| `reviewed` | repositories that ship what merges: services, products, sites | one grouped pull request after a soak, a person merges | one branch of their own, merges itself on green | one branch of their own, merges itself on green after a soak | dashboard tick, own branch | one branch of their own, no soak, merges itself on green | merge themselves on green | third-party: dashboard tick; Webgrip's own: a pull request without a tick, a person merges |
 | `unattended` | repositories whose consumers take each release through their own pull request: packages, presets, reusable workflows, actions, image sets | one grouped branch that merges itself on green after a soak | in that grouped branch | same as `reviewed` | same | same | same | same |
 
 The profile names stay published, generated from the gates: `profile-app` and `profile-site` are

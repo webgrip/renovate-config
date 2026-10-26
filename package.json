@@ -5,7 +5,7 @@
   "private": true,
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": "v26.12.1"
   },
   "scripts": {
     "validate": "renovate-config-validator --strict $(node -p \"require('./scripts/published.cjs').join(' ')\")",
@@ -15,14 +15,14 @@
     "generate": "node scripts/presets.mjs"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/exec": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^10.3.5",
-    "@semantic-release/release-notes-generator": "^14.0.3",
-    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/commit-analyzer": "13.0.1",
+    "@semantic-release/exec": "6.0.3",
+    "@semantic-release/git": "10.0.1",
+    "@semantic-release/github": "10.3.5",
+    "@semantic-release/release-notes-generator": "14.1.1",
+    "conventional-changelog-conventionalcommits": "8.0.0",
     "renovate": "43.208.0",
-    "semantic-release": "^24.2.5"
+    "semantic-release": "24.2.9"
   }
 }

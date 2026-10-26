@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Every profile includes it. Extend after the default preset and the non-major overlay.",
+  "description": "Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green; their majors open a pull request without a tick and a person merges it. Every profile includes it. Extend after the default preset and the non-major overlay.",
   "packageRules": [
     {
       "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
@@ -29,6 +29,62 @@
         "automerge"
       ],
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "A major of Webgrip's own packages opens its pull request without a dashboard tick and never merges itself. The approval part ticks every major and this part comes after it, so this rule lifts that tick for Webgrip's own packages only; the major's own branch, commit type and zero soak stay as the earlier parts set them.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": false,
+      "automerge": false
+    },
+    {
+      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchPackageNames": [
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "groupName": "{{depName}} agent package",
+      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}"
+    },
+    {
+      "description": "Skills from webgrip/ai-skills share one branch: each skill is its own dependency, and one branch per skill would make every other skill branch conflict on apm.lock.yaml once the first merges.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchPackageNames": [
+        "https://forgejo.webgrip.dev/webgrip/ai-skills.git"
+      ],
+      "groupName": "webgrip/ai-skills skills",
+      "groupSlug": "agent-skills"
     },
     {
       "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'local>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",
