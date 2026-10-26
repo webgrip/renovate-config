@@ -81,6 +81,17 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       writeFileSync(fileOf(name), expected);
     }
   }
+  const { policyFile, render } = await import('./policy.mjs');
+  const policy = await render();
+  if (check) {
+    let actual = '';
+    try {
+      actual = readFileSync(policyFile, 'utf8');
+    } catch {}
+    if (actual !== policy) stale.push(policyFile);
+  } else {
+    writeFileSync(policyFile, policy);
+  }
   if (stale.length > 0) {
     console.error(`Out of date, run \`npm run generate\`: ${stale.join(', ')}`);
     process.exit(1);

@@ -26,28 +26,12 @@ part that makes the decision, so a change starts in the right file.
 
 ## The policy, update by update
 
-| Update | `profile-app`, `profile-site` | `profile-library`, `profile-image-set` | Decided in |
-| --- | --- | --- | --- |
-| Major | dashboard tick, no soak | dashboard tick, no soak | approval |
-| Third-party minor | `all non-major dependencies` PR after 3 days, a person merges | same branch after 3 days, merges itself | non-major, automerge |
-| Third-party patch | same PR after 1 day, a person merges | same branch after 1 day, merges itself | non-major, automerge |
-| Third-party pin | same PR, a person merges | same branch, merges itself | non-major, automerge |
-| Third-party digest or digest pin | `digests and CI actions` branch, merges itself | the non-major branch, merges itself | digests-and-actions, automerge |
-| CI action minor, patch, pin, digest | `digests and CI actions` branch after the soak of its type, merges itself | the non-major branch, merges itself | digests-and-actions, automerge |
-| Webgrip minor, patch, digest, pin | `webgrip dependencies` branch, no soak, merges itself | same | first-party |
-| Security fix | its own PR at once, lowest fixing version, merges itself | same | base, security-automerge |
-| Lock file maintenance | monthly, dashboard tick | monthly, merges itself | base, automerge |
-| Go toolchain minor | the non-major PR | dashboard tick, no soak | automerge |
-| Go toolchain patch | the non-major PR | `Go toolchain patches` branch, merges itself | automerge |
-| `webgrip/renovate-config` | its own branch, no soak, merges itself | same | preset-bump |
-| Peer dependency | ignored | ignored | base |
-| Replacement, rollback | dashboard tick | dashboard tick | approval |
+[The policy table](policy.md) is generated from the presets themselves: every update type, for every
+profile and for the overlay stacks repositories still compose by hand. A pull request that changes
+behaviour changes that file, so its diff is the behaviour change.
 
 Branches a person merges rebase only on a conflict; branches that merge themselves rebase when
 they fall behind. An update still inside its soak stays out of a group instead of holding it.
-
-`scripts/presets.test.mjs` holds this table as data and checks every profile against it with
-Renovate's own rule matching.
 
 ## Why
 

@@ -1,44 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { resolveConfigPresets } from 'renovate/dist/config/presets/index.js';
-import { applyPackageRules } from 'renovate/dist/util/package-rules/index.js';
-import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 import { build, fileOf, generated } from './presets.mjs';
+import { deps, effective as resolveUpdate } from './policy.mjs';
 
-const resolved = new Map();
-
-function resolve(preset) {
-  if (!resolved.has(preset)) resolved.set(preset, resolveConfigPresets(JSON.parse(readFileSync(fileOf(preset), 'utf8'))));
-  return resolved.get(preset);
-}
-
-async function effective(preset, update) {
-  const { config } = await resolve(preset);
-  const { packageRules, vulnerabilityAlerts, ...repo } = config;
-  let upgrade = await applyPackageRules({ ...repo, packageRules, ...update });
-  if (update.isVulnerabilityAlert) upgrade = mergeChildConfig(upgrade, vulnerabilityAlerts);
-  return {
-    group: upgrade.groupName ?? null,
-    automerge: upgrade.automerge === true,
-    approval: upgrade.dependencyDashboardApproval === true,
-    soak: upgrade.minimumReleaseAge ?? null,
-    commitType: upgrade.semanticCommitType,
-  };
-}
-
-const dep = (manager, datasource, packageName, depType, depName = packageName) => ({ manager, datasource, depName, packageName, depType });
-const npm = dep('npm', 'npm', 'left-pad', 'dependencies');
-const action = dep('github-actions', 'github-tags', 'actions/checkout', 'action');
-const go = dep('gomod', 'golang-version', 'go', 'golang');
-const proxiedImage = dep('dockerfile', 'docker', 'harbor.webgrip.dev/dockerhub/library/node', 'stage');
-const webgrip = {
-  image: dep('dockerfile', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', 'stage'),
-  action: dep('github-actions', 'gitea-tags', 'webgrip/workflows', 'action'),
-  gitTag: dep('mise', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', 'tools', 'webgrip/agent-standards'),
-  npm: dep('npm', 'npm', '@webgrip/ui', 'dependencies'),
-};
-const presetBump = dep('renovate-config-presets', 'gitea-tags', 'webgrip/renovate-config', undefined);
+const effective = (preset, update) => resolveUpdate([fileOf(preset)], update);
+const { npm, action, go, image: proxiedImage, presetBump } = deps;
+const webgrip = { image: deps.webgripImage, action: deps.webgripAction, gitTag: deps.webgripGitTag, npm: deps.webgripNpm };
 
 const tick = { group: null, automerge: false, approval: true };
 const nonMajor = 'all non-major dependencies';
