@@ -59,6 +59,24 @@ for (const profile of ['profile-app', 'profile-site']) {
   });
 }
 
+const own = [
+  { manager: 'npm', datasource: 'npm', depName: '@webgrip/prettier-config', packageName: '@webgrip/prettier-config', depType: 'devDependencies' },
+  { manager: 'github-actions', datasource: 'git-tags', depName: 'webgrip/workflows', packageName: 'webgrip/workflows', depType: 'action' },
+  { manager: 'custom.regex', datasource: 'git-tags', depName: 'product-owner', packageName: 'https://forgejo.webgrip.dev/webgrip/ai-skills.git' },
+  { manager: 'dockerfile', datasource: 'docker', depName: 'harbor.webgrip.dev/webgrip/semantic-release', packageName: 'harbor.webgrip.dev/webgrip/semantic-release' },
+];
+
+for (const profile of Object.keys(profiles)) {
+  test(`${profile}: webgrip's own dependencies merge themselves without a tick, majors included`, async () => {
+    for (const dependency of own) {
+      for (const updateType of ['major', 'minor', 'patch']) {
+        const result = await effective(profile, { ...dependency, updateType });
+        assert.deepEqual({ name: dependency.depName, updateType, automerge: result.automerge, approval: result.approval, group: result.group }, { name: dependency.depName, updateType, automerge: true, approval: false, group: 'webgrip packages' });
+      }
+    }
+  });
+}
+
 for (const profile of ['profile-library', 'profile-image-set']) {
   test(`${profile}: the grouped non-major branch merges itself`, async () => {
     assert.equal((await effective(profile, { ...npm, updateType: 'minor' })).automerge, true);

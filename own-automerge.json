@@ -1,0 +1,23 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Webgrip's own packages, presets, reusable workflows, agent packs, skills and images merge themselves once the pull request checks are green, majors included: no dashboard tick, no release-age soak. Their releases are reviewed where they are made, and a consumer waiting on a tick for its own organisation's change is a fix that has not landed. Put this preset last, after a profile, so nothing after it turns automerge off again.",
+  "packageRules": [
+    {
+      "description": "Webgrip-owned dependencies, matched by package name across npm, git tags, Forgejo tags, the apm preset's skill pins and the Harbor registry. One branch for all of them, so one CI run per Renovate run.",
+      "matchPackageNames": [
+        "webgrip/**",
+        "@webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "harbor.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest", "pinDigest"],
+      "groupName": "webgrip packages",
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": ["automerge", "webgrip"]
+    }
+  ]
+}

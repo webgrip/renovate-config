@@ -402,6 +402,33 @@
       "automergeType": "pr",
       "platformAutomerge": false,
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Webgrip-owned dependencies, matched by package name across npm, git tags, Forgejo tags, the apm preset's skill pins and the Harbor registry. One branch for all of them, so one CI run per Renovate run.",
+      "matchPackageNames": [
+        "webgrip/**",
+        "@webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "harbor.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "pinDigest"
+      ],
+      "groupName": "webgrip packages",
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge",
+        "webgrip"
+      ]
     }
   ],
   "customManagers": [
