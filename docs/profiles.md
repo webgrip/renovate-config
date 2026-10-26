@@ -15,37 +15,23 @@ part that makes the decision, so a change starts in the right file.
 | 2 | `parts/approval.json` | Every update waits for a dashboard tick, and a ticked update has no soak |
 | 3 | `apm.json` | Agent packages in `apm.yml` and the `agentstd` pin in `mise.toml` |
 | 4 | `parts/non-major.json` | Lifts the tick for minor, patch and pin, groups them, restores the soak |
-| 5 | `safe-automerge.json` (app, site) or `parts/automerge.json` (library, image-set) | Who merges the non-major work |
+| 5 | `parts/digests-and-actions.json` (app, site) or `parts/automerge.json` (library, image-set) | Who merges what |
 | 6 | `security-automerge.json` | Security fixes merge themselves |
 | 7 | `parts/first-party.json` | Webgrip's own non-major updates get their own branch, no soak, automerge |
 | 8 | `docker-arg-pins.json` (image-set only) | Dockerfile `ARG` pins under a `# renovate:` line |
 | last | `parts/preset-bump.json` | The `webgrip/renovate-config` bump, appended to every generated preset |
 
-`default.json`, `review-non-major.json`, `automerge-non-major.json` and `first-party.json` are
-generated from the same parts, for repositories that still compose overlays by hand.
+`default.json`, `grouped.json`, `review-non-major.json`, `automerge-non-major.json` and
+`first-party.json` are generated from the same parts, for repositories that still compose overlays by hand.
 
 ## The policy, update by update
 
-| Update | `profile-app`, `profile-site` | `profile-library`, `profile-image-set` | Decided in |
-| --- | --- | --- | --- |
-| Major | dashboard tick, no soak | dashboard tick, no soak | approval |
-| Third-party minor | `all non-major dependencies` PR after 3 days, a person merges | same branch after 3 days, merges itself | non-major, automerge |
-| Third-party patch | same PR after 1 day, a person merges | same branch after 1 day, merges itself | non-major, automerge |
-| Third-party pin | same PR, a person merges | same branch, merges itself | non-major, automerge |
-| Third-party Docker or action digest | dashboard tick, then its own branch merges itself (see finding 2) | the non-major branch, merges itself | approval, safe-automerge, automerge |
-| Third-party Docker or action pinDigest | dashboard tick | the non-major branch, merges itself | approval, automerge |
-| CI action minor or patch | the non-major PR (see finding 1) | the non-major branch, merges itself | non-major, safe-automerge |
-| Webgrip minor, patch, digest, pin | `webgrip dependencies` branch, no soak, merges itself | same | first-party |
-| Security fix | its own PR at once, lowest fixing version, merges itself | same | base, security-automerge |
-| Lock file maintenance | monthly, dashboard tick | monthly, merges itself | base, automerge |
-| Go toolchain minor | the non-major PR | dashboard tick, and a 3-day soak (see finding 6) | automerge |
-| Go toolchain patch | the non-major PR | `Go toolchain patches` branch, merges itself | automerge |
-| `webgrip/renovate-config` | its own branch, no soak, merges itself | same | preset-bump |
-| Peer dependency | ignored | ignored | base |
-| Replacement, rollback | dashboard tick | dashboard tick | approval |
+[The policy table](policy.md) is generated from the presets themselves: every update type, for every
+profile and for the overlay stacks repositories still compose by hand. A pull request that changes
+behaviour changes that file, so its diff is the behaviour change.
 
-`scripts/presets.test.mjs` holds this table as data and checks every profile against it with
-Renovate's own rule matching.
+Branches a person merges rebase only on a conflict; branches that merge themselves rebase when
+they fall behind. An update still inside its soak stays out of a group instead of holding it.
 
 ## Why
 
@@ -58,6 +44,16 @@ and the runner pool is small. One grouped branch per run instead of one per depe
 
 **Apps wait for a person, libraries do not.** A library's consumers take each release through their
 own pull request, so the library's CI is a sufficient gate. An app ships what merges.
+
+**On apps, only code a person would read waits for a person.** A digest moves a tag already pinned
+to the same version, and a CI action changes how CI runs, not what ships. They share a branch that
+merges itself, apart from the person-merged branch: Renovate merges a group only when every update
+in it merges itself, so a single update that waits for a person holds the whole branch.
+
+**A branch that waits for a person rebases only on a conflict.** Rebasing it on every push to the
+base branch reruns its CI for a merge nobody is ready to make. A branch that merges itself rebases
+when it falls behind, because a red result from an old base, say a test fixed on the base since,
+would otherwise keep it from ever merging. That costs at most one rebase per Renovate run.
 
 **Webgrip's own packages skip the soak and the group.** Their release pipeline already gated them,
 and we keep their semantic versioning ourselves, so a soak only delays them. A branch of their own
@@ -85,37 +81,13 @@ are `timestamp-optional`. The cost: the soak never holds a ghcr.io, quay.io or H
 **Renovate merges, not Forgejo.** `platformAutomerge: false`, because Forgejo's
 merge-when-checks-succeed merges at once on a branch without required checks.
 
-## Where it looks off
+## Decisions that stay open
 
-These are open decisions, not bugs fixed in passing. Each one names what would change.
-
-1. **The CI-action automerge in app and site is erratic.** `safe-automerge` marks action minors and
-   patches as automerge, but `non-major` already put them into the person-merged group, and
-   Renovate merges a group only when every member automerges. An action update merges itself only
-   when it happens to be alone in the group. Either drop the rule from app and site, or give
-   actions an automerging group of their own.
-2. **Third-party Docker and action digests on app and site wait for a tick.** `safe-automerge` sets
-   automerge on digests but never lifts the approval, and the approval part covers every Docker and
-   action update. A digest waits on the dashboard, then merges itself after the tick. The same holds
-   for `pinDigest`, which `safe-automerge` does not cover at all. Libraries lift both. The README
-   claimed app digests merge themselves; the old test only checked the automerge flag of an npm
-   digest, which has no approval rule.
-3. **Third-party digests on app and site get one branch each,** one CI run per image, which is the
-   cost the non-major group exists to avoid. Libraries put them in the group.
-4. **App and site rebase every branch when it falls behind.** A person-merged PR is rebased, and its
-   CI rerun, on every push to the base branch. Libraries use `rebaseWhen: conflicted` and rebase
-   only the automerging branches. App and site also keep `internalChecksFilter: none`, so the
-   grouped PR opens before the soak ends and a person can merge an update the soak was meant to
-   hold.
-5. **The agent-package grouping in `apm.json` only reaches majors.** Its `{{depName}} agent package`
-   group sits before the non-major and first-party groups, which override it for every non-major
-   update. Majors are ticked one by one anyway, so the rule groups nothing.
-6. **A Go toolchain minor in a library is ticked and soaked.** The automerge part puts the tick back
-   on it, but the non-major part's 3-day soak still applies, which is the double gate the tick rule
-   exists to avoid: a tick in the first three days is discarded.
-7. **Majors never soak.** The old default set 14 days, but its own zero-soak rule overrode that in
-   every preset, so the value was never in effect and is gone. A ticked major can merge the hour
-   it is released. That follows from the tick rule above; a soak would need a different gate than
-   the tick.
-8. **`grouped.json` sweeps the preset bump into its group.** It is a hand-written overlay that the
-   generator does not end with `preset-bump`. No profile uses it.
+1. **Majors never soak.** The tick is their gate, and a soak on a ticked update discards the tick.
+   A ticked major can therefore merge the hour it is released. A soak for majors would need a gate
+   other than the tick, such as an automerging major branch, which this repository does not want.
+2. **The agent-package group in `apm.json` only shapes majors.** The non-major and first-party
+   groups come after it and take every non-major agent-package update. For a major, it keeps the
+   `apm.yml` and `mise.toml` pins of one package in one branch.
+3. **Images outside Docker Hub do not soak.** See the timestamp note above. A datasource that reads
+   Harbor's push time would close the gap.

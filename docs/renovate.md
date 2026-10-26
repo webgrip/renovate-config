@@ -31,7 +31,7 @@ Use for most repositories:
 
 ```json
 {
-  "extends": ["github>webgrip/renovate-config#v1.2.1"]
+  "extends": ["local>webgrip/renovate-config#vX.Y.Z"]
 }
 ```
 
@@ -42,8 +42,8 @@ Use when a repository wants fewer PRs for routine updates:
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.2.1",
-    "github>webgrip/renovate-config:grouped#v1.2.1"
+    "local>webgrip/renovate-config#vX.Y.Z",
+    "local>webgrip/renovate-config:grouped#vX.Y.Z"
   ]
 }
 ```
@@ -55,8 +55,8 @@ Use when a repository has mature CI and wants the lowest-risk updates merged aut
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.2.1",
-    "github>webgrip/renovate-config:safe-automerge#v1.2.1"
+    "local>webgrip/renovate-config#vX.Y.Z",
+    "local>webgrip/renovate-config:safe-automerge#vX.Y.Z"
   ]
 }
 ```
@@ -68,8 +68,8 @@ Use when a repository's CI is the gate and the dashboard should hold only the de
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.12.0",
-    "github>webgrip/renovate-config:automerge-non-major#v1.12.0"
+    "local>webgrip/renovate-config#vX.Y.Z",
+    "local>webgrip/renovate-config:automerge-non-major#vX.Y.Z"
   ]
 }
 ```
@@ -98,8 +98,8 @@ Use for Kubernetes, Flux, or homelab-style GitOps repositories. Extend it after 
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.2.1",
-    "github>webgrip/renovate-config:gitops#v1.2.1"
+    "local>webgrip/renovate-config#vX.Y.Z",
+    "local>webgrip/renovate-config:gitops#vX.Y.Z"
   ]
 }
 ```
@@ -111,8 +111,8 @@ Use for any repository with a `go.mod`. Extend it after the default preset:
 ```json
 {
   "extends": [
-    "github>webgrip/renovate-config#v1.6.0",
-    "github>webgrip/renovate-config:golang#v1.6.0"
+    "local>webgrip/renovate-config#vX.Y.Z",
+    "local>webgrip/renovate-config:golang#vX.Y.Z"
   ]
 }
 ```
@@ -171,8 +171,8 @@ Use `webgrip/homelab-cluster` as the repo-local policy layer, not as the place t
    ```json
    {
      "extends": [
-       "github>webgrip/renovate-config#v1.2.1",
-       "github>webgrip/renovate-config:gitops#v1.2.1"
+       "local>webgrip/renovate-config#vX.Y.Z",
+       "local>webgrip/renovate-config:gitops#vX.Y.Z"
      ]
    }
    ```

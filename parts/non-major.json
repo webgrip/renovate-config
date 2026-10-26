@@ -1,10 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Minor, patch and pin updates share one branch that opens without a dashboard tick, with the release-age soak restored because the tick no longer gates them.",
+  "description": "Minor, patch and pin updates share one branch that opens without a dashboard tick, with the release-age soak restored because the tick no longer gates them. Branches rebase only on a conflict, and an update still inside its soak stays out of the branch instead of holding it.",
   "separateMinorPatch": false,
+  "rebaseWhen": "conflicted",
+  "internalChecksFilter": "strict",
   "packageRules": [
     {
-      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased.",
+      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased. A branch that waits for a person rebases only on a conflict: with behind-base-branch every push to the base branch would rebase it and rerun its CI. Branches that merge themselves set behind-base-branch, because a red result from an old base would otherwise keep them from merging forever.",
       "matchUpdateTypes": [
         "minor",
         "patch",

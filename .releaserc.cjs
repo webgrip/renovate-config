@@ -1,6 +1,6 @@
 'use strict';
 
-// Org Renovate preset: v* tags on main (consumers pin github>webgrip/renovate-config#vX.Y.Z),
+// Org Renovate preset: v* tags on main (consumers pin local>webgrip/renovate-config#vX.Y.Z),
 // presets validated before the tag is cut, and the preset JSON files uploaded as release assets.
 // The emoji section names are kept via extraNotesTypes (prepended, so they win over defaults).
 const { makeConfig } = require('@webgrip/semantic-release-config');

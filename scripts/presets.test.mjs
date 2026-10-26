@@ -1,55 +1,30 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { resolveConfigPresets } from 'renovate/dist/config/presets/index.js';
-import { applyPackageRules } from 'renovate/dist/util/package-rules/index.js';
-import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 import { build, fileOf, generated } from './presets.mjs';
+import { deps, effective as resolveUpdate } from './policy.mjs';
 
-const resolved = new Map();
-
-function resolve(preset) {
-  if (!resolved.has(preset)) resolved.set(preset, resolveConfigPresets(JSON.parse(readFileSync(fileOf(preset), 'utf8'))));
-  return resolved.get(preset);
-}
-
-async function effective(preset, update) {
-  const { config } = await resolve(preset);
-  const { packageRules, vulnerabilityAlerts, ...repo } = config;
-  let upgrade = await applyPackageRules({ ...repo, packageRules, ...update });
-  if (update.isVulnerabilityAlert) upgrade = mergeChildConfig(upgrade, vulnerabilityAlerts);
-  return {
-    group: upgrade.groupName ?? null,
-    automerge: upgrade.automerge === true,
-    approval: upgrade.dependencyDashboardApproval === true,
-    soak: upgrade.minimumReleaseAge ?? null,
-    commitType: upgrade.semanticCommitType,
-  };
-}
-
-const dep = (manager, datasource, packageName, depType, depName = packageName) => ({ manager, datasource, depName, packageName, depType });
-const npm = dep('npm', 'npm', 'left-pad', 'dependencies');
-const action = dep('github-actions', 'github-tags', 'actions/checkout', 'action');
-const proxiedImage = dep('dockerfile', 'docker', 'harbor.webgrip.dev/dockerhub/library/node', 'stage');
-const webgrip = {
-  image: dep('dockerfile', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', 'stage'),
-  action: dep('github-actions', 'gitea-tags', 'webgrip/workflows', 'action'),
-  gitTag: dep('mise', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', 'tools', 'webgrip/agent-standards'),
-  npm: dep('npm', 'npm', '@webgrip/ui', 'dependencies'),
-};
-const presetBump = dep('renovate-config-presets', 'gitea-tags', 'webgrip/renovate-config', undefined);
+const effective = (preset, update) => resolveUpdate([fileOf(preset)], update);
+const { npm, action, go, image: proxiedImage, presetBump } = deps;
+const webgrip = { image: deps.webgripImage, action: deps.webgripAction, gitTag: deps.webgripGitTag, npm: deps.webgripNpm };
 
 const tick = { group: null, automerge: false, approval: true };
 const nonMajor = 'all non-major dependencies';
+const safeBranch = 'digests and CI actions';
 const ownBranch = { group: 'webgrip dependencies', automerge: true, approval: false, soak: '0 days' };
 
 const policy = [
   ['a major', { ...npm, updateType: 'major' }, { default: tick, reviewed: tick, unattended: tick }],
   ['a minor', { ...npm, updateType: 'minor' }, { default: tick, reviewed: { group: nonMajor, automerge: false, approval: false, soak: '3 days', commitType: 'fix' }, unattended: { group: nonMajor, automerge: true, approval: false, soak: '3 days', commitType: 'fix' } }],
   ['a patch', { ...npm, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor, automerge: false, approval: false, soak: '1 day', commitType: 'fix' }, unattended: { group: nonMajor, automerge: true, approval: false, soak: '1 day', commitType: 'fix' } }],
-  ['a digest', { ...npm, updateType: 'digest' }, { default: tick, reviewed: { automerge: true }, unattended: { group: nonMajor, automerge: true } }],
-  ['a Docker digest', { ...proxiedImage, updateType: 'digest' }, { default: tick, reviewed: { automerge: true, approval: true }, unattended: { group: nonMajor, automerge: true, approval: false } }],
-  ['a CI action minor', { ...action, updateType: 'minor' }, { default: tick, reviewed: { automerge: true }, unattended: { automerge: true } }],
+  ['a digest', { ...npm, updateType: 'digest' }, { default: tick, reviewed: { group: safeBranch, automerge: true, approval: false }, unattended: { group: nonMajor, automerge: true } }],
+  ['a Docker digest', { ...proxiedImage, updateType: 'digest' }, { default: tick, reviewed: { group: safeBranch, automerge: true, approval: false, soak: '0 days' }, unattended: { group: nonMajor, automerge: true, approval: false } }],
+  ['a Docker digest pin', { ...proxiedImage, updateType: 'pinDigest' }, { default: tick, reviewed: { group: safeBranch, automerge: true, approval: false }, unattended: { group: nonMajor, automerge: true, approval: false } }],
+  ['a CI action minor', { ...action, updateType: 'minor' }, { default: tick, reviewed: { group: safeBranch, automerge: true, approval: false, soak: '3 days', commitType: 'ci' }, unattended: { group: nonMajor, automerge: true, commitType: 'ci' } }],
+  ['a CI action digest', { ...action, updateType: 'digest' }, { default: tick, reviewed: { group: safeBranch, automerge: true, approval: false }, unattended: { group: nonMajor, automerge: true } }],
+  ['a CI action major', { ...action, updateType: 'major' }, { default: tick, reviewed: tick, unattended: tick }],
+  ['a Go toolchain minor', { ...go, updateType: 'minor' }, { default: tick, reviewed: { group: nonMajor, automerge: false }, unattended: { group: null, automerge: false, approval: true, soak: '0 days' } }],
+  ['a Go toolchain patch', { ...go, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor, automerge: false }, unattended: { group: 'Go toolchain patches', automerge: true, approval: false } }],
   ['a security fix', { ...npm, updateType: 'minor', isVulnerabilityAlert: true }, { default: { approval: false, automerge: false }, reviewed: { approval: false, automerge: true }, unattended: { approval: false, automerge: true } }],
   ['a patch from a Harbor proxy project', { ...proxiedImage, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor }, unattended: { group: nonMajor } }],
   ...Object.entries(webgrip).flatMap(([kind, update]) => [

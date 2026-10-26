@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a deployed service or product. Minor, patch and pin updates arrive together in one pull request a person merges; digest and CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green; majors wait for a dashboard tick.",
+  "description": "Profile for a deployed service or product. Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",
@@ -14,7 +14,7 @@
   ],
   "updateNotScheduled": false,
   "fetchChangeLogs": "pr",
-  "rebaseWhen": "behind-base-branch",
+  "rebaseWhen": "conflicted",
   "recreateWhen": "always",
   "rangeStrategy": "pin",
   "pinDigests": true,
@@ -25,7 +25,7 @@
   "ignoreUnstable": true,
   "respectLatest": true,
   "rollbackPrs": true,
-  "internalChecksFilter": "none",
+  "internalChecksFilter": "strict",
   "prCreation": "not-pending",
   "prNotPendingHours": 2,
   "prHourlyLimit": 0,
@@ -68,7 +68,8 @@
     "automergeType": "pr",
     "addLabels": [
       "automerge"
-    ]
+    ],
+    "rebaseWhen": "behind-base-branch"
   },
   "lockFileMaintenance": {
     "enabled": true,
@@ -282,7 +283,7 @@
       }
     },
     {
-      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased.",
+      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased. A branch that waits for a person rebases only on a conflict: with behind-base-branch every push to the base branch would rebase it and rerun its CI. Branches that merge themselves set behind-base-branch, because a red result from an old base would otherwise keep them from merging forever.",
       "matchUpdateTypes": [
         "minor",
         "patch",
@@ -307,31 +308,42 @@
       "minimumReleaseAge": "1 day"
     },
     {
-      "description": "Automerge digest updates after CI passes",
+      "description": "Docker and CI action digests and digest pins. A digest moves a tag that is already pinned to the same version, so the soak does not apply.",
       "matchUpdateTypes": [
-        "digest"
+        "digest",
+        "pinDigest"
       ],
+      "groupName": "digests and CI actions",
+      "groupSlug": "digests-and-actions",
+      "dependencyDashboardApproval": false,
       "automerge": true,
       "automergeType": "pr",
       "addLabels": [
         "automerge"
-      ]
+      ],
+      "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Automerge GitHub Actions patch and minor updates after CI passes",
+      "description": "CI action updates change only how CI runs. Taken out of the person-merged branch, because Renovate merges a group only when every update in it merges itself; they keep the soak of their update type.",
       "matchManagers": [
         "github-actions"
       ],
       "matchUpdateTypes": [
         "minor",
-        "patch"
+        "patch",
+        "pin",
+        "digest",
+        "pinDigest"
       ],
+      "groupName": "digests and CI actions",
+      "groupSlug": "digests-and-actions",
+      "dependencyDashboardApproval": false,
       "automerge": true,
       "automergeType": "pr",
       "addLabels": [
-        "automerge",
-        "github-actions"
-      ]
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
     },
     {
       "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
@@ -362,7 +374,7 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'github>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",
+      "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'local>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",
       "matchPackageNames": [
         "webgrip/renovate-config"
       ],

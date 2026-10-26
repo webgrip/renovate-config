@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "For repositories where a person merges the non-major branch: digests, digest pins and CI action updates carry no code a person would review, so they share a branch of their own that opens without a tick and merges itself once its checks are green.",
+  "packageRules": [
+    {
+      "description": "Docker and CI action digests and digest pins. A digest moves a tag that is already pinned to the same version, so the soak does not apply.",
+      "matchUpdateTypes": [
+        "digest",
+        "pinDigest"
+      ],
+      "groupName": "digests and CI actions",
+      "groupSlug": "digests-and-actions",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "CI action updates change only how CI runs. Taken out of the person-merged branch, because Renovate merges a group only when every update in it merges itself; they keep the soak of their update type.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "pinDigest"
+      ],
+      "groupName": "digests and CI actions",
+      "groupSlug": "digests-and-actions",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    }
+  ]
+}
