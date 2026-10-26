@@ -3,7 +3,8 @@
   "description": [
     "Keeps the git pins in apm.yml current for agent packages from webgrip's Forgejo.",
     "Renovate's built-in apm manager only reads the string form (host/owner/repo#ref), and on a non-GitHub host APM itself only splits a subdirectory off that form at prompts/, instructions/ or collections/. webgrip pins packages and skills by subdirectory (packages/<name>, skills/<name>) in the object form (git, path, ref), so these regex managers read that form instead.",
-    "After a bump of webgrip/agent-standards Renovate runs `agentstd install` from the new tag as a post-upgrade task, so apm.lock.yaml and every file APM writes arrive in the same pull request. The self-hosted config must allow the two commands (homelab-cluster configmap-forgejo.yaml)."
+    "Every bump of an agent package runs `agentstd install` as a post-upgrade task, so apm.lock.yaml and every file APM writes arrive in the same pull request: a bump of webgrip/agent-standards runs the CLI from its new tag, any other package from the agent-standards release this preset names, which Renovate keeps current in this repository. The self-hosted config must allow the two commands (homelab-cluster configmap-forgejo.yaml).",
+    "Profiles apply this part after the first-party part, so an agent package keeps its own branch instead of joining the shared Webgrip branch: Renovate takes a branch's post-upgrade task from the first update in it, sorted by name, so in a shared branch the install ran only when agent-standards happened to sort first, and with the wrong tag when it did not."
   ],
   "customManagers": [
     {
@@ -51,7 +52,10 @@
   ],
   "packageRules": [
     {
-      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step. A bump of agent files changes what agents read, not what the repository ships, so it lands as chore(agents) and cuts no release.",
+      "matchManagers": [
+        "custom.regex"
+      ],
       "matchFileNames": [
         "**/apm.yml",
         "apm.yml",
@@ -61,12 +65,57 @@
       "matchDatasources": [
         "git-tags"
       ],
+      "matchPackageNames": [
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
       "groupName": "{{depName}} agent package",
+      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}",
       "semanticCommitType": "chore",
-      "semanticCommitScope": "agents"
+      "semanticCommitScope": "agents",
+      "postUpgradeTasks": {
+        "commands": [
+          "install-tool uv",
+          "uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@v0.3.2#subdirectory=cli agentstd install"
+        ],
+        "fileFilters": [
+          "**/*",
+          "**/.*",
+          "**/.*/**"
+        ],
+        "executionMode": "branch"
+      }
     },
     {
-      "description": "A bump of agent-standards reinstalls from the new tag, so the lockfile and the generated agent files match it in the same pull request.",
+      "description": "Skills from webgrip/ai-skills share one branch: each skill is its own dependency, and one branch per skill would make every other skill branch conflict on apm.lock.yaml once the first merges.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchPackageNames": [
+        "https://forgejo.webgrip.dev/webgrip/ai-skills.git"
+      ],
+      "groupName": "webgrip/ai-skills skills",
+      "groupSlug": "agent-skills"
+    },
+    {
+      "description": "A bump of agent-standards installs with the CLI from the tag it bumps to, so the lockfile and the generated agent files match that release.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
       "matchDatasources": [
         "git-tags"
       ],

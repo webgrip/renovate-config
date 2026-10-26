@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a deployed service or product. Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.",
+  "description": "Profile for a deployed service or product. Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; third-party majors wait for a dashboard tick, Webgrip’s own majors open a pull request a person merges.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",
@@ -247,42 +247,6 @@
       "minimumReleaseAge": "0 days"
     },
     {
-      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
-      "matchFileNames": [
-        "**/apm.yml",
-        "apm.yml",
-        "**/mise.toml",
-        "mise.toml"
-      ],
-      "matchDatasources": [
-        "git-tags"
-      ],
-      "groupName": "{{depName}} agent package",
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "agents"
-    },
-    {
-      "description": "A bump of agent-standards reinstalls from the new tag, so the lockfile and the generated agent files match it in the same pull request.",
-      "matchDatasources": [
-        "git-tags"
-      ],
-      "matchDepNames": [
-        "webgrip/agent-standards"
-      ],
-      "postUpgradeTasks": {
-        "commands": [
-          "install-tool uv",
-          "uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@{{{newValue}}}#subdirectory=cli agentstd install"
-        ],
-        "fileFilters": [
-          "**/*",
-          "**/.*",
-          "**/.*/**"
-        ],
-        "executionMode": "branch"
-      }
-    },
-    {
       "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased. A branch that waits for a person rebases only on a conflict: with behind-base-branch every push to the base branch would rebase it and rerun its CI. Branches that merge themselves set behind-base-branch, because a red result from an old base would otherwise keep them from merging forever.",
       "matchUpdateTypes": [
         "minor",
@@ -372,6 +336,106 @@
         "automerge"
       ],
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "A major of Webgrip's own packages opens its pull request without a dashboard tick and never merges itself. The approval part ticks every major and this part comes after it, so this rule lifts that tick for Webgrip's own packages only; the major's own branch, commit type and zero soak stay as the earlier parts set them.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "dependencyDashboardApproval": false,
+      "automerge": false
+    },
+    {
+      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step. A bump of agent files changes what agents read, not what the repository ships, so it lands as chore(agents) and cuts no release.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchPackageNames": [
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "groupName": "{{depName}} agent package",
+      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}",
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "agents",
+      "postUpgradeTasks": {
+        "commands": [
+          "install-tool uv",
+          "uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@v0.3.2#subdirectory=cli agentstd install"
+        ],
+        "fileFilters": [
+          "**/*",
+          "**/.*",
+          "**/.*/**"
+        ],
+        "executionMode": "branch"
+      }
+    },
+    {
+      "description": "Skills from webgrip/ai-skills share one branch: each skill is its own dependency, and one branch per skill would make every other skill branch conflict on apm.lock.yaml once the first merges.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchPackageNames": [
+        "https://forgejo.webgrip.dev/webgrip/ai-skills.git"
+      ],
+      "groupName": "webgrip/ai-skills skills",
+      "groupSlug": "agent-skills"
+    },
+    {
+      "description": "A bump of agent-standards installs with the CLI from the tag it bumps to, so the lockfile and the generated agent files match that release.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "matchDepNames": [
+        "webgrip/agent-standards"
+      ],
+      "postUpgradeTasks": {
+        "commands": [
+          "install-tool uv",
+          "uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@{{{newValue}}}#subdirectory=cli agentstd install"
+        ],
+        "fileFilters": [
+          "**/*",
+          "**/.*",
+          "**/.*/**"
+        ],
+        "executionMode": "branch"
+      }
     },
     {
       "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'local>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",

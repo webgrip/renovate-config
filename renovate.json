@@ -2,5 +2,21 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "local>webgrip/renovate-config:profile-library"
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "description": "The agent-standards release whose CLI the apm preset runs after a bump of any agent package other than agent-standards itself. Every generated preset carries it, so the regex reads every preset file at the root.",
+            "managerFilePatterns": [
+                "/^[a-z-]+\\.json$/"
+            ],
+            "matchStrings": [
+                "agent-standards\\.git@(?<currentValue>v\\d+\\.\\d+\\.\\d+)#subdirectory=cli agentstd install"
+            ],
+            "depNameTemplate": "webgrip/agent-standards",
+            "datasourceTemplate": "git-tags",
+            "packageNameTemplate": "https://forgejo.webgrip.dev/webgrip/agent-standards.git",
+            "versioningTemplate": "semver"
+        }
     ]
 }
