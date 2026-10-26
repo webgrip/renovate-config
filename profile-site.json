@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a static site deployed from its releases. Same policy as profile-app: one reviewed pull request for minor, patch and pin updates, automerge for digests, CI actions and security fixes, majors behind a dashboard tick.",
+  "description": "Profile for a static site deployed from its releases. Same policy as profile-app: one reviewed pull request for minor, patch and pin updates, automerge for digests, CI actions, Webgrip’s own patches and security fixes, majors behind a dashboard tick.",
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
@@ -378,6 +378,35 @@
         "automerge",
         "github-actions"
       ]
+    },
+    {
+      "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**",
+        "!webgrip/renovate-config"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "webgrip dependencies",
+      "groupSlug": "webgrip",
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
     }
   ],
   "customManagers": [

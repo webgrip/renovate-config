@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; security fixes merge themselves; majors wait for a dashboard tick.",
+  "description": "Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own patches merge themselves in a branch of their own without one; security fixes merge themselves; majors wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
@@ -401,6 +401,35 @@
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": false,
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**",
+        "!webgrip/renovate-config"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "webgrip dependencies",
+      "groupSlug": "webgrip",
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "addLabels": [
+        "automerge"
+      ],
       "rebaseWhen": "behind-base-branch"
     }
   ],

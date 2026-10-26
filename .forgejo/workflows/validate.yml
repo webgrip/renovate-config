@@ -25,6 +25,7 @@ jobs:
           - forgejo.json
           - automerge-non-major.json
           - apm.json
+          - first-party.json
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4

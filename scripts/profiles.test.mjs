@@ -85,3 +85,44 @@ for (const profile of Object.keys(profiles)) {
     assert.equal((await effective(profile, { ...npm, updateType: 'patch' })).commitType, 'fix');
   });
 }
+
+const webgripImage = { manager: 'dockerfile', datasource: 'docker', depName: 'harbor.webgrip.dev/webgrip/semantic-release', packageName: 'harbor.webgrip.dev/webgrip/semantic-release', depType: 'stage' };
+const proxiedImage = { manager: 'dockerfile', datasource: 'docker', depName: 'harbor.webgrip.dev/dockerhub/library/node', packageName: 'harbor.webgrip.dev/dockerhub/library/node', depType: 'stage' };
+const webgripAction = { manager: 'github-actions', datasource: 'gitea-tags', depName: 'webgrip/workflows', packageName: 'webgrip/workflows', depType: 'action' };
+const webgripGitTag = { manager: 'mise', datasource: 'git-tags', depName: 'webgrip/agent-standards', packageName: 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', depType: 'tools' };
+const webgripNpm = { ...npm, depName: '@webgrip/ui', packageName: '@webgrip/ui' };
+const presetBump = { ...action, datasource: 'github-tags', depName: 'webgrip/renovate-config', packageName: 'webgrip/renovate-config', updateType: 'patch' };
+
+for (const profile of Object.keys(profiles)) {
+  for (const update of [webgripImage, webgripAction, webgripGitTag, webgripNpm]) {
+    test(`${profile}: a Webgrip patch of ${update.packageName} merges itself in the webgrip branch`, async () => {
+      const result = await effective(profile, { ...update, updateType: 'patch' });
+      assert.deepEqual({ group: result.group, automerge: result.automerge, approval: result.approval }, { group: 'webgrip dependencies', automerge: true, approval: false });
+    });
+  }
+
+  test(`${profile}: a Webgrip patch skips the release-age soak`, async () => {
+    const { config } = await resolveConfigPresets(JSON.parse(readFileSync(fileOf(profile), 'utf8')));
+    const upgrade = await applyPackageRules({ ...config, ...webgripGitTag, updateType: 'patch' });
+    assert.equal(upgrade.minimumReleaseAge, '0 days');
+  });
+
+  test(`${profile}: a Webgrip major still waits for a dashboard tick`, async () => {
+    const major = await effective(profile, { ...webgripImage, updateType: 'major' });
+    assert.deepEqual({ group: major.group, automerge: major.automerge, approval: major.approval }, { group: null, automerge: false, approval: true });
+  });
+
+  test(`${profile}: a Webgrip minor keeps the profile's non-major group`, async () => {
+    assert.equal((await effective(profile, { ...webgripImage, updateType: 'minor' })).group, 'all non-major dependencies');
+  });
+
+  test(`${profile}: an image from a Harbor proxy project is third-party`, async () => {
+    assert.equal((await effective(profile, { ...proxiedImage, updateType: 'patch' })).group, 'all non-major dependencies');
+  });
+
+  test(`${profile}: the renovate-config bump keeps its own branch`, async () => {
+    const result = await effective(profile, presetBump);
+    assert.equal(result.group, null);
+    assert.equal(result.automerge, true);
+  });
+}

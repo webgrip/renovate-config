@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "validate": "renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json golang.json forgejo.json apm.json automerge-non-major.json review-non-major.json security-automerge.json docker-arg-pins.json profile-app.json profile-site.json profile-library.json profile-image-set.json",
+    "validate": "renovate-config-validator --strict default.json grouped.json safe-automerge.json gitops.json golang.json forgejo.json apm.json automerge-non-major.json review-non-major.json security-automerge.json docker-arg-pins.json first-party.json profile-app.json profile-site.json profile-library.json profile-image-set.json",
     "validate:preset": "renovate-config-validator --strict",
     "release": "semantic-release",
     "profiles": "node scripts/profiles.mjs",
