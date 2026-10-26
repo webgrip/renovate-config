@@ -1,0 +1,32 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Minor, patch and pin updates share one branch that opens without a dashboard tick, with the release-age soak restored because the tick no longer gates them.",
+  "separateMinorPatch": false,
+  "packageRules": [
+    {
+      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major",
+      "dependencyDashboardApproval": false
+    },
+    {
+      "description": "Without the tick the soak returns, so a freshly published release is not proposed the hour it appears.",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Patch soak without the tick.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "1 day"
+    }
+  ]
+}

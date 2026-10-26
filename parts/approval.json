@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Every update waits for a dashboard tick, and the tick is the only gate: Renovate does not persist approvals, so a tick on a soak-blocked update is consumed and silently discarded, and this part sets no release-age soak. The non-major part lifts the tick and brings the soak back.",
+  "packageRules": [
+    {
+      "description": "Require explicit dashboard approval for all normal updates",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "replacement",
+        "rollback"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Docker updates wait for a tick, digest pins included.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "CI action updates wait for a tick, digest pins included.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "The tick is the gate, so ticked update types carry no release-age soak; the non-major part restores it where it lifts the tick.",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "replacement",
+        "rollback"
+      ],
+      "minimumReleaseAge": "0 days"
+    }
+  ]
+}
