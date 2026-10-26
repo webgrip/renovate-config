@@ -2,11 +2,11 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 
 const strict = ['parts/base.json', 'parts/approval.json'];
-const reviewed = [...strict, 'apm.json', 'parts/non-major.json', 'parts/digests-and-actions.json', 'security-automerge.json', 'parts/first-party.json'];
-const unattended = [...strict, 'apm.json', 'parts/non-major.json', 'parts/automerge.json', 'security-automerge.json', 'parts/first-party.json'];
+const reviewed = [...strict, 'parts/non-major.json', 'parts/digests-and-actions.json', 'security-automerge.json', 'parts/first-party.json', 'apm.json'];
+const unattended = [...strict, 'parts/non-major.json', 'parts/automerge.json', 'security-automerge.json', 'parts/first-party.json', 'apm.json'];
 
 const appPolicy =
-  'Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.';
+  'Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; third-party majors wait for a dashboard tick, Webgrip’s own majors open a pull request a person merges.';
 
 export const generated = {
   default: {
@@ -31,14 +31,14 @@ export const generated = {
   },
   'first-party': {
     description:
-      'Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Every profile includes it. Extend after the default preset and the non-major overlay.',
+      'Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green; their majors open a pull request without a tick and a person merges it. Every profile includes it. Extend after the default preset and the non-major overlay.',
     parts: ['parts/first-party.json'],
   },
   'profile-app': { description: `Profile for a deployed service or product. ${appPolicy}`, parts: reviewed },
   'profile-site': { description: `Profile for a static site deployed from its releases. ${appPolicy}`, parts: reviewed },
   'profile-library': {
     description:
-      'Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors wait for a dashboard tick.',
+      'Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; third-party majors wait for a dashboard tick, Webgrip’s own majors open a pull request a person merges.',
     parts: unattended,
   },
   'profile-image-set': {

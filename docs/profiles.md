@@ -13,11 +13,11 @@ part that makes the decision, so a change starts in the right file.
 | --- | --- | --- |
 | 1 | `parts/base.json` | Settings every preset shares: pinning, commit types, labels, PR body, manager quirks |
 | 2 | `parts/approval.json` | Every update waits for a dashboard tick, and a ticked update has no soak |
-| 3 | `apm.json` | Agent packages in `apm.yml` and the `agentstd` pin in `mise.toml` |
-| 4 | `parts/non-major.json` | Lifts the tick for minor, patch and pin, groups them, restores the soak |
-| 5 | `parts/digests-and-actions.json` (app, site) or `parts/automerge.json` (library, image-set) | Who merges what |
-| 6 | `security-automerge.json` | Security fixes merge themselves |
-| 7 | `parts/first-party.json` | Webgrip's own non-major updates get their own branch, no soak, automerge |
+| 3 | `parts/non-major.json` | Lifts the tick for minor, patch and pin, groups them, restores the soak |
+| 4 | `parts/digests-and-actions.json` (app, site) or `parts/automerge.json` (library, image-set) | Who merges what |
+| 5 | `security-automerge.json` | Security fixes merge themselves |
+| 6 | `parts/first-party.json` | Webgrip's own non-major updates get their own branch, no soak, automerge; their majors open without a tick |
+| 7 | `apm.json` | Agent packages in `apm.yml` and the `agentstd` pin in `mise.toml`: a branch per package, the lockfile in the same pull request |
 | 8 | `docker-arg-pins.json` (image-set only) | Dockerfile `ARG` pins under a `# renovate:` line |
 | last | `parts/preset-bump.json` | The `webgrip/renovate-config` bump, appended to every generated preset |
 
@@ -58,8 +58,22 @@ would otherwise keep it from ever merging. That costs at most one rebase per Ren
 **Webgrip's own packages skip the soak and the group.** Their release pipeline already gated them,
 and we keep their semantic versioning ourselves, so a soak only delays them. A branch of their own
 keeps a red third-party update from holding them back, and on apps they no longer wait for a
-person. Majors still take a tick. Harbor's proxy projects (`harbor.webgrip.dev/dockerhub/...`)
+person. Their majors open a pull request without a tick and wait for a person to merge them: a
+major of our own is a break we chose to make, so nobody should have to ask Renovate for it, and
+nobody should find it merged unread. Harbor's proxy projects (`harbor.webgrip.dev/dockerhub/...`)
 are third-party.
+
+**Agent packages get a branch per package, and the lockfile comes with the bump.** `apm.json`
+comes after the first-party part, so an agent package leaves the shared Webgrip branch for a branch
+of its own: every pin of `webgrip/agent-standards` in one, every `webgrip/ai-skills` skill in
+another. Two reasons. Renovate takes a branch's post-upgrade task from the first update in the
+branch, sorted by name, so in the shared branch `agentstd install` ran only when agent-standards
+sorted first, and a skill that sorted first gave the command its own version as the tag. And
+every bump rewrites `apm.lock.yaml`, which `apm audit` in `agentstd check` compares with the
+deployed files, so a bump without the install fails CI. A bump of agent-standards installs with
+the CLI from its new tag; any other agent package installs with the agent-standards release named
+in `apm.json`, which this repository's own Renovate keeps current. Agent-package bumps land as
+`chore(agents)` and cut no release: they change what agents read, not what ships.
 
 **Security fixes merge themselves everywhere,** at the lowest version that closes the advisory: the
 smallest change that removes the exposure.
@@ -86,8 +100,10 @@ merge-when-checks-succeed merges at once on a branch without required checks.
 1. **Majors never soak.** The tick is their gate, and a soak on a ticked update discards the tick.
    A ticked major can therefore merge the hour it is released. A soak for majors would need a gate
    other than the tick, such as an automerging major branch, which this repository does not want.
-2. **The agent-package group in `apm.json` only shapes majors.** The non-major and first-party
-   groups come after it and take every non-major agent-package update. For a major, it keeps the
-   `apm.yml` and `mise.toml` pins of one package in one branch.
+2. **A skill bump installs with the agent-standards release this preset names, not the one the
+   repository pins.** Renovate cannot read a pin that is not part of the bump. The two differ only
+   while this repository has not yet taken a new agent-standards release, or while a repository
+   is behind on its own agent-standards bump, which then opens at the same time. When the two
+   releases write a different lockfile, CI fails and the skill branch waits for a person.
 3. **Images outside Docker Hub do not soak.** See the timestamp note above. A datasource that reads
    Harbor's push time would close the gap.

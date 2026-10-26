@@ -39,7 +39,7 @@ A repository takes one profile, in one line of its `renovate.json`:
 
 | Profile | For | Third-party minor, patch, pin | Digests, CI actions | Webgrip's own minor, patch, digest, pin | Security fixes | Majors |
 | --- | --- | --- | --- | --- | --- | --- |
-| `profile-app` | services and products | one grouped pull request after a soak, a person merges | one branch of their own, merges itself on green | one branch of their own, no soak, merges itself on green | merge themselves on green | dashboard tick |
+| `profile-app` | services and products | one grouped pull request after a soak, a person merges | one branch of their own, merges itself on green | one branch of their own, no soak, merges itself on green | merge themselves on green | third-party: dashboard tick; Webgrip's own: a pull request without a tick, a person merges |
 | `profile-site` | static sites | same as `profile-app` | same | same | same | same |
 | `profile-library` | packages, presets, reusable workflows and actions | one grouped branch that merges itself on green after a soak | in that grouped branch | same | same | same |
 | `profile-image-set` | repositories of container images | as `profile-library`, plus Dockerfile `ARG` pins under a `# renovate:` line | in that grouped branch | same | same | same |

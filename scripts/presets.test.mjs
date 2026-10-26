@@ -12,6 +12,11 @@ const tick = { group: null, automerge: false, approval: true };
 const nonMajor = 'all non-major dependencies';
 const safeBranch = 'digests and CI actions';
 const ownBranch = { group: 'webgrip dependencies', automerge: true, approval: false, soak: '0 days' };
+const ownMajor = { group: null, automerge: false, approval: false, soak: '0 days' };
+const agentPackage = '{{depName}} agent package';
+const agentBranch = (group, install) => ({ ...ownBranch, group, commitType: 'chore', commitScope: 'agents', install });
+const installNew = 'uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@{{{newValue}}}#subdirectory=cli agentstd install';
+const installPinned = /^uv tool run --from git\+https:\/\/forgejo\.webgrip\.dev\/webgrip\/agent-standards\.git@v\d+\.\d+\.\d+#subdirectory=cli agentstd install$/;
 
 const policy = [
   ['a major', { ...npm, updateType: 'major' }, { default: tick, reviewed: tick, unattended: tick }],
@@ -31,7 +36,10 @@ const policy = [
     [`a Webgrip ${kind} patch`, { ...update, updateType: 'patch' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],
     [`a Webgrip ${kind} minor`, { ...update, updateType: 'minor' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],
   ]),
-  ['a Webgrip major', { ...webgrip.image, updateType: 'major' }, { default: tick, reviewed: tick, unattended: tick }],
+  ['a Webgrip major', { ...webgrip.image, updateType: 'major' }, { default: tick, reviewed: ownMajor, unattended: ownMajor }],
+  ['a Webgrip agent package major', { ...deps.agentPackage, updateType: 'major' }, { default: tick, reviewed: { ...ownMajor, group: agentPackage, install: installNew }, unattended: { ...ownMajor, group: agentPackage, install: installNew } }],
+  ...[['agent package', deps.agentPackage], ['agentstd pin', deps.agentCli]].map(([what, update]) => [`a Webgrip ${what} minor`, { ...update, updateType: 'minor' }, { default: tick, reviewed: agentBranch(agentPackage, installNew), unattended: agentBranch(agentPackage, installNew) }]),
+  ['a Webgrip skill patch', { ...deps.agentSkill, updateType: 'patch' }, { default: tick, reviewed: agentBranch('webgrip/ai-skills skills', installPinned), unattended: agentBranch('webgrip/ai-skills skills', installPinned) }],
   ['the preset bump', { ...presetBump, updateType: 'minor' }, Object.fromEntries(['default', 'reviewed', 'unattended'].map(kind => [kind, { group: null, automerge: true, approval: false, soak: '0 days', commitType: 'chore' }]))],
 ];
 
@@ -53,7 +61,10 @@ for (const [kind, presets] of Object.entries(presetsByPolicy)) {
       test(`${preset}: ${what}`, async () => {
         const actual = await effective(preset, update);
         const want = expected[kind];
-        assert.deepEqual(Object.fromEntries(Object.keys(want).map(key => [key, actual[key]])), want);
+        const { install, ...rest } = want;
+        assert.deepEqual(Object.fromEntries(Object.keys(rest).map(key => [key, actual[key]])), rest);
+        if (install instanceof RegExp) assert.match(actual.install, install);
+        else if (install !== undefined) assert.equal(actual.install, install);
       });
     }
   }
