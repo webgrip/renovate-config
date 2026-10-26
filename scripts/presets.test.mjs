@@ -6,8 +6,15 @@ import { applyPackageRules } from 'renovate/dist/util/package-rules/index.js';
 import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 import { build, fileOf, generated } from './presets.mjs';
 
+const resolved = new Map();
+
+function resolve(preset) {
+  if (!resolved.has(preset)) resolved.set(preset, resolveConfigPresets(JSON.parse(readFileSync(fileOf(preset), 'utf8'))));
+  return resolved.get(preset);
+}
+
 async function effective(preset, update) {
-  const { config } = await resolveConfigPresets(JSON.parse(readFileSync(fileOf(preset), 'utf8')));
+  const { config } = await resolve(preset);
   const { packageRules, vulnerabilityAlerts, ...repo } = config;
   let upgrade = await applyPackageRules({ ...repo, packageRules, ...update });
   if (update.isVulnerabilityAlert) upgrade = mergeChildConfig(upgrade, vulnerabilityAlerts);
