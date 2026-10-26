@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { build, fileOf, generated } from './presets.mjs';
+import { mergeChildConfig } from 'renovate/dist/config/utils.js';
+import { aliases, build, capabilities, fileOf, generated, policyKeys } from './presets.mjs';
 import { deps, effective as resolveUpdate } from './policy.mjs';
 
 const effective = (preset, update) => resolveUpdate([fileOf(preset)], update);
@@ -12,6 +13,9 @@ const tick = { group: null, automerge: false, approval: true };
 const nonMajor = 'all non-major dependencies';
 const safeBranch = 'digests and CI actions';
 const ownBranch = { group: 'webgrip dependencies', automerge: true, approval: false, soak: '0 days' };
+const neverShips = soak => ({ group: 'development dependencies', automerge: true, approval: false, soak });
+const alwaysReview = { group: null, automerge: false, approval: true, soak: '0 days' };
+const everyGate = expected => ({ reviewed: expected, unattended: expected });
 const ownMajor = { group: null, automerge: false, approval: false, soak: '0 days' };
 const agentPackage = '{{depName}} agent package';
 const agentBranch = (group, install) => ({ ...ownBranch, group, commitType: 'chore', commitScope: 'agents', install });
@@ -31,22 +35,33 @@ const policy = [
   ['a Go toolchain minor', { ...go, updateType: 'minor' }, { default: tick, reviewed: { group: nonMajor, automerge: false }, unattended: { group: null, automerge: false, approval: true, soak: '0 days' } }],
   ['a Go toolchain patch', { ...go, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor, automerge: false }, unattended: { group: 'Go toolchain patches', automerge: true, approval: false } }],
   ['a security fix', { ...npm, updateType: 'minor', isVulnerabilityAlert: true }, { default: { approval: false, automerge: false }, reviewed: { approval: false, automerge: true }, unattended: { approval: false, automerge: true } }],
+  ['a devDependency minor', { ...deps.devDependency, updateType: 'minor' }, { default: tick, ...everyGate(neverShips('3 days')) }],
+  ['a devDependency major', { ...deps.devDependency, updateType: 'major' }, { default: tick, ...everyGate(tick) }],
+  ['a Composer require-dev patch', { ...deps.composerDev, updateType: 'patch' }, { default: tick, ...everyGate(neverShips('1 day')) }],
+  ['an @types patch outside devDependencies', { ...deps.types, updateType: 'patch' }, { default: tick, ...everyGate(neverShips('1 day')) }],
+  ['an always-review npm minor', { ...deps.tokenLibrary, updateType: 'minor' }, { default: tick, ...everyGate(alwaysReview) }],
+  ['an always-review Go patch', { ...deps.databaseDriver, updateType: 'patch' }, { default: tick, ...everyGate(alwaysReview) }],
+  ['an always-review major', { ...deps.tokenLibrary, updateType: 'major' }, { default: tick, ...everyGate(tick) }],
+  ['an always-review security fix', { ...deps.tokenLibrary, updateType: 'patch', isVulnerabilityAlert: true }, { default: { approval: false, automerge: false }, ...everyGate({ approval: false, automerge: true }) }],
+  ['an always-review library used only by tests', { ...deps.testDatabaseDriver, updateType: 'minor' }, { default: tick, ...everyGate(neverShips('3 days')) }],
+  ['a Webgrip devDependency patch', { ...deps.webgripDevDependency, updateType: 'patch' }, { default: tick, ...everyGate(ownBranch) }],
+  ['a golang.org/x minor', { ...deps.goX, updateType: 'minor' }, { default: { group: 'golang.org/x modules', approval: true }, reviewed: { group: 'golang.org/x modules', automerge: false, approval: false }, unattended: { group: 'golang.org/x modules', automerge: true, approval: false } }],
   ['a patch from a Harbor proxy project', { ...proxiedImage, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor }, unattended: { group: nonMajor } }],
   ...Object.entries(webgrip).flatMap(([kind, update]) => [
     [`a Webgrip ${kind} patch`, { ...update, updateType: 'patch' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],
     [`a Webgrip ${kind} minor`, { ...update, updateType: 'minor' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],
   ]),
   ['a Webgrip major', { ...webgrip.image, updateType: 'major' }, { default: tick, reviewed: ownMajor, unattended: ownMajor }],
-  ['a Webgrip agent package major', { ...deps.agentPackage, updateType: 'major' }, { default: tick, reviewed: { ...ownMajor, group: agentPackage, install: installNew }, unattended: { ...ownMajor, group: agentPackage, install: installNew } }],
-  ...[['agent package', deps.agentPackage], ['agentstd pin', deps.agentCli]].map(([what, update]) => [`a Webgrip ${what} minor`, { ...update, updateType: 'minor' }, { default: tick, reviewed: agentBranch(agentPackage, installNew), unattended: agentBranch(agentPackage, installNew) }]),
-  ['a Webgrip skill patch', { ...deps.agentSkill, updateType: 'patch' }, { default: tick, reviewed: agentBranch('webgrip/ai-skills skills', installPinned), unattended: agentBranch('webgrip/ai-skills skills', installPinned) }],
+  ['a Webgrip agent package major', { ...deps.agentPackage, updateType: 'major' }, { default: { ...tick, group: agentPackage }, reviewed: { ...ownMajor, group: agentPackage, install: installNew }, unattended: { ...ownMajor, group: agentPackage, install: installNew } }],
+  ...[['agent package', deps.agentPackage], ['agentstd pin', deps.agentCli]].map(([what, update]) => [`a Webgrip ${what} minor`, { ...update, updateType: 'minor' }, { default: { ...tick, group: agentPackage }, reviewed: agentBranch(agentPackage, installNew), unattended: agentBranch(agentPackage, installNew) }]),
+  ['a Webgrip skill patch', { ...deps.agentSkill, updateType: 'patch' }, { default: { ...tick, group: 'webgrip/ai-skills skills' }, reviewed: agentBranch('webgrip/ai-skills skills', installPinned), unattended: agentBranch('webgrip/ai-skills skills', installPinned) }],
   ['the preset bump', { ...presetBump, updateType: 'minor' }, Object.fromEntries(['default', 'reviewed', 'unattended'].map(kind => [kind, { group: null, automerge: true, approval: false, soak: '0 days', commitType: 'chore' }]))],
 ];
 
 const presetsByPolicy = {
   default: ['default'],
-  reviewed: ['profile-app', 'profile-site'],
-  unattended: ['profile-library', 'profile-image-set'],
+  reviewed: ['reviewed', 'profile-app', 'profile-site'],
+  unattended: ['unattended', 'profile-library', 'profile-image-set'],
 };
 
 for (const name of Object.keys(generated)) {
@@ -68,6 +83,30 @@ for (const [kind, presets] of Object.entries(presetsByPolicy)) {
       });
     }
   }
+}
+
+const withoutDescription = file => {
+  const { description, ...config } = JSON.parse(readFileSync(file, 'utf8'));
+  return config;
+};
+
+for (const [name, { gate, capabilities: extra = [] }] of Object.entries(aliases)) {
+  test(`${fileOf(name)} is the ${gate} gate${extra.map(file => ` plus ${file}`).join('')}`, () => {
+    const expected = [fileOf(gate), ...extra].map(withoutDescription).reduce((parent, child) => mergeChildConfig(parent, child));
+    assert.deepEqual(withoutDescription(fileOf(name)), expected);
+  });
+}
+
+function policyKeysIn(value, path = '') {
+  if (Array.isArray(value)) return value.flatMap((item, index) => policyKeysIn(item, `${path}[${index}]`));
+  if (value === null || typeof value !== 'object') return [];
+  return Object.entries(value).flatMap(([key, child]) => [...(policyKeys.includes(key) ? [`${path}.${key}`] : []), ...policyKeysIn(child, `${path}.${key}`)]);
+}
+
+for (const capability of capabilities) {
+  test(`${capability} teaches detection and decides no policy`, () => {
+    assert.deepEqual(policyKeysIn(JSON.parse(readFileSync(capability, 'utf8'))), []);
+  });
 }
 
 test('profile-image-set reads Dockerfile ARG pins under a renovate directive', () => {

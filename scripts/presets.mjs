@@ -1,28 +1,55 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 
-const strict = ['parts/base.json', 'parts/approval.json'];
-const reviewed = [...strict, 'parts/non-major.json', 'parts/digests-and-actions.json', 'security-automerge.json', 'parts/first-party.json', 'apm.json'];
-const unattended = [...strict, 'parts/non-major.json', 'parts/automerge.json', 'security-automerge.json', 'parts/first-party.json', 'apm.json'];
+export const capabilities = ['apm.json', 'docker-arg-pins.json', 'golang.json'];
+export const policyKeys = ['groupName', 'groupSlug', 'automerge', 'dependencyDashboardApproval', 'minimumReleaseAge', 'rebaseWhen'];
 
-const appPolicy =
-  'Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; third-party majors wait for a dashboard tick, Webgrip’s own majors open a pull request a person merges.';
+const strict = ['parts/base.json', 'parts/approval.json'];
+const groups = ['parts/agent-package-group.json', 'parts/go-module-groups.json'];
+const gated = gate => [...strict, 'apm.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'parts/risk-tiers.json', 'security-automerge.json', 'parts/first-party.json', 'parts/agent-package-group.json'];
+
+const gates = {
+  reviewed: {
+    description:
+      'Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, dependencies that never ship (devDependencies, require-dev, @types), Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; third-party majors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick; Webgrip’s own majors open a pull request a person merges.',
+    parts: gated('parts/digests-and-actions.json'),
+  },
+  unattended: {
+    description:
+      'Gate for a repository whose CI is a sufficient gate because its consumers take each release through their own pull request, such as a package, a preset, a reusable workflow, an action or a set of images: third-party minor, patch, digest and pin updates share one branch that merges itself on green after a release-age soak. Dependencies that never ship (devDependencies, require-dev, @types) merge themselves in a branch of their own after the same soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; third-party majors, Go toolchain minors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick; Webgrip’s own majors open a pull request a person merges.',
+    parts: gated('parts/automerge.json'),
+  },
+};
+
+export const aliases = {
+  'profile-app': { gate: 'reviewed', for: 'a deployed service or product' },
+  'profile-site': { gate: 'reviewed', for: 'a static site deployed from its releases' },
+  'profile-library': { gate: 'unattended', for: 'a package, preset, reusable workflow or action' },
+  'profile-image-set': { gate: 'unattended', for: 'a repository of container images', capabilities: ['docker-arg-pins.json'], adds: ', plus base and tool images pinned in Dockerfile ARG lines under a renovate directive' },
+};
+
+function alias({ gate, for: what, capabilities: extra = [], adds = '' }) {
+  return {
+    description: `Profile for ${what}, kept as a name for the ${gate} gate${adds}. ${gates[gate].description}`,
+    parts: [...gates[gate].parts, ...extra],
+  };
+}
 
 export const generated = {
   default: {
     description:
       'Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Every update waits for a dashboard tick and the tick is the only gate, so there is no release-age soak to double-gate it. Per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included. Schedule is \'at any time\' since 2026-09-18: with every update behind a tick, nothing opens unattended anyway, so a window only delayed work a human had already asked for, and Renovate does not persist an approval it cannot act on, so a tick made outside the window could be silently discarded. A repo that wants quiet hours can set its own schedule.',
-    parts: strict,
+    parts: [...strict, ...groups],
   },
   'review-non-major': {
     description:
       'Opt-in overlay for repositories where a person reviews dependency updates but should not tick them one by one: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge, after a release-age soak. Digests are left to safe-automerge, majors keep the tick. Extend after the default preset.',
-    parts: ['parts/non-major.json'],
+    parts: ['parts/non-major.json', 'parts/agent-package-group.json'],
   },
   'automerge-non-major': {
     description:
       'Opt-in overlay for repositories whose CI is the gate: minor, patch, digest and pin updates skip the dashboard tick, share one branch and merge themselves once the pull request checks are green, after a release-age soak. Majors and Go toolchain minors keep the tick. Extend after the default preset and after golang when the repository has one.',
-    parts: ['parts/non-major.json', 'parts/automerge.json'],
+    parts: ['parts/non-major.json', 'parts/automerge.json', 'parts/agent-package-group.json'],
   },
   grouped: {
     description:
@@ -32,20 +59,10 @@ export const generated = {
   'first-party': {
     description:
       'Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green; their majors open a pull request without a tick and a person merges it. Every profile includes it. Extend after the default preset and the non-major overlay.',
-    parts: ['parts/first-party.json'],
+    parts: ['parts/first-party.json', 'parts/agent-package-group.json'],
   },
-  'profile-app': { description: `Profile for a deployed service or product. ${appPolicy}`, parts: reviewed },
-  'profile-site': { description: `Profile for a static site deployed from its releases. ${appPolicy}`, parts: reviewed },
-  'profile-library': {
-    description:
-      'Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; third-party majors wait for a dashboard tick, Webgrip’s own majors open a pull request a person merges.',
-    parts: unattended,
-  },
-  'profile-image-set': {
-    description:
-      'Profile for a repository of container images. Like profile-library, plus base and tool images pinned in Dockerfile ARG lines under a renovate directive.',
-    parts: [...unattended, 'docker-arg-pins.json'],
-  },
+  ...gates,
+  ...Object.fromEntries(Object.entries(aliases).map(([name, definition]) => [name, alias(definition)])),
 };
 
 const schema = 'https://docs.renovatebot.com/renovate-schema.json';

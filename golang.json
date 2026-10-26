@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Opt-in Go overlay for repositories with a go.mod. Manages the parts of a Go module graph the gomod manager ignores out of the box (indirect requirements, /vN import paths), keeps go.mod and go.sum coherent inside the branch, and makes toolchain moves legible as toolchain moves. Extend after the default org preset.",
+  "description": "Opt-in Go overlay for repositories with a go.mod. Teaches Renovate the parts of a Go module graph the gomod manager ignores out of the box (indirect requirements, /vN import paths), keeps go.mod and go.sum coherent inside the branch, and labels toolchain moves as toolchain moves. It decides no grouping, gate or soak: the golang.org/x and indirect-module groups live in the policy presets, so this overlay means the same wherever it sits in an extends list.",
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths"
@@ -15,36 +15,21 @@
         "indirect"
       ],
       "enabled": true,
-      "groupName": "Go indirect modules",
-      "groupSlug": "go-indirect",
       "addLabels": [
         "go"
       ]
     },
     {
-      "description": "Group golang.org/x/* regardless of direct/indirect. They cut releases in lockstep, share go.sum entries, and `go mod tidy` resolves them together — one PR per module just rebases the others for no review value.",
+      "description": "Label golang.org/x modules as Go modules whether they are direct or indirect requirements. The policy presets group them, because they release in lockstep and share go.sum entries.",
       "matchManagers": [
         "gomod"
       ],
       "matchPackageNames": [
         "golang.org/x/**"
       ],
-      "groupName": "golang.org/x modules",
-      "groupSlug": "golang-x",
       "addLabels": [
         "go"
       ]
-    },
-    {
-      "description": "Never batch a Go security fix behind a group. A grouped branch is only as fast as its slowest member — one red or soaking sibling holds the whole PR, which is the opposite of what a vulnerability update needs.",
-      "matchManagers": [
-        "gomod"
-      ],
-      "matchUpdateTypes": [
-        "vulnerability"
-      ],
-      "groupName": null,
-      "groupSlug": null
     },
     {
       "description": "Label and scope Go toolchain moves so they are not mistaken for library bumps. The `go` directive stays on Renovate's default (no updates proposed): it is a minimum-compatibility floor, and raising it drops support for older toolchains — a deliberate human decision, not a dependency bump. The `toolchain` directive does get proposals, and lands as chore(go).",

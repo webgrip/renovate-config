@@ -1,10 +1,14 @@
-# What each profile does, and why
+# What each gate does, and why
 
-A profile is the whole Renovate policy of a repository in one `extends` line. This page lists every
-decision a profile makes, the reason for it, and where the reasons are weak. Each row names the
-part that makes the decision, so a change starts in the right file.
+A gate is the whole Renovate policy of a repository in one `extends` line: `reviewed` when a person
+merges third-party non-major updates, `unattended` when green CI does. The profile names are
+generated from the gates (`profile-app` and `profile-site` are `reviewed`, `profile-library` is
+`unattended`, `profile-image-set` is `unattended` plus `docker-arg-pins`). This page lists every
+decision a gate makes, the reason for it, and where the reasons are weak. Each row names the part
+that makes the decision, so a change starts in the right file. [ADR 0001](adr/0001-gates-risk-tiers-and-capabilities.md)
+records why gate, risk tier and capability are separate questions.
 
-## How a profile is built
+## How a gate is built
 
 `scripts/presets.mjs` merges parts in order with Renovate's own `mergeChildConfig`. Later
 `packageRules` win, so order is policy.
@@ -13,21 +17,32 @@ part that makes the decision, so a change starts in the right file.
 | --- | --- | --- |
 | 1 | `parts/base.json` | Settings every preset shares: pinning, commit types, labels, PR body, manager quirks |
 | 2 | `parts/approval.json` | Every update waits for a dashboard tick, and a ticked update has no soak |
-| 3 | `parts/non-major.json` | Lifts the tick for minor, patch and pin, groups them, restores the soak |
-| 4 | `parts/digests-and-actions.json` (app, site) or `parts/automerge.json` (library, image-set) | Who merges what |
-| 5 | `security-automerge.json` | Security fixes merge themselves |
-| 6 | `parts/first-party.json` | Webgrip's own non-major updates get their own branch, no soak, automerge; their majors open without a tick |
-| 7 | `apm.json` | Agent packages in `apm.yml` and the `agentstd` pin in `mise.toml`: a branch per package, the lockfile in the same pull request |
-| 8 | `docker-arg-pins.json` (image-set only) | Dockerfile `ARG` pins under a `# renovate:` line |
+| 3 | `apm.json` | Capability: agent packages in `apm.yml` and the `agentstd` pin in `mise.toml`, the lockfile in the same pull request |
+| 4 | `parts/non-major.json` | Lifts the tick for minor, patch and pin, groups them, restores the soak |
+| 5 | `parts/digests-and-actions.json` (`reviewed`) or `parts/automerge.json` (`unattended`) | The gate: who merges what |
+| 6 | `parts/go-module-groups.json` | `golang.org/x` modules and indirect Go modules get a branch each |
+| 7 | `parts/risk-tiers.json` | Never-ships dependencies merge themselves; the always-review list keeps the tick |
+| 8 | `security-automerge.json` | Security fixes merge themselves |
+| 9 | `parts/first-party.json` | Webgrip's own non-major updates get their own branch, no soak, automerge; their majors open without a tick |
+| 10 | `parts/agent-package-group.json` | A branch per agent package, and one for all `webgrip/ai-skills` skills |
+| 11 | `docker-arg-pins.json` (`profile-image-set` only) | Capability: Dockerfile `ARG` pins under a `# renovate:` line |
 | last | `parts/preset-bump.json` | The `webgrip/renovate-config` bump, appended to every generated preset |
 
 `default.json`, `grouped.json`, `review-non-major.json`, `automerge-non-major.json` and
-`first-party.json` are generated from the same parts, for repositories that still compose overlays by hand.
+`first-party.json` are generated from the same parts, for repositories that still compose overlays
+by hand; `default` carries parts 1, 2, 6 and 10, and `review-non-major`, `automerge-non-major` and
+`first-party` end with part 10.
+
+**Capability overlays decide no policy.** `apm.json`, `golang.json` and `docker-arg-pins.json`
+set none of `groupName`, `groupSlug`, `automerge`, `dependencyDashboardApproval`,
+`minimumReleaseAge` or `rebaseWhen`, and `npm test` fails when one does. That is what lets a
+repository put them anywhere in its `extends` list. `gitops.json` is not one of them yet: it sets
+its own groups and extends external presets (see the ADR).
 
 ## The policy, update by update
 
 [The policy table](policy.md) is generated from the presets themselves: every update type, for every
-profile and for the overlay stacks repositories still compose by hand. A pull request that changes
+gate and for the overlay stacks repositories still compose by hand. A pull request that changes
 behaviour changes that file, so its diff is the behaviour change.
 
 Branches a person merges rebase only on a conflict; branches that merge themselves rebase when
@@ -42,10 +57,18 @@ a ticked update only eats clicks. Where a part lifts the tick, it brings the soa
 **Non-major work travels in one branch.** Every open branch costs a CI run each time it is rebased,
 and the runner pool is small. One grouped branch per run instead of one per dependency.
 
-**Apps wait for a person, libraries do not.** A library's consumers take each release through their
-own pull request, so the library's CI is a sufficient gate. An app ships what merges.
+**`reviewed` waits for a person, `unattended` does not.** A library's consumers take each release
+through their own pull request, so the library's CI is a sufficient gate. An app ships what merges.
 
-**On apps, only code a person would read waits for a person.** A digest moves a tag already pinned
+**Risk belongs to the dependency, not the repository.** npm `devDependencies`, Composer
+`require-dev` and `@types/*` are not installed in what a repository deploys, so a green CI run is
+the whole question: under either gate they share a `development dependencies` branch that merges
+itself after the soak of their update type, apart from the branch a person merges. The
+always-review list (token and OIDC libraries, database drivers) waits for a tick in a branch of its
+own under either gate, unless the package is only a dev dependency. Majors, security fixes,
+Webgrip's own packages and the preset bump keep their rules, which come later.
+
+**Under `reviewed`, only code a person would read waits for a person.** A digest moves a tag already pinned
 to the same version, and a CI action changes how CI runs, not what ships. They share a branch that
 merges itself, apart from the person-merged branch: Renovate merges a group only when every update
 in it merges itself, so a single update that waits for a person holds the whole branch.
@@ -57,16 +80,16 @@ would otherwise keep it from ever merging. That costs at most one rebase per Ren
 
 **Webgrip's own packages skip the soak and the group.** Their release pipeline already gated them,
 and we keep their semantic versioning ourselves, so a soak only delays them. A branch of their own
-keeps a red third-party update from holding them back, and on apps they no longer wait for a
-person. Their majors open a pull request without a tick and wait for a person to merge them: a
+keeps a red third-party update from holding them back, and under `reviewed` they no longer wait
+for a person. Their majors open a pull request without a tick and wait for a person to merge them: a
 major of our own is a break we chose to make, so nobody should have to ask Renovate for it, and
 nobody should find it merged unread. Harbor's proxy projects (`harbor.webgrip.dev/dockerhub/...`)
 are third-party.
 
-**Agent packages get a branch per package, and the lockfile comes with the bump.** `apm.json`
-comes after the first-party part, so an agent package leaves the shared Webgrip branch for a branch
-of its own: every pin of `webgrip/agent-standards` in one, every `webgrip/ai-skills` skill in
-another. Two reasons. Renovate takes a branch's post-upgrade task from the first update in the
+**Agent packages get a branch per package, and the lockfile comes with the bump.**
+`parts/agent-package-group.json` comes after the first-party part, so an agent package leaves the
+shared Webgrip branch for a branch of its own: every pin of `webgrip/agent-standards` in one, every
+`webgrip/ai-skills` skill in another. Two reasons. Renovate takes a branch's post-upgrade task from the first update in the
 branch, sorted by name, so in the shared branch `agentstd install` ran only when agent-standards
 sorted first, and a skill that sorted first gave the command its own version as the tag. And
 every bump rewrites `apm.lock.yaml`, which `apm audit` in `agentstd check` compares with the
@@ -96,6 +119,10 @@ are `timestamp-optional`. The cost: the soak never holds a ghcr.io, quay.io or H
 merge-when-checks-succeed merges at once on a branch without required checks.
 
 ## Decisions that stay open
+
+The always-review list, the npm soak, build tools in `devDependencies`, the commit type of
+never-ships updates, Unfold's gate and a GitOps gate are open questions in
+[ADR 0001](adr/0001-gates-risk-tiers-and-capabilities.md). The older ones:
 
 1. **Majors never soak.** The tick is their gate, and a soak on a ticked update discards the tick.
    A ticked major can therefore merge the hour it is released. A soak for majors would need a gate
