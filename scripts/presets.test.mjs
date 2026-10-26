@@ -47,7 +47,7 @@ const policy = [
   ['a patch from a Harbor proxy project', { ...proxiedImage, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor }, unattended: { group: nonMajor } }],
   ...Object.entries(webgrip).flatMap(([kind, update]) => [
     [`a Webgrip ${kind} patch`, { ...update, updateType: 'patch' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],
-    [`a Webgrip ${kind} minor`, { ...update, updateType: 'minor' }, { default: tick, reviewed: { group: nonMajor }, unattended: { group: nonMajor } }],
+    [`a Webgrip ${kind} minor`, { ...update, updateType: 'minor' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],
   ]),
   ['a Webgrip major', { ...webgrip.image, updateType: 'major' }, { default: tick, reviewed: tick, unattended: tick }],
   ['the preset bump', { ...presetBump, updateType: 'minor' }, Object.fromEntries(['default', 'reviewed', 'unattended'].map(kind => [kind, { group: null, automerge: true, approval: false, soak: '0 days', commitType: 'chore' }]))],

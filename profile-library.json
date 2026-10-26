@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own patches merge themselves in a branch of their own without one; security fixes merge themselves; majors wait for a dashboard tick.",
+  "description": "Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",
@@ -379,6 +379,7 @@
         "https://forgejo.webgrip.dev/webgrip/**"
       ],
       "matchUpdateTypes": [
+        "minor",
         "patch",
         "digest",
         "pin",

@@ -379,6 +379,7 @@
         "https://forgejo.webgrip.dev/webgrip/**"
       ],
       "matchUpdateTypes": [
+        "minor",
         "patch",
         "digest",
         "pin",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a static site deployed from its releases. Minor, patch and pin updates arrive together in one pull request a person merges; digest and CI action updates, Webgrip’s own patches and security fixes merge themselves on green; majors wait for a dashboard tick.",
+  "description": "Profile for a static site deployed from its releases. Minor, patch and pin updates arrive together in one pull request a person merges; digest and CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green; majors wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",
@@ -344,6 +344,7 @@
         "https://forgejo.webgrip.dev/webgrip/**"
       ],
       "matchUpdateTypes": [
+        "minor",
         "patch",
         "digest",
         "pin",

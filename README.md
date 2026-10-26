@@ -37,7 +37,7 @@ A repository takes one profile, in one line of its `renovate.json`:
 }
 ```
 
-| Profile | For | Third-party minor, patch, pin | Webgrip's own patch, digest, pin | Security fixes | Majors |
+| Profile | For | Third-party minor, patch, pin | Webgrip's own minor, patch, digest, pin | Security fixes | Majors |
 | --- | --- | --- | --- | --- | --- |
 | `profile-app` | services and products | one grouped pull request after a soak, a person merges | one branch of their own, no soak, merges itself on green | merge themselves on green | dashboard tick |
 | `profile-site` | static sites | same as `profile-app` | same | same | same |
@@ -59,7 +59,7 @@ GitOps repositories keep `default` plus `gitops`. A generated gitops profile wou
 | `github>webgrip/renovate-config:gitops` | Opt-in GitOps overlay that composes selected `home-operations/renovate-presets` for Kubernetes/Flux/OCI/Talos/CNPG/Grafana extraction plus Webgrip-specific GitOps PR polish |
 | `github>webgrip/renovate-config:golang` | Opt-in Go overlay: manages indirect Go modules (off by default in Renovate), tidies go.mod/go.sum in-branch, rewrites `/vN` import paths, and labels toolchain moves |
 | `github>webgrip/renovate-config:review-non-major` | Opt-in overlay: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge, with the release-age soak restored |
-| `github>webgrip/renovate-config:first-party` | Opt-in overlay: patch, digest and pin updates of Webgrip's own packages share one branch that opens without a tick, skips the soak and merges itself on green; every profile includes it |
+| `github>webgrip/renovate-config:first-party` | Opt-in overlay: minor, patch, digest and pin updates of Webgrip's own packages share one branch that opens without a tick, skips the soak and merges itself on green; every profile includes it |
 | `github>webgrip/renovate-config:security-automerge` | Opt-in overlay: security fixes from OSV alerts merge themselves once checks are green |
 | `github>webgrip/renovate-config:docker-arg-pins` | Opt-in overlay: Dockerfile `ARG` image and tool pins under a `# renovate: datasource=… depName=…` line |
 

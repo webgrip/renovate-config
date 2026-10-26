@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Opt-in overlay for Webgrip’s own packages: patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Every profile includes it. Extend after the default preset and the non-major overlay.",
+  "description": "Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Every profile includes it. Extend after the default preset and the non-major overlay.",
   "packageRules": [
     {
       "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
@@ -13,6 +13,7 @@
         "https://forgejo.webgrip.dev/webgrip/**"
       ],
       "matchUpdateTypes": [
+        "minor",
         "patch",
         "digest",
         "pin",
