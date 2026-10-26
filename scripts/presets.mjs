@@ -1,9 +1,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 
+export const capabilities = ['apm.json', 'docker-arg-pins.json', 'golang.json'];
+export const policyKeys = ['groupName', 'groupSlug', 'automerge', 'dependencyDashboardApproval', 'minimumReleaseAge', 'rebaseWhen'];
+
 const strict = ['parts/base.json', 'parts/approval.json'];
-const reviewed = [...strict, 'apm.json', 'parts/non-major.json', 'parts/digests-and-actions.json', 'security-automerge.json', 'parts/first-party.json'];
-const unattended = [...strict, 'apm.json', 'parts/non-major.json', 'parts/automerge.json', 'security-automerge.json', 'parts/first-party.json'];
+const groups = ['parts/agent-package-group.json', 'parts/go-module-groups.json'];
+const reviewed = [...strict, 'apm.json', 'parts/agent-package-group.json', 'parts/non-major.json', 'parts/digests-and-actions.json', 'parts/go-module-groups.json', 'security-automerge.json', 'parts/first-party.json'];
+const unattended = [...strict, 'apm.json', 'parts/agent-package-group.json', 'parts/non-major.json', 'parts/automerge.json', 'parts/go-module-groups.json', 'security-automerge.json', 'parts/first-party.json'];
 
 const appPolicy =
   'Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.';
@@ -12,7 +16,7 @@ export const generated = {
   default: {
     description:
       'Webgrip org default Renovate preset — strict, conservative defaults for all repositories. Every update waits for a dashboard tick and the tick is the only gate, so there is no release-age soak to double-gate it. Per-type semantic commits and labels, OSV vulnerability alerts, and Merge Confidence badges included. Schedule is \'at any time\' since 2026-09-18: with every update behind a tick, nothing opens unattended anyway, so a window only delayed work a human had already asked for, and Renovate does not persist an approval it cannot act on, so a tick made outside the window could be silently discarded. A repo that wants quiet hours can set its own schedule.',
-    parts: strict,
+    parts: [...strict, ...groups],
   },
   'review-non-major': {
     description:

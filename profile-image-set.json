@@ -249,7 +249,7 @@
       "minimumReleaseAge": "0 days"
     },
     {
-      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "description": "Agent package pins land as chore(agents): they change the agent tooling, not what the repository ships.",
       "matchFileNames": [
         "**/apm.yml",
         "apm.yml",
@@ -259,7 +259,6 @@
       "matchDatasources": [
         "git-tags"
       ],
-      "groupName": "{{depName}} agent package",
       "semanticCommitType": "chore",
       "semanticCommitScope": "agents"
     },
@@ -283,6 +282,19 @@
         ],
         "executionMode": "branch"
       }
+    },
+    {
+      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "groupName": "{{depName}} agent package"
     },
     {
       "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased. A branch that waits for a person rebases only on a conflict: with behind-base-branch every push to the base branch would rebase it and rerun its CI. Branches that merge themselves set behind-base-branch, because a red result from an old base would otherwise keep them from merging forever.",
@@ -369,6 +381,28 @@
         "**/golang"
       ],
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Indirect Go modules share one branch. The golang overlay enables them; this rule only decides where they land.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "indirect"
+      ],
+      "groupName": "Go indirect modules",
+      "groupSlug": "go-indirect"
+    },
+    {
+      "description": "golang.org/x modules share one branch whether they are direct or indirect. They cut releases in lockstep, share go.sum entries, and `go mod tidy` resolves them together, so one pull request per module only rebases the others for no review value.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchPackageNames": [
+        "golang.org/x/**"
+      ],
+      "groupName": "golang.org/x modules",
+      "groupSlug": "golang-x"
     },
     {
       "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",

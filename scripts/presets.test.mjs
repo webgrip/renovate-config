@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { build, fileOf, generated } from './presets.mjs';
+import { build, capabilities, fileOf, generated, policyKeys } from './presets.mjs';
 import { deps, effective as resolveUpdate } from './policy.mjs';
 
 const effective = (preset, update) => resolveUpdate([fileOf(preset)], update);
@@ -57,6 +57,18 @@ for (const [kind, presets] of Object.entries(presetsByPolicy)) {
       });
     }
   }
+}
+
+function policyKeysIn(value, path = '') {
+  if (Array.isArray(value)) return value.flatMap((item, index) => policyKeysIn(item, `${path}[${index}]`));
+  if (value === null || typeof value !== 'object') return [];
+  return Object.entries(value).flatMap(([key, child]) => [...(policyKeys.includes(key) ? [`${path}.${key}`] : []), ...policyKeysIn(child, `${path}.${key}`)]);
+}
+
+for (const capability of capabilities) {
+  test(`${capability} teaches detection and decides no policy`, () => {
+    assert.deepEqual(policyKeysIn(JSON.parse(readFileSync(capability, 'utf8'))), []);
+  });
 }
 
 test('profile-image-set reads Dockerfile ARG pins under a renovate directive', () => {

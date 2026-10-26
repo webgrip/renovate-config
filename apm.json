@@ -51,7 +51,7 @@
   ],
   "packageRules": [
     {
-      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "description": "Agent package pins land as chore(agents): they change the agent tooling, not what the repository ships.",
       "matchFileNames": [
         "**/apm.yml",
         "apm.yml",
@@ -61,7 +61,6 @@
       "matchDatasources": [
         "git-tags"
       ],
-      "groupName": "{{depName}} agent package",
       "semanticCommitType": "chore",
       "semanticCommitScope": "agents"
     },

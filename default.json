@@ -241,6 +241,41 @@
       "minimumReleaseAge": "0 days"
     },
     {
+      "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "matchFileNames": [
+        "**/apm.yml",
+        "apm.yml",
+        "**/mise.toml",
+        "mise.toml"
+      ],
+      "matchDatasources": [
+        "git-tags"
+      ],
+      "groupName": "{{depName}} agent package"
+    },
+    {
+      "description": "Indirect Go modules share one branch. The golang overlay enables them; this rule only decides where they land.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "indirect"
+      ],
+      "groupName": "Go indirect modules",
+      "groupSlug": "go-indirect"
+    },
+    {
+      "description": "golang.org/x modules share one branch whether they are direct or indirect. They cut releases in lockstep, share go.sum entries, and `go mod tidy` resolves them together, so one pull request per module only rebases the others for no review value.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchPackageNames": [
+        "golang.org/x/**"
+      ],
+      "groupName": "golang.org/x modules",
+      "groupSlug": "golang-x"
+    },
+    {
       "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'local>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",
       "matchPackageNames": [
         "webgrip/renovate-config"

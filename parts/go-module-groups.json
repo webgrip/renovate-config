@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Go module groups, moved out of the golang overlay so they no longer depend on where that overlay sits in an extends list. Inert in a repository without go.mod, and the indirect group is inert until the golang overlay enables indirect modules.",
+  "packageRules": [
+    {
+      "description": "Indirect Go modules share one branch. The golang overlay enables them; this rule only decides where they land.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "indirect"
+      ],
+      "groupName": "Go indirect modules",
+      "groupSlug": "go-indirect"
+    },
+    {
+      "description": "golang.org/x modules share one branch whether they are direct or indirect. They cut releases in lockstep, share go.sum entries, and `go mod tidy` resolves them together, so one pull request per module only rebases the others for no review value.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchPackageNames": [
+        "golang.org/x/**"
+      ],
+      "groupName": "golang.org/x modules",
+      "groupSlug": "golang-x"
+    }
+  ]
+}
