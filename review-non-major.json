@@ -2,9 +2,11 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Opt-in overlay for repositories where a person reviews dependency updates but should not tick them one by one: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge, after a release-age soak. Digests are left to safe-automerge, majors keep the tick. Extend after the default preset.",
   "separateMinorPatch": false,
+  "rebaseWhen": "conflicted",
+  "internalChecksFilter": "strict",
   "packageRules": [
     {
-      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased.",
+      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased. A branch that waits for a person rebases only on a conflict: with behind-base-branch every push to the base branch would rebase it and rerun its CI. Branches that merge themselves set behind-base-branch, because a red result from an old base would otherwise keep them from merging forever.",
       "matchUpdateTypes": [
         "minor",
         "patch",

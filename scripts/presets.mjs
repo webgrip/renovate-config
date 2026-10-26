@@ -2,11 +2,11 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 
 const strict = ['parts/base.json', 'parts/approval.json'];
-const reviewed = [...strict, 'apm.json', 'parts/non-major.json', 'safe-automerge.json', 'security-automerge.json', 'parts/first-party.json'];
+const reviewed = [...strict, 'apm.json', 'parts/non-major.json', 'parts/digests-and-actions.json', 'security-automerge.json', 'parts/first-party.json'];
 const unattended = [...strict, 'apm.json', 'parts/non-major.json', 'parts/automerge.json', 'security-automerge.json', 'parts/first-party.json'];
 
 const appPolicy =
-  'Minor, patch and pin updates arrive together in one pull request a person merges; digest and CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green; majors wait for a dashboard tick.';
+  'Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.';
 
 export const generated = {
   default: {
@@ -23,6 +23,11 @@ export const generated = {
     description:
       'Opt-in overlay for repositories whose CI is the gate: minor, patch, digest and pin updates skip the dashboard tick, share one branch and merge themselves once the pull request checks are green, after a release-age soak. Majors and Go toolchain minors keep the tick. Extend after the default preset and after golang when the repository has one.',
     parts: ['parts/non-major.json', 'parts/automerge.json'],
+  },
+  grouped: {
+    description:
+      'Opt-in overlay for repositories that want to group non-major dependency updates into fewer pull requests. Extend after the default preset.',
+    parts: ['parts/grouped.json'],
   },
   'first-party': {
     description:

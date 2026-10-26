@@ -1,11 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Opt-in overlay: a security fix (an OSV vulnerability alert) merges itself once the pull request checks are green. The default preset already opens these at once, without a dashboard tick, at the lowest version that closes the advisory.",
+  "description": "Opt-in overlay: a security fix (an OSV vulnerability alert) merges itself once the pull request checks are green. The default preset already opens these at once, without a dashboard tick, at the lowest version that closes the advisory. It rebases when it falls behind, so a red result from an old base cannot hold it.",
   "vulnerabilityAlerts": {
     "automerge": true,
     "automergeType": "pr",
     "addLabels": [
       "automerge"
-    ]
+    ],
+    "rebaseWhen": "behind-base-branch"
   }
 }
