@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a package, preset, reusable workflow or action whose CI is the gate and whose consumers take each release through their own pull request. Non-major updates share one branch that merges itself on green after a soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors wait for a dashboard tick.",
+  "description": "Profile for a package, preset, reusable workflow or action, kept as a name for the unattended gate. Gate for a repository whose CI is a sufficient gate because its consumers take each release through their own pull request, such as a package, a preset, a reusable workflow, an action or a set of images: third-party minor, patch, digest and pin updates share one branch that merges itself on green after a release-age soak. Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors and Go toolchain minors wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",

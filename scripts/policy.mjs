@@ -51,8 +51,8 @@ export const deps = {
 };
 
 export const columns = [
-  ['`profile-app`, `profile-site`', ['profile-app.json']],
-  ['`profile-library`, `profile-image-set`', ['profile-library.json']],
+  ['`reviewed` (`profile-app`, `profile-site`)', ['reviewed.json']],
+  ['`unattended` (`profile-library`, `profile-image-set`)', ['unattended.json']],
   ['`default`', ['default.json']],
   ['`default` + `automerge-non-major`', ['default.json', 'automerge-non-major.json']],
   ['`default` + `review-non-major` + `safe-automerge`', ['default.json', 'review-non-major.json', 'safe-automerge.json']],
@@ -111,12 +111,12 @@ export async function render() {
     '`npm run generate` writes this page by resolving each preset and applying its rules with',
     'Renovate’s own code, and `npm test` fails when it is out of date. A pull request that changes',
     'what Renovate does changes this table, so the diff of this file is the behaviour change.',
-    '[What each profile does, and why](profiles.md) gives the reasons.',
+    '[What each gate does, and why](profiles.md) gives the reasons.',
     '',
     'Each cell reads: the branch, the soak, who merges, and the commit type. `tick` is a dashboard',
     'approval. Renovate merges a group only when every update in it merges itself, so an update that',
-    'would merge itself waits when its group also holds updates a person merges. `profile-site`',
-    'behaves as `profile-app` and `profile-image-set` as `profile-library`; the tests check each.',
+    'would merge itself waits when its group also holds updates a person merges. The `profile-*`',
+    'presets are generated names for the two gates, and the tests check each of them.',
     '',
     header,
     rule,

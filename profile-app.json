@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a deployed service or product. Minor, patch and pin updates arrive together in one pull request a person merges; digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.",
+  "description": "Profile for a deployed service or product, kept as a name for the reviewed gate. Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",

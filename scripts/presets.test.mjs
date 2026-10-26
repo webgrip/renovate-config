@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { build, capabilities, fileOf, generated, policyKeys } from './presets.mjs';
+import { mergeChildConfig } from 'renovate/dist/config/utils.js';
+import { aliases, build, capabilities, fileOf, generated, policyKeys } from './presets.mjs';
 import { deps, effective as resolveUpdate } from './policy.mjs';
 
 const effective = (preset, update) => resolveUpdate([fileOf(preset)], update);
@@ -37,8 +38,8 @@ const policy = [
 
 const presetsByPolicy = {
   default: ['default'],
-  reviewed: ['profile-app', 'profile-site'],
-  unattended: ['profile-library', 'profile-image-set'],
+  reviewed: ['reviewed', 'profile-app', 'profile-site'],
+  unattended: ['unattended', 'profile-library', 'profile-image-set'],
 };
 
 for (const name of Object.keys(generated)) {
@@ -57,6 +58,18 @@ for (const [kind, presets] of Object.entries(presetsByPolicy)) {
       });
     }
   }
+}
+
+const withoutDescription = file => {
+  const { description, ...config } = JSON.parse(readFileSync(file, 'utf8'));
+  return config;
+};
+
+for (const [name, { gate, capabilities: extra = [] }] of Object.entries(aliases)) {
+  test(`${fileOf(name)} is the ${gate} gate${extra.map(file => ` plus ${file}`).join('')}`, () => {
+    const expected = [fileOf(gate), ...extra].map(withoutDescription).reduce((parent, child) => mergeChildConfig(parent, child));
+    assert.deepEqual(withoutDescription(fileOf(name)), expected);
+  });
 }
 
 function policyKeysIn(value, path = '') {
