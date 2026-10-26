@@ -1,0 +1,51 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green. Every profile includes it. Extend after the default preset and the non-major overlay.",
+  "packageRules": [
+    {
+      "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "webgrip dependencies",
+      "groupSlug": "webgrip",
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'github>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",
+      "matchPackageNames": [
+        "webgrip/renovate-config"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": false,
+      "rebaseWhen": "behind-base-branch",
+      "pinDigests": false,
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "renovate"
+    }
+  ]
+}

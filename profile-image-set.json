@@ -3,11 +3,6 @@
   "description": "Profile for a repository of container images. Like profile-library, plus base and tool images pinned in Dockerfile ARG lines under a renovate directive.",
   "extends": [
     "config:recommended",
-    ":dependencyDashboard",
-    ":semanticCommits",
-    ":separateMultipleMajorReleases",
-    ":enableVulnerabilityAlerts",
-    ":timezone(Europe/Amsterdam)",
     "abandonments:recommended",
     "mergeConfidence:all-badges"
   ],
@@ -105,25 +100,10 @@
   ],
   "packageRules": [
     {
-      "description": "Require explicit dashboard approval for all normal updates",
-      "matchUpdateTypes": [
-        "major",
-        "minor",
-        "patch",
-        "pin",
-        "digest",
-        "replacement",
-        "rollback"
-      ],
-      "dependencyDashboardApproval": true
-    },
-    {
-      "description": "Major updates — longest soak time, major label, plain feat commits: a dependency's major is NOT the consuming product's major (a `!` here cut ploeg v1.0.0-rc.1 off a postgres image bump, 2026-07-26); semantic-release-config also guards deps-scoped breaking as minor",
+      "description": "Major updates — major label, plain feat commits: a dependency's major is NOT the consuming product's major (a `!` here cut ploeg v1.0.0-rc.1 off a postgres image bump, 2026-07-26); semantic-release-config also guards deps-scoped breaking as minor",
       "matchUpdateTypes": [
         "major"
       ],
-      "minimumReleaseAge": "14 days",
-      "automerge": false,
       "semanticCommitType": "feat",
       "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
       "addLabels": [
@@ -131,11 +111,10 @@
       ]
     },
     {
-      "description": "Minor updates — short soak time, fix commits: a dependency's minor is not a feature of the consuming product, so it cuts a patch release, the same as a patch update.",
+      "description": "Minor updates — fix commits: a dependency's minor is not a feature of the consuming product, so it cuts a patch release, the same as a patch update.",
       "matchUpdateTypes": [
         "minor"
       ],
-      "minimumReleaseAge": "3 days",
       "semanticCommitType": "fix",
       "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
       "addLabels": [
@@ -143,11 +122,10 @@
       ]
     },
     {
-      "description": "Patch updates — minimal soak time, fix commits",
+      "description": "Patch updates — fix commits",
       "matchUpdateTypes": [
         "patch"
       ],
-      "minimumReleaseAge": "1 day",
       "semanticCommitType": "fix",
       "commitMessageExtra": "( {{currentVersion}} ➔ {{newVersion}} )",
       "addLabels": [
@@ -167,12 +145,11 @@
       ]
     },
     {
-      "description": "Pin Docker image digests and require approval",
+      "description": "Pin Docker image digests",
       "matchDatasources": [
         "docker"
       ],
       "pinDigests": true,
-      "dependencyDashboardApproval": true,
       "addLabels": [
         "container"
       ]
@@ -183,27 +160,12 @@
         "github-actions"
       ],
       "pinDigests": true,
-      "dependencyDashboardApproval": true,
       "semanticCommitType": "ci",
       "semanticCommitScope": "actions",
       "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):",
       "addLabels": [
         "github-actions"
       ]
-    },
-    {
-      "description": "Do not apply stability-days soak time to shared Renovate preset updates",
-      "matchPackageNames": [
-        "webgrip/renovate-config"
-      ],
-      "minimumReleaseAge": "0 days"
-    },
-    {
-      "description": "Never digest-pin the shared preset reference. It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'github>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run.",
-      "matchPackageNames": [
-        "webgrip/renovate-config"
-      ],
-      "pinDigests": false
     },
     {
       "description": "Disable peer dependency updates to avoid range-only churn",
@@ -235,27 +197,6 @@
       "pinDigests": false
     },
     {
-      "description": "A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release. This rule sits after the per-update-type rules, which would otherwise make it fix(deps) or feat(deps).",
-      "matchPackageNames": [
-        "webgrip/renovate-config"
-      ],
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "renovate"
-    },
-    {
-      "description": "Approval IS the gate: update types that require a dashboard tick skip the release-age soak. Renovate does not persist approvals — a tick on a soak-blocked update is consumed and silently discarded, so double-gating just eats clicks. Soak still applies wherever a repo-level rule re-adds minimumReleaseAge on unattended automerge paths (repo config is applied after presets).",
-      "matchUpdateTypes": [
-        "major",
-        "minor",
-        "patch",
-        "pin",
-        "digest",
-        "replacement",
-        "rollback"
-      ],
-      "minimumReleaseAge": "0 days"
-    },
-    {
       "description": "Renovate defaults to minimumReleaseAgeBehaviour timestamp-required, which silently keeps an update without a release timestamp out of every branch for as long as a soak applies. Only Docker Hub reports Docker release timestamps, so images from any other registry were detected and never proposed wherever an overlay restores the soak. These registries cannot report a timestamp; the soak is skipped for them because it cannot be measured, not because it is unwanted.",
       "matchDatasources": [
         "docker"
@@ -267,17 +208,44 @@
       "minimumReleaseAgeBehaviour": "timestamp-optional"
     },
     {
-      "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once.",
-      "matchPackageNames": [
-        "webgrip/renovate-config"
+      "description": "Require explicit dashboard approval for all normal updates",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "replacement",
+        "rollback"
       ],
-      "groupName": null,
-      "groupSlug": null,
-      "dependencyDashboardApproval": false,
-      "minimumReleaseAge": "0 days",
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": false
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Docker updates wait for a tick, digest pins included.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "CI action updates wait for a tick, digest pins included.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "The tick is the gate, so ticked update types carry no release-age soak; the non-major part restores it where it lifts the tick.",
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "replacement",
+        "rollback"
+      ],
+      "minimumReleaseAge": "0 days"
     },
     {
       "description": "One pull request per repository bumps every pin of the same package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
@@ -316,7 +284,32 @@
       }
     },
     {
-      "description": "Non-major updates share one branch and merge themselves once its checks are green. One grouped branch per run instead of one per dependency: every open branch costs a full CI run each time it is rebased, and a small runner pool cannot absorb twenty of them per push. An automerging branch rebases when it falls behind: with rebaseWhen conflicted it would keep a red result from an old base forever, and one branch rebased once per Renovate run costs at most one CI run an hour.",
+      "description": "Minor, patch and pin updates share one branch and open without a dashboard tick. One pull request per run instead of one per dependency: every open branch costs a CI run each time it is rebased.",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major",
+      "dependencyDashboardApproval": false
+    },
+    {
+      "description": "Without the tick the soak returns, so a freshly published release is not proposed the hour it appears.",
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Patch soak without the tick.",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "description": "Non-major updates share one branch and merge themselves once its checks are green. One grouped branch per run instead of one per dependency: every open branch costs a full CI run each time it is rebased, and a small runner pool cannot absorb twenty of them per push. An automerging branch rebases when it falls behind: with rebaseWhen conflicted it would keep a red result from an old base forever, and one branch rebased once per Renovate run costs at most one CI run an hour. internalChecksFilter strict keeps an unsoaked update out of the group instead of holding the whole branch.",
       "matchUpdateTypes": [
         "minor",
         "patch",
@@ -333,20 +326,6 @@
         "automerge"
       ],
       "rebaseWhen": "behind-base-branch"
-    },
-    {
-      "description": "The default preset drops the release-age soak because the dashboard tick was the gate. Unattended merges get the soak back; internalChecksFilter strict keeps an unsoaked update out of the group instead of holding the whole branch.",
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "minimumReleaseAge": "3 days"
-    },
-    {
-      "description": "Patch soak for unattended merges.",
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "minimumReleaseAge": "1 day"
     },
     {
       "description": "With minor and patch combined, Renovate offers only the highest non-major Go version, a minor that waits for approval, so the toolchain patch would never be proposed. Go keeps them apart.",
@@ -390,7 +369,35 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Repeats the default preset's preset-bump rule after this overlay's soak and grouping rules, which would otherwise put the bump back in the grouped branch and hold it a day.",
+      "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "webgrip dependencies",
+      "groupSlug": "webgrip",
+      "dependencyDashboardApproval": false,
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Shared preset bumps merge themselves once the pull request checks are green: no dashboard tick, no release-age soak, their own branch. The preset is Webgrip's own reviewed code, released from this repository, and every consumer waiting for a tick on it is a policy fix that has not landed. Renovate's automerge, not the platform's, so a branch without checks does not merge at once. It is never digest-pinned: It is already pinned to a protected semver release tag; the global pinDigests=true otherwise makes Renovate try to rewrite 'github>webgrip/renovate-config#vX.Y.Z' to a commit SHA, the replacement never applies ('Digest is not updated'), and the whole pin-dependencies branch aborts with 'Error updating branch: update failure' on every run. A preset bump changes how Renovate treats the repository, not what it ships, so it lands as chore(renovate) and never cuts a release.. The generator appends this part to every preset it builds, so no grouping, soak or commit-type rule of an earlier part can catch the bump.",
       "matchPackageNames": [
         "webgrip/renovate-config"
       ],
@@ -401,7 +408,10 @@
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": false,
-      "rebaseWhen": "behind-base-branch"
+      "rebaseWhen": "behind-base-branch",
+      "pinDigests": false,
+      "semanticCommitType": "chore",
+      "semanticCommitScope": "renovate"
     }
   ],
   "customManagers": [
