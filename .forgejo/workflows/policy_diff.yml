@@ -1,0 +1,35 @@
+name: Policy diff
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  policy-diff:
+    name: policy diff
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: The diff finds exactly the changed cells
+        run: node --test scripts/policy-diff.test.mjs
+      - name: Comment the behaviour change on the pull request
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          POLICY_DIFF_TOKEN: ${{ secrets.WEBGRIP_CI_TOKEN }}
+        run: |
+          set -eu
+          git fetch --no-tags origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+          base="$(git merge-base HEAD "origin/${BASE_REF}")"
+          echo "Head $(git rev-parse HEAD), merge base ${base}, token $([ -n "${POLICY_DIFF_TOKEN}" ] && echo present || echo absent)"
+          node scripts/policy-diff.mjs "${base}" HEAD
