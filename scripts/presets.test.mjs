@@ -13,6 +13,9 @@ const tick = { group: null, automerge: false, approval: true };
 const nonMajor = 'all non-major dependencies';
 const safeBranch = 'digests and CI actions';
 const ownBranch = { group: 'webgrip dependencies', automerge: true, approval: false, soak: '0 days' };
+const neverShips = soak => ({ group: 'development dependencies', automerge: true, approval: false, soak });
+const alwaysReview = { group: null, automerge: false, approval: true, soak: '0 days' };
+const everyGate = expected => ({ reviewed: expected, unattended: expected });
 
 const policy = [
   ['a major', { ...npm, updateType: 'major' }, { default: tick, reviewed: tick, unattended: tick }],
@@ -27,6 +30,17 @@ const policy = [
   ['a Go toolchain minor', { ...go, updateType: 'minor' }, { default: tick, reviewed: { group: nonMajor, automerge: false }, unattended: { group: null, automerge: false, approval: true, soak: '0 days' } }],
   ['a Go toolchain patch', { ...go, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor, automerge: false }, unattended: { group: 'Go toolchain patches', automerge: true, approval: false } }],
   ['a security fix', { ...npm, updateType: 'minor', isVulnerabilityAlert: true }, { default: { approval: false, automerge: false }, reviewed: { approval: false, automerge: true }, unattended: { approval: false, automerge: true } }],
+  ['a devDependency minor', { ...deps.devDependency, updateType: 'minor' }, { default: tick, ...everyGate(neverShips('3 days')) }],
+  ['a devDependency major', { ...deps.devDependency, updateType: 'major' }, { default: tick, ...everyGate(tick) }],
+  ['a Composer require-dev patch', { ...deps.composerDev, updateType: 'patch' }, { default: tick, ...everyGate(neverShips('1 day')) }],
+  ['an @types patch outside devDependencies', { ...deps.types, updateType: 'patch' }, { default: tick, ...everyGate(neverShips('1 day')) }],
+  ['an always-review npm minor', { ...deps.tokenLibrary, updateType: 'minor' }, { default: tick, ...everyGate(alwaysReview) }],
+  ['an always-review Go patch', { ...deps.databaseDriver, updateType: 'patch' }, { default: tick, ...everyGate(alwaysReview) }],
+  ['an always-review major', { ...deps.tokenLibrary, updateType: 'major' }, { default: tick, ...everyGate(tick) }],
+  ['an always-review security fix', { ...deps.tokenLibrary, updateType: 'patch', isVulnerabilityAlert: true }, { default: { approval: false, automerge: false }, ...everyGate({ approval: false, automerge: true }) }],
+  ['an always-review library used only by tests', { ...deps.testDatabaseDriver, updateType: 'minor' }, { default: tick, ...everyGate(neverShips('3 days')) }],
+  ['a Webgrip devDependency patch', { ...deps.webgripDevDependency, updateType: 'patch' }, { default: tick, ...everyGate(ownBranch) }],
+  ['a golang.org/x minor', { ...deps.goX, updateType: 'minor' }, { default: { group: 'golang.org/x modules', approval: true }, reviewed: { group: 'golang.org/x modules', automerge: false, approval: false }, unattended: { group: 'golang.org/x modules', automerge: true, approval: false } }],
   ['a patch from a Harbor proxy project', { ...proxiedImage, updateType: 'patch' }, { default: tick, reviewed: { group: nonMajor }, unattended: { group: nonMajor } }],
   ...Object.entries(webgrip).flatMap(([kind, update]) => [
     [`a Webgrip ${kind} patch`, { ...update, updateType: 'patch' }, { default: tick, reviewed: ownBranch, unattended: ownBranch }],

@@ -6,17 +6,17 @@ export const policyKeys = ['groupName', 'groupSlug', 'automerge', 'dependencyDas
 
 const strict = ['parts/base.json', 'parts/approval.json'];
 const groups = ['parts/agent-package-group.json', 'parts/go-module-groups.json'];
-const gated = gate => [...strict, 'apm.json', 'parts/agent-package-group.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'security-automerge.json', 'parts/first-party.json'];
+const gated = gate => [...strict, 'apm.json', 'parts/agent-package-group.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'parts/risk-tiers.json', 'security-automerge.json', 'parts/first-party.json'];
 
 const gates = {
   reviewed: {
     description:
-      'Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.',
+      'Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, dependencies that never ship (devDependencies, require-dev, @types), Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick.',
     parts: gated('parts/digests-and-actions.json'),
   },
   unattended: {
     description:
-      'Gate for a repository whose CI is a sufficient gate because its consumers take each release through their own pull request, such as a package, a preset, a reusable workflow, an action or a set of images: third-party minor, patch, digest and pin updates share one branch that merges itself on green after a release-age soak. Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors and Go toolchain minors wait for a dashboard tick.',
+      'Gate for a repository whose CI is a sufficient gate because its consumers take each release through their own pull request, such as a package, a preset, a reusable workflow, an action or a set of images: third-party minor, patch, digest and pin updates share one branch that merges itself on green after a release-age soak. Dependencies that never ship (devDependencies, require-dev, @types) merge themselves in a branch of their own after the same soak; Webgrip’s own non-major updates merge themselves in a branch of their own without one; security fixes merge themselves; majors, Go toolchain minors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick.',
     parts: gated('parts/automerge.json'),
   },
 };

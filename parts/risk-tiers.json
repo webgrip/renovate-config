@@ -1,0 +1,78 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Risk belongs to the dependency, not the repository, so both gates carry this part. Dependencies that never ship merge themselves in a branch of their own even where a person merges the rest; dependencies on the always-review list wait for a dashboard tick even where CI merges the rest. Majors keep the tick, security fixes and Webgrip’s own packages keep their own rules, which come later.",
+  "packageRules": [
+    {
+      "description": "Always review: libraries that hold credentials, sign or verify tokens, or speak to the database. A green test suite rarely covers a changed token check or connection default, so their minor, patch and digest updates wait for a dashboard tick in a branch of their own, whatever the gate. The tick is their gate, so they carry no soak: a tick on an update still inside its soak is discarded. Only where they ship: as a devDependency or require-dev they fall to the never-ships rules below. The list is the owner’s to set (ADR 0001); it starts with what Webgrip code uses today, such as webgrip/ploeg’s golang-jwt, pgx and lib/pq.",
+      "matchPackageNames": [
+        "jsonwebtoken",
+        "jose",
+        "openid-client",
+        "pg",
+        "github.com/golang-jwt/jwt",
+        "github.com/golang-jwt/jwt/**",
+        "github.com/coreos/go-oidc",
+        "github.com/coreos/go-oidc/**",
+        "github.com/jackc/pgx",
+        "github.com/jackc/pgx/**",
+        "github.com/lib/pq"
+      ],
+      "matchDepTypes": [
+        "!devDependencies",
+        "!require-dev"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "dependencyDashboardApproval": true,
+      "automerge": false,
+      "minimumReleaseAge": "0 days",
+      "rebaseWhen": "conflicted"
+    },
+    {
+      "description": "Never ships: npm devDependencies and Composer require-dev, which is where linters, formatters, test runners and type packages live. They are not installed in what a repository deploys, so a green CI run is the whole question; their minor, patch and pin updates share a branch of their own that merges itself after the soak, apart from the branch a person merges. A database driver used only by tests is one of them: the always-review rule excludes these dependency types.",
+      "matchDepTypes": [
+        "devDependencies",
+        "require-dev"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "development dependencies",
+      "groupSlug": "development-dependencies",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Never ships: type packages carry no runtime code, whichever dependency list they sit in.",
+      "matchPackageNames": [
+        "@types/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "development dependencies",
+      "groupSlug": "development-dependencies",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    }
+  ]
+}

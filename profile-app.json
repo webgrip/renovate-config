@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Profile for a deployed service or product, kept as a name for the reviewed gate. Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors wait for a dashboard tick.",
+  "description": "Profile for a deployed service or product, kept as a name for the reviewed gate. Gate for a repository that ships what merges, such as a service, a product or a site: a person merges third-party minor, patch and pin updates, which arrive together in one pull request after a release-age soak. Digests, CI action updates, dependencies that never ship (devDependencies, require-dev, @types), Webgrip’s own non-major updates and security fixes merge themselves on green in branches of their own; majors and the always-review list (token, OIDC and database libraries) wait for a dashboard tick.",
   "extends": [
     "config:recommended",
     "abandonments:recommended",
@@ -378,6 +378,78 @@
       ],
       "groupName": "golang.org/x modules",
       "groupSlug": "golang-x"
+    },
+    {
+      "description": "Always review: libraries that hold credentials, sign or verify tokens, or speak to the database. A green test suite rarely covers a changed token check or connection default, so their minor, patch and digest updates wait for a dashboard tick in a branch of their own, whatever the gate. The tick is their gate, so they carry no soak: a tick on an update still inside its soak is discarded. Only where they ship: as a devDependency or require-dev they fall to the never-ships rules below. The list is the owner’s to set (ADR 0001); it starts with what Webgrip code uses today, such as webgrip/ploeg’s golang-jwt, pgx and lib/pq.",
+      "matchPackageNames": [
+        "jsonwebtoken",
+        "jose",
+        "openid-client",
+        "pg",
+        "github.com/golang-jwt/jwt",
+        "github.com/golang-jwt/jwt/**",
+        "github.com/coreos/go-oidc",
+        "github.com/coreos/go-oidc/**",
+        "github.com/jackc/pgx",
+        "github.com/jackc/pgx/**",
+        "github.com/lib/pq"
+      ],
+      "matchDepTypes": [
+        "!devDependencies",
+        "!require-dev"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "groupName": null,
+      "groupSlug": null,
+      "dependencyDashboardApproval": true,
+      "automerge": false,
+      "minimumReleaseAge": "0 days",
+      "rebaseWhen": "conflicted"
+    },
+    {
+      "description": "Never ships: npm devDependencies and Composer require-dev, which is where linters, formatters, test runners and type packages live. They are not installed in what a repository deploys, so a green CI run is the whole question; their minor, patch and pin updates share a branch of their own that merges itself after the soak, apart from the branch a person merges. A database driver used only by tests is one of them: the always-review rule excludes these dependency types.",
+      "matchDepTypes": [
+        "devDependencies",
+        "require-dev"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "development dependencies",
+      "groupSlug": "development-dependencies",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Never ships: type packages carry no runtime code, whichever dependency list they sit in.",
+      "matchPackageNames": [
+        "@types/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin"
+      ],
+      "groupName": "development dependencies",
+      "groupSlug": "development-dependencies",
+      "dependencyDashboardApproval": false,
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "automerge"
+      ],
+      "rebaseWhen": "behind-base-branch"
     },
     {
       "description": "Harbor's webgrip project holds only Webgrip's images; its proxy projects (dockerhub, ghcr, quay) are third-party and stay out.",
