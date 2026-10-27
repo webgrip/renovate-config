@@ -122,3 +122,11 @@ test('profile-image-set reads Dockerfile ARG pins under a renovate directive', (
   assert.equal(found[0]?.groups.currentValue, '24-alpine');
   assert.equal(found[0]?.groups.currentDigest, `sha256:${'a'.repeat(64)}`);
 });
+
+test('platform-automerge hands the merge to the platform and decides nothing else', () => {
+  const overlay = JSON.parse(readFileSync('platform-automerge.json', 'utf8'));
+  const { $schema, description, ...settings } = overlay;
+  assert.deepEqual(settings, { platformAutomerge: true });
+  const resolved = mergeChildConfig(mergeChildConfig(JSON.parse(readFileSync('default.json', 'utf8')), JSON.parse(readFileSync('automerge-non-major.json', 'utf8'))), overlay);
+  assert.equal(resolved.platformAutomerge, true, 'extended after the automerge overlay, it wins over the default');
+});
