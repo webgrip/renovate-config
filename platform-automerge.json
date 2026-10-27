@@ -1,0 +1,5 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Opt-in overlay: Forgejo merges an automerging pull request as soon as the required checks of its base branch are green, instead of waiting for Renovate's next run. Forgejo decides on the branch rule's required contexts only and merges at once when there are none, so extend this only when every protected branch requires the repository's gate check; homelab-cluster's repo-config validator refuses it otherwise (homelab-cluster ADR-0084). Renovate schedules the merge when it opens a pull request, and still merges a green pull request itself on its next run. Extend after the gate or automerge overlay.",
+  "platformAutomerge": true
+}

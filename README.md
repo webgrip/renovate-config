@@ -79,6 +79,7 @@ GitOps repositories keep `default` plus `gitops`. `gitops` still sets groups of 
 | `local>webgrip/renovate-config:golang` | Capability overlay for Go: manages indirect Go modules (off by default in Renovate), tidies go.mod/go.sum in-branch, rewrites `/vN` import paths, and labels toolchain moves; the gates and `default` carry its groups |
 | `local>webgrip/renovate-config:review-non-major` | Opt-in overlay: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge, with the release-age soak restored |
 | `local>webgrip/renovate-config:first-party` | Opt-in overlay: minor, patch, digest and pin updates of Webgrip's own packages share one branch that opens without a tick, skips the soak and merges itself on green; every gate includes it |
+| `local>webgrip/renovate-config:platform-automerge` | Opt-in overlay: Forgejo merges an automerging pull request as soon as its base branch's required checks are green, instead of at Renovate's next run; only for repositories whose protected branches require their gate check (homelab-cluster ADR-0084) |
 | `local>webgrip/renovate-config:security-automerge` | Opt-in overlay: security fixes from OSV alerts merge themselves once checks are green |
 | `local>webgrip/renovate-config:docker-arg-pins` | Capability overlay: Dockerfile `ARG` image and tool pins under a `# renovate: datasource=… depName=…` line |
 

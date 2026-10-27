@@ -115,8 +115,13 @@ reference is already a protected tag. Each of these used to abort a whole groupe
 `timestamp-required` would keep them out of every branch for as long as a soak applies, so they
 are `timestamp-optional`. The cost: the soak never holds a ghcr.io, quay.io or Harbor proxy image.
 
-**Renovate merges, not Forgejo.** `platformAutomerge: false`, because Forgejo's
-merge-when-checks-succeed merges at once on a branch without required checks.
+**Renovate merges, not Forgejo, unless a repository opts in.** Every preset sets
+`platformAutomerge: false`, because Forgejo's merge-when-checks-succeed merges at once on a
+branch without required checks. A repository whose protected branches require its `gate` check
+extends `platform-automerge` after its gate, and Forgejo merges as soon as that check is green
+instead of at Renovate's next run, up to an hour later. homelab-cluster's repo-config validator
+refuses the overlay on a repository whose branches do not require the gate
+([homelab-cluster ADR-0084](https://forgejo.webgrip.dev/webgrip/homelab-cluster/src/branch/main/docs/techdocs/docs/adr/adr-0084-a-branch-rule-requires-one-gate-and-forgejo-merges-renovate-on-it.md)).
 
 ## Decisions that stay open
 
