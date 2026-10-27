@@ -268,7 +268,7 @@
       "postUpgradeTasks": {
         "commands": [
           "install-tool uv",
-          "uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@v0.4.1#subdirectory=cli agentstd install"
+          "uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@v0.5.1#subdirectory=cli agentstd install"
         ],
         "fileFilters": [
           "**/*",
