@@ -78,7 +78,7 @@ jobs:
       statuses: write
     steps:
       - name: Semantic Release
-        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v3.2.1
+        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v3.3.0
         with:
           token: ${{ secrets.WEBGRIP_CI_TOKEN }}
           install-dependencies: "false"
