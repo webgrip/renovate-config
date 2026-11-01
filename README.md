@@ -51,12 +51,16 @@ A preset answers three questions apart ([ADR 0001](docs/adr/0001-gates-risk-tier
 
 | Gate | For | Third-party minor, patch, pin | Digests, CI actions | Never ships: devDependencies, `require-dev`, `@types` | Always review: token, OIDC and database libraries | Webgrip's own minor, patch, digest, pin | Security fixes | Majors |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `reviewed` | repositories that ship what merges: services, products, sites | one grouped pull request after a soak, a person merges | one branch of their own, merges itself on green | one branch of their own, merges itself on green after a soak | dashboard tick, own branch | one branch of their own, no soak, merges itself on green | merge themselves on green | third-party: dashboard tick; Webgrip's own: a pull request without a tick, a person merges |
+| `reviewed` | repositories that ship what merges: services, products, sites | one grouped pull request after a soak, a person merges | one branch of their own, merges itself on green | one branch of their own, merges itself on green after a soak | dashboard tick, own branch | one branch of their own, no soak, merges itself on green; pins in CI files in a second one that commits as `ci` and releases nothing | merge themselves on green | third-party: dashboard tick; Webgrip's own: a pull request without a tick, a person merges |
 | `unattended` | repositories whose consumers take each release through their own pull request: packages, presets, reusable workflows, actions, image sets | one grouped branch that merges itself on green after a soak | in that grouped branch | same as `reviewed` | same | same | same | same |
 
 The profile names stay published, generated from the gates: `profile-app` and `profile-site` are
 `reviewed`, `profile-library` is `unattended`, and `profile-image-set` is `unattended` plus
 `docker-arg-pins`. Existing `extends` lines keep working.
+
+A Webgrip package pinned in `.forgejo/**` or `.github/**` (outside `webgrip/workflows`, which ships
+those files) commits as `ci(tooling)` in every preset, so a release of one tooling repository no
+longer releases every repository that runs it in CI. [Why, and which pins stay `fix`](docs/profiles.md).
 
 [The policy table](docs/policy.md) shows what every gate does with each kind of update; it is generated from the presets, so a pull request that changes behaviour changes that table. [What each gate does, and why](docs/profiles.md) gives the reasons and the decisions that stay open.
 

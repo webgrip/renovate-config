@@ -36,6 +36,8 @@ export async function effective(stack, update) {
   };
 }
 
+const consumer = 'webgrip/semantic-release-config';
+
 export const dep = (manager, datasource, packageName, depType, depName = packageName) => ({ manager, datasource, depName, packageName, depType });
 
 export const deps = {
@@ -60,6 +62,14 @@ export const deps = {
   agentCli: { ...dep('regex', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/agent-standards.git', undefined, 'webgrip/agent-standards'), packageFile: 'mise.toml' },
   agentSkill: { ...dep('regex', 'git-tags', 'https://forgejo.webgrip.dev/webgrip/ai-skills.git', undefined, 'guard-secrets'), packageFile: 'apm.yml' },
   presetBump: dep('renovate-config-presets', 'gitea-tags', 'webgrip/renovate-config', undefined),
+  webgripCiWorkflow: { ...dep('github-actions', 'gitea-tags', 'webgrip/workflows', 'action'), packageFile: '.forgejo/workflows/agents-check.yml', repository: consumer },
+  webgripCiComposite: { ...dep('github-actions', 'gitea-tags', 'https://forgejo.webgrip.dev/webgrip/workflows', 'action'), packageFile: '.forgejo/workflows/on_source_change.yml', repository: consumer },
+  webgripCiContainer: { ...dep('github-actions', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', 'container'), packageFile: '.forgejo/workflows/on_source_change.yml', repository: consumer },
+  webgripCiToolchainInput: { ...dep('regex', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', undefined), packageFile: '.forgejo/workflows/ci.yml', repository: consumer },
+  webgripGithubCiAction: { ...dep('github-actions', 'github-tags', 'webgrip/copilot-action', 'action'), packageFile: '.github/workflows/review.yml', repository: consumer },
+  webgripReleaseConfig: { ...dep('npm', 'npm', '@webgrip/semantic-release-config', 'devDependencies'), packageFile: 'package.json', repository: consumer },
+  workflowsToolchainDefault: { ...dep('regex', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', undefined), packageFile: '.forgejo/workflows/semantic-release.yml', repository: 'webgrip/workflows' },
+  workflowsOwnCiContainer: { ...dep('github-actions', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', 'container'), packageFile: '.forgejo/workflows/on_source_change.yml', repository: 'webgrip/workflows' },
 };
 
 export const columns = [
@@ -105,6 +115,16 @@ export const rows = [
   ['Webgrip skill patch', { ...deps.agentSkill, updateType: 'patch' }],
   ['Webgrip npm package patch', { ...deps.webgripNpm, updateType: 'patch' }],
   ['Webgrip devDependency patch', { ...deps.webgripDevDependency, updateType: 'patch' }],
+  ['Webgrip reusable workflow ref in CI, patch', { ...deps.webgripCiWorkflow, updateType: 'patch' }],
+  ['Webgrip composite action ref in CI, minor', { ...deps.webgripCiComposite, updateType: 'minor' }],
+  ['Webgrip toolchain image in a CI `container:`, minor', { ...deps.webgripCiContainer, updateType: 'minor' }],
+  ['Webgrip toolchain image in a CI `container:`, digest', { ...deps.webgripCiContainer, updateType: 'digest' }],
+  ['Webgrip `toolchain-image:` in CI, patch', { ...deps.webgripCiToolchainInput, updateType: 'patch' }],
+  ['Webgrip ref in CI, major', { ...deps.webgripCiComposite, updateType: 'major' }],
+  ['Webgrip toolchain image in a CI `container:`, major', { ...deps.webgripCiContainer, updateType: 'major' }],
+  ['`@webgrip/semantic-release-config` in package.json, minor', { ...deps.webgripReleaseConfig, updateType: 'minor' }],
+  ['webgrip/workflows: toolchain input default, minor', { ...deps.workflowsToolchainDefault, updateType: 'minor' }],
+  ['webgrip/workflows: toolchain image its own CI job runs in, patch', { ...deps.workflowsOwnCiContainer, updateType: 'patch' }],
   ['`webgrip/renovate-config` bump', { ...deps.presetBump, updateType: 'minor' }],
 ];
 

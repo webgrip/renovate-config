@@ -24,14 +24,15 @@ records why gate, risk tier and capability are separate questions.
 | 7 | `parts/risk-tiers.json` | Never-ships dependencies merge themselves; the always-review list keeps the tick |
 | 8 | `security-automerge.json` | Security fixes merge themselves |
 | 9 | `parts/first-party.json` | Webgrip's own non-major updates get their own branch, no soak, automerge; their majors open without a tick |
-| 10 | `parts/agent-package-group.json` | A branch per agent package, and one for all `webgrip/ai-skills` skills |
-| 11 | `docker-arg-pins.json` (`profile-image-set` only) | Capability: Dockerfile `ARG` pins under a `# renovate:` line |
+| 10 | `parts/ci-tooling-group.json` | Webgrip's pins in CI files get a branch of their own, so it commits as `ci` |
+| 11 | `parts/agent-package-group.json` | A branch per agent package, and one for all `webgrip/ai-skills` skills |
+| 12 | `docker-arg-pins.json` (`profile-image-set` only) | Capability: Dockerfile `ARG` pins under a `# renovate:` line |
 | last | `parts/preset-bump.json` | The `webgrip/renovate-config` bump, appended to every generated preset |
 
 `default.json`, `grouped.json`, `review-non-major.json`, `automerge-non-major.json` and
 `first-party.json` are generated from the same parts, for repositories that still compose overlays
-by hand; `default` carries parts 1, 2, 6 and 10, and `review-non-major`, `automerge-non-major` and
-`first-party` end with part 10.
+by hand; `default` carries parts 1, 2, 6 and 11, `review-non-major`, `automerge-non-major` and
+`first-party` end with parts 10 and 11, and `grouped` ends with part 10.
 
 **Capability overlays decide no policy.** `apm.json`, `golang.json` and `docker-arg-pins.json`
 set none of `groupName`, `groupSlug`, `automerge`, `dependencyDashboardApproval`,
@@ -86,6 +87,47 @@ major of our own is a break we chose to make, so nobody should have to ask Renov
 nobody should find it merged unread. Harbor's proxy projects (`harbor.webgrip.dev/dockerhub/...`)
 are third-party.
 
+**Webgrip's pins in CI files commit as `ci` and release nothing.** The four shared tooling
+repositories (workflows, semantic-release-config, agent-standards, renovate-config) pin each other,
+mostly in CI files, and a release of one asks Renovate to update its consumers. When those bumps
+landed as `fix(deps)`, a release of A merged a bump into B that released B, whose bump merged into A
+and released A again, and each round opened a pull request in every consuming repository. A pin
+in `.forgejo/**` or `.github/**` changes how a repository is built, not what it ships, so a Webgrip
+package found there (a reusable workflow or composite action ref, the
+`harbor.webgrip.dev/webgrip/semantic-release` toolchain image in `container:` or `toolchain-image:`)
+lands as `ci(tooling)` for every update type, majors included, and `semantic-release-config` cuts
+no release for `ci`. The rule sits in `parts/base.json`, after the per-update-type commit rules, so
+every preset carries it, `default` included.
+
+The same pins get a branch of their own, `webgrip CI dependencies`, next to `webgrip dependencies`.
+Renovate gives a branch the highest commit type among its updates (`chore` < `ci` < `build` < `fix`
+< `feat`), so one shared branch would commit every CI pin as `fix(deps)` whenever an update that
+ships sat in it, which is how `fix(actions): Update webgrip dependencies` kept releasing. Every
+stack that groups updates carries `parts/ci-tooling-group.json` after its grouping parts. The rule
+changes only the branch: in a gate it opens without a tick, skips the soak and merges itself like
+the rest of Webgrip's packages; in a hand-composed stack it keeps the tick, soak and merge of the
+branch it replaces. Majors stay out of both branches, one pull request each that a person merges.
+A repository gets at most two Webgrip branches per round: one `ci`, one `fix`.
+
+`webgrip/workflows` is excluded by name. Its `.forgejo/workflows` and `.forgejo/composite-actions`
+are what it ships: a caller receives the toolchain image pinned as an input default in a reusable
+workflow, so that bump must release. Pins there keep the commit type they had: input defaults
+(its own `custom.regex` manager) land as `fix(deps)`, and the image its own CI jobs run in keeps the
+CI action rule, `ci(actions)`, which in its shared toolchain branch is outranked by the `fix`.
+Its self-references are `@main` and not managed. Any other repository whose `.forgejo` or `.github`
+holds what it ships needs the same exclusion here.
+
+| Repository | Webgrip pins that commit as `ci(tooling)` | Webgrip pins that keep releasing |
+| --- | --- | --- |
+| `webgrip/renovate-config` | workflows refs and the toolchain `container:` image in `.forgejo/workflows` | the agent-standards tag inside the presets (`fix(deps)`) |
+| `webgrip/semantic-release-config` | workflows refs and the toolchain `container:` image in `.forgejo/workflows` | none today; a `@webgrip/*` package in `package.json` would stay `fix(deps)` |
+| `webgrip/agent-standards` | workflows refs, `toolchain-image:` and the toolchain `container:` image in `.forgejo/workflows` | none today; its release config comes from the toolchain image |
+| `webgrip/workflows` | none | input defaults in `.forgejo/workflows` and `.forgejo/composite-actions` (`fix(deps)`) |
+| any other consumer | the same CI pins | `@webgrip/*` npm packages, Webgrip images in a Dockerfile or chart, tools in `mise.toml` (`fix(deps)`) |
+
+Agent packages in `apm.yml` and `mise.toml` stay `chore(agents)` and the preset bump `chore(renovate)`,
+each in its own branch, for the reasons below and in `parts/preset-bump.json`.
+
 **Agent packages get a branch per package, and the lockfile comes with the bump.**
 `parts/agent-package-group.json` comes after the first-party part, so an agent package leaves the
 shared Webgrip branch for a branch of its own: every pin of `webgrip/agent-standards` in one, every
@@ -104,8 +146,8 @@ smallest change that removes the exposure.
 **Commit types decide releases.** A dependency minor or patch lands as `fix(deps)` and cuts a patch
 release; a major lands as `feat(deps)` and cuts a minor, because a dependency's major is not the
 product's major. Digests and pins land as `chore(deps)`, which `semantic-release-config` also
-releases as a patch. CI actions land as `ci(actions)` and the preset bump as `chore(renovate)`;
-neither releases anything.
+releases as a patch. CI actions land as `ci(actions)`, Webgrip pins in CI files as `ci(tooling)` and the preset bump as
+`chore(renovate)`; none of them releases anything.
 
 **Digests are pinned everywhere except where they cannot be written.** `mise` cannot write a digest
 into its tool entries, an action's `with: version:` input cannot take one, and the preset

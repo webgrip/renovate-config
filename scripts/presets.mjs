@@ -4,9 +4,10 @@ import { mergeChildConfig } from 'renovate/dist/config/utils.js';
 export const capabilities = ['apm.json', 'docker-arg-pins.json', 'golang.json'];
 export const policyKeys = ['groupName', 'groupSlug', 'automerge', 'dependencyDashboardApproval', 'minimumReleaseAge', 'rebaseWhen'];
 
+const ciGroup = 'parts/ci-tooling-group.json';
 const strict = ['parts/base.json', 'parts/approval.json'];
 const groups = ['parts/agent-package-group.json', 'parts/go-module-groups.json'];
-const gated = gate => [...strict, 'apm.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'parts/risk-tiers.json', 'security-automerge.json', 'parts/first-party.json', 'parts/agent-package-group.json'];
+const gated = gate => [...strict, 'apm.json', 'parts/non-major.json', gate, 'parts/go-module-groups.json', 'parts/risk-tiers.json', 'security-automerge.json', 'parts/first-party.json', ciGroup, 'parts/agent-package-group.json'];
 
 const gates = {
   reviewed: {
@@ -44,22 +45,22 @@ export const generated = {
   'review-non-major': {
     description:
       'Opt-in overlay for repositories where a person reviews dependency updates but should not tick them one by one: minor, patch and pin updates share one pull request that opens without a dashboard tick and waits for a human merge, after a release-age soak. Digests are left to safe-automerge, majors keep the tick. Extend after the default preset.',
-    parts: ['parts/non-major.json', 'parts/agent-package-group.json'],
+    parts: ['parts/non-major.json', ciGroup, 'parts/agent-package-group.json'],
   },
   'automerge-non-major': {
     description:
       'Opt-in overlay for repositories whose CI is the gate: minor, patch, digest and pin updates skip the dashboard tick, share one branch and merge themselves once the pull request checks are green, after a release-age soak. Majors and Go toolchain minors keep the tick. Extend after the default preset and after golang when the repository has one.',
-    parts: ['parts/non-major.json', 'parts/automerge.json', 'parts/agent-package-group.json'],
+    parts: ['parts/non-major.json', 'parts/automerge.json', ciGroup, 'parts/agent-package-group.json'],
   },
   grouped: {
     description:
       'Opt-in overlay for repositories that want to group non-major dependency updates into fewer pull requests. Extend after the default preset.',
-    parts: ['parts/grouped.json'],
+    parts: ['parts/grouped.json', ciGroup],
   },
   'first-party': {
     description:
       'Opt-in overlay for Webgrip’s own packages: minor, patch, digest and pin updates of anything Webgrip publishes share one branch of their own that opens without a tick, skips the release-age soak and merges itself on green; their majors open a pull request without a tick and a person merges it. Every profile includes it. Extend after the default preset and the non-major overlay.',
-    parts: ['parts/first-party.json', 'parts/agent-package-group.json'],
+    parts: ['parts/first-party.json', ciGroup, 'parts/agent-package-group.json'],
   },
   ...gates,
   ...Object.fromEntries(Object.entries(aliases).map(([name, definition]) => [name, alias(definition)])),
