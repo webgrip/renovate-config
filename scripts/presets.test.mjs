@@ -20,6 +20,11 @@ const ownMajor = { group: null, automerge: false, approval: false, soak: '0 days
 const agentPackage = '{{depName}} agent package';
 const agentBranch = (group, install) => ({ ...ownBranch, group, commitType: 'chore', commitScope: 'agents', install });
 const installNew = 'uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@{{{newValue}}}#subdirectory=cli agentstd install';
+const ciTooling = { commitType: 'ci', commitScope: 'tooling' };
+const ciBranch = { group: 'webgrip CI dependencies', automerge: true, approval: false, soak: '0 days', ...ciTooling };
+const ciMajor = { ...ownMajor, ...ciTooling };
+const ciOnly = { workflowRef: deps.webgripCiWorkflow, compositeRef: deps.webgripCiComposite, container: deps.webgripCiContainer, toolchainInput: deps.webgripCiToolchainInput, githubAction: deps.webgripGithubCiAction };
+const ships = { npm: deps.webgripNpm, releaseConfig: deps.webgripReleaseConfig, image: deps.webgripImage, gitTag: deps.webgripGitTag, workflowsDefault: deps.workflowsToolchainDefault };
 const installPinned = /^uv tool run --from git\+https:\/\/forgejo\.webgrip\.dev\/webgrip\/agent-standards\.git@v\d+\.\d+\.\d+#subdirectory=cli agentstd install$/;
 
 const policy = [
@@ -55,6 +60,15 @@ const policy = [
   ['a Webgrip agent package major', { ...deps.agentPackage, updateType: 'major' }, { default: { ...tick, group: agentPackage }, reviewed: { ...ownMajor, group: agentPackage, install: installNew }, unattended: { ...ownMajor, group: agentPackage, install: installNew } }],
   ...[['agent package', deps.agentPackage], ['agentstd pin', deps.agentCli]].map(([what, update]) => [`a Webgrip ${what} minor`, { ...update, updateType: 'minor' }, { default: { ...tick, group: agentPackage }, reviewed: agentBranch(agentPackage, installNew), unattended: agentBranch(agentPackage, installNew) }]),
   ['a Webgrip skill patch', { ...deps.agentSkill, updateType: 'patch' }, { default: { ...tick, group: 'webgrip/ai-skills skills' }, reviewed: agentBranch('webgrip/ai-skills skills', installPinned), unattended: agentBranch('webgrip/ai-skills skills', installPinned) }],
+  ...Object.entries(ciOnly).flatMap(([kind, update]) => [
+    [`a Webgrip ${kind} in CI files, patch`, { ...update, updateType: 'patch' }, { default: { ...tick, ...ciTooling }, ...everyGate(ciBranch) }],
+    [`a Webgrip ${kind} in CI files, minor`, { ...update, updateType: 'minor' }, { default: { ...tick, ...ciTooling }, ...everyGate(ciBranch) }],
+    [`a Webgrip ${kind} in CI files, major`, { ...update, updateType: 'major' }, { default: { ...tick, ...ciTooling }, ...everyGate(ciMajor) }],
+  ]),
+  ['a Webgrip toolchain image digest in a CI container:', { ...deps.webgripCiContainer, updateType: 'digest' }, { default: { ...tick, ...ciTooling }, ...everyGate(ciBranch) }],
+  ['@webgrip/semantic-release-config in package.json, minor', { ...deps.webgripReleaseConfig, updateType: 'minor' }, { default: { ...tick, commitType: 'fix', commitScope: 'deps' }, ...everyGate({ ...ownBranch, commitType: 'fix', commitScope: 'deps' }) }],
+  ['webgrip/workflows: the toolchain input default it ships, minor', { ...deps.workflowsToolchainDefault, updateType: 'minor' }, { default: { ...tick, commitType: 'fix', commitScope: 'deps' }, ...everyGate({ ...ownBranch, commitType: 'fix', commitScope: 'deps' }) }],
+  ['webgrip/workflows: the image its own CI job runs in keeps the CI action rule, patch', { ...deps.workflowsOwnCiContainer, updateType: 'patch' }, { default: { ...tick, commitType: 'ci', commitScope: 'actions' }, ...everyGate({ ...ownBranch, commitType: 'ci', commitScope: 'actions' }) }],
   ['the preset bump', { ...presetBump, updateType: 'minor' }, Object.fromEntries(['default', 'reviewed', 'unattended'].map(kind => [kind, { group: null, automerge: true, approval: false, soak: '0 days', commitType: 'chore' }]))],
 ];
 
@@ -83,6 +97,50 @@ for (const [kind, presets] of Object.entries(presetsByPolicy)) {
       });
     }
   }
+}
+
+async function branchesOf(preset, updates) {
+  const branches = new Map();
+  for (const update of updates) {
+    const { group, commitType } = await effective(preset, update);
+    branches.set(group, [...(branches.get(group) ?? []), commitType]);
+  }
+  return branches;
+}
+
+for (const preset of [...presetsByPolicy.reviewed, ...presetsByPolicy.unattended]) {
+  test(`${preset}: Webgrip non-major updates land in one CI branch that commits as ci and one shipping branch that commits as fix`, async () => {
+    const nonMajors = ['patch', 'minor', 'digest'];
+    const ci = await branchesOf(preset, Object.values(ciOnly).flatMap(update => nonMajors.map(updateType => ({ ...update, updateType }))));
+    assert.deepEqual([...ci.keys()], ['webgrip CI dependencies']);
+    assert.deepEqual(new Set(ci.get('webgrip CI dependencies')), new Set(['ci']));
+    const shipping = await branchesOf(preset, Object.values(ships).flatMap(update => ['patch', 'minor'].map(updateType => ({ ...update, updateType }))));
+    assert.deepEqual([...shipping.keys()], ['webgrip dependencies']);
+    assert.deepEqual(new Set(shipping.get('webgrip dependencies')), new Set(['fix']));
+  });
+
+  test(`${preset}: a Webgrip major stays out of both shared branches`, async () => {
+    const majors = await branchesOf(preset, [...Object.values(ciOnly), ...Object.values(ships), deps.workflowsOwnCiContainer].map(update => ({ ...update, updateType: 'major' })));
+    assert.deepEqual([...majors.keys()], [null]);
+  });
+}
+
+const composedStacks = [
+  ['default.json', 'automerge-non-major.json'],
+  ['default.json', 'review-non-major.json', 'safe-automerge.json'],
+  ['default.json', 'grouped.json'],
+  ['default.json', 'review-non-major.json', 'first-party.json'],
+];
+
+for (const stack of composedStacks) {
+  test(`${stack.join(' + ')}: no group mixes a Webgrip CI-only pin with an update that ships`, async () => {
+    for (const update of Object.values(ciOnly)) {
+      for (const updateType of ['patch', 'minor']) {
+        const { group, commitType } = await resolveUpdate(stack, { ...update, updateType });
+        assert.deepEqual({ group, commitType }, { group: 'webgrip CI dependencies', commitType: 'ci' });
+      }
+    }
+  });
 }
 
 const withoutDescription = file => {

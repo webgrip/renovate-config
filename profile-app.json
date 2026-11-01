@@ -167,6 +167,26 @@
       ]
     },
     {
+      "description": "A Webgrip package pinned in a repository's CI files (.forgejo/** and .github/**: reusable workflow and composite action refs, the semantic-release toolchain image in container: or toolchain-image:) changes how that repository is built, not what it ships, so it lands as ci(tooling), whatever the update type, and never cuts a release. A Webgrip release asks Renovate to update its consumers, and when these bumps landed as fix(deps) every consumer released in turn and the shared tooling repositories bumped each other in a loop. webgrip/workflows is excluded: its .forgejo/workflows and .forgejo/composite-actions are what it ships, so a pin there, an input default included, still lands as fix and releases. A Webgrip package anywhere else (package.json, a Dockerfile, mise.toml) keeps the commit type of its update type.",
+      "matchFileNames": [
+        ".forgejo/**",
+        ".github/**"
+      ],
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchRepositories": [
+        "!webgrip/workflows"
+      ],
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "tooling"
+    },
+    {
       "description": "Disable peer dependency updates to avoid range-only churn",
       "matchDepTypes": [
         "peerDependencies"
@@ -508,6 +528,33 @@
       ],
       "dependencyDashboardApproval": false,
       "automerge": false
+    },
+    {
+      "description": "Webgrip packages pinned only in CI files get a branch of their own in every stack that groups updates. Renovate gives a branch the highest commit type among its updates (fix beats ci), so a branch shared with anything that ships would commit these pins as fix(deps) and cut a release again. The rule changes only the branch: whoever merges the branch it replaces, its tick and its soak stay as the earlier parts set them, so in a gate it opens without a tick, skips the soak and merges itself like the rest of Webgrip's packages. webgrip/workflows ships its CI files, so its pins stay where they were. Majors stay out of it, one pull request each.",
+      "matchFileNames": [
+        ".forgejo/**",
+        ".github/**"
+      ],
+      "matchPackageNames": [
+        "harbor.webgrip.dev/webgrip/**",
+        "ghcr.io/webgrip/**",
+        "@webgrip/**",
+        "webgrip/**",
+        "forgejo.webgrip.dev/webgrip/**",
+        "https://forgejo.webgrip.dev/webgrip/**"
+      ],
+      "matchRepositories": [
+        "!webgrip/workflows"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
+      "groupName": "webgrip CI dependencies",
+      "groupSlug": "webgrip-ci"
     },
     {
       "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
