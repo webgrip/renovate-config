@@ -161,10 +161,12 @@
       ]
     },
     {
-      "description": "A Webgrip package pinned in a repository's CI files (.forgejo/** and .github/**: reusable workflow and composite action refs, the semantic-release toolchain image in container: or toolchain-image:) changes how that repository is built, not what it ships, so it lands as ci(tooling), whatever the update type, and never cuts a release. A Webgrip release asks Renovate to update its consumers, and when these bumps landed as fix(deps) every consumer released in turn and the shared tooling repositories bumped each other in a loop. webgrip/workflows is excluded: its .forgejo/workflows and .forgejo/composite-actions are what it ships, so a pin there, an input default included, still lands as fix and releases. A Webgrip package anywhere else (package.json, a Dockerfile, mise.toml) keeps the commit type of its update type.",
+      "description": "A Webgrip package pinned in a file a repository never ships changes how that repository is built, not what it ships, so it lands as ci(tooling), whatever the update type, and never cuts a release. Those files are its CI files (.forgejo/** and .github/**: reusable workflow and composite action refs, the semantic-release toolchain image in container: or toolchain-image:) and its mise.toml (a task that runs the toolchain image, a tool it installs). A Webgrip release asks Renovate to update its consumers, and when these bumps landed as fix(deps) every consumer released in turn and the shared tooling repositories bumped each other in a loop; a mise.toml pin of the same image, left out, still released Unfold through a fix(deps) branch of its own. webgrip/workflows is excluded: its .forgejo/workflows and .forgejo/composite-actions are what it ships, so a pin there, an input default included, still lands as fix and releases. A Webgrip package in a file that ships (package.json, a Dockerfile) keeps the commit type of its update type.",
       "matchFileNames": [
         ".forgejo/**",
-        ".github/**"
+        ".github/**",
+        "**/mise.toml",
+        "**/.mise.toml"
       ],
       "matchPackageNames": [
         "harbor.webgrip.dev/webgrip/**",
@@ -261,7 +263,7 @@
       "minimumReleaseAge": "0 days"
     },
     {
-      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step. The tooling part turns separateMajorMinor off for Webgrip pins in mise.toml and comes earlier, so this rule turns it back on: otherwise a major would split the apm.yml pin into a major branch and leave the mise.toml pin in this one.",
       "matchManagers": [
         "custom.regex"
       ],
@@ -278,7 +280,8 @@
         "https://forgejo.webgrip.dev/webgrip/**"
       ],
       "groupName": "{{depName}} agent package",
-      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}"
+      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}",
+      "separateMajorMinor": true
     },
     {
       "description": "Skills from webgrip/ai-skills share one branch: each skill is its own dependency, and one branch per skill would make every other skill branch conflict on apm.lock.yaml once the first merges.",

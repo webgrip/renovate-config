@@ -3,7 +3,7 @@
   "description": "The branches of agent-package bumps, moved out of apm.json so that overlay only teaches detection. Gates apply it after the first-party part, so an agent package leaves the shared Webgrip branch for one of its own and its post-upgrade install runs with the right tag.",
   "packageRules": [
     {
-      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step.",
+      "description": "One pull request per package and repository bumps every pin of that package together (apm.yml and the agentstd tag in mise.toml), so the generated files and the lockfile move in one step. The tooling part turns separateMajorMinor off for Webgrip pins in mise.toml and comes earlier, so this rule turns it back on: otherwise a major would split the apm.yml pin into a major branch and leave the mise.toml pin in this one.",
       "matchManagers": [
         "custom.regex"
       ],
@@ -20,7 +20,8 @@
         "https://forgejo.webgrip.dev/webgrip/**"
       ],
       "groupName": "{{depName}} agent package",
-      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}"
+      "groupSlug": "agent-package-{{{replace '/' '-' depName}}}",
+      "separateMajorMinor": true
     },
     {
       "description": "Skills from webgrip/ai-skills share one branch: each skill is its own dependency, and one branch per skill would make every other skill branch conflict on apm.lock.yaml once the first merges.",

@@ -161,10 +161,12 @@
       ]
     },
     {
-      "description": "A Webgrip package pinned in a repository's CI files (.forgejo/** and .github/**: reusable workflow and composite action refs, the semantic-release toolchain image in container: or toolchain-image:) changes how that repository is built, not what it ships, so it lands as ci(tooling), whatever the update type, and never cuts a release. A Webgrip release asks Renovate to update its consumers, and when these bumps landed as fix(deps) every consumer released in turn and the shared tooling repositories bumped each other in a loop. webgrip/workflows is excluded: its .forgejo/workflows and .forgejo/composite-actions are what it ships, so a pin there, an input default included, still lands as fix and releases. A Webgrip package anywhere else (package.json, a Dockerfile, mise.toml) keeps the commit type of its update type.",
+      "description": "A Webgrip package pinned in a file a repository never ships changes how that repository is built, not what it ships, so it lands as ci(tooling), whatever the update type, and never cuts a release. Those files are its CI files (.forgejo/** and .github/**: reusable workflow and composite action refs, the semantic-release toolchain image in container: or toolchain-image:) and its mise.toml (a task that runs the toolchain image, a tool it installs). A Webgrip release asks Renovate to update its consumers, and when these bumps landed as fix(deps) every consumer released in turn and the shared tooling repositories bumped each other in a loop; a mise.toml pin of the same image, left out, still released Unfold through a fix(deps) branch of its own. webgrip/workflows is excluded: its .forgejo/workflows and .forgejo/composite-actions are what it ships, so a pin there, an input default included, still lands as fix and releases. A Webgrip package in a file that ships (package.json, a Dockerfile) keeps the commit type of its update type.",
       "matchFileNames": [
         ".forgejo/**",
-        ".github/**"
+        ".github/**",
+        "**/mise.toml",
+        "**/.mise.toml"
       ],
       "matchPackageNames": [
         "harbor.webgrip.dev/webgrip/**",

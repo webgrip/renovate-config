@@ -87,15 +87,15 @@ major of our own is a break we chose to make, so nobody should have to ask Renov
 nobody should find it merged unread. Harbor's proxy projects (`harbor.webgrip.dev/dockerhub/...`)
 are third-party.
 
-**Webgrip's pins in CI files commit as `ci` and release nothing.** The four shared tooling
+**Webgrip's pins in files that never ship commit as `ci` and release nothing.** The four shared tooling
 repositories (workflows, semantic-release-config, agent-standards, renovate-config) pin each other,
 mostly in CI files, and a release of one asks Renovate to update its consumers. When those bumps
 landed as `fix(deps)`, a release of A merged a bump into B that released B, whose bump merged into A
 and released A again, and each round opened a pull request in every consuming repository. A pin
-in `.forgejo/**` or `.github/**` changes how a repository is built, not what it ships, so a Webgrip
-package found there (a reusable workflow or composite action ref, the
-`harbor.webgrip.dev/webgrip/semantic-release` toolchain image in `container:` or `toolchain-image:`)
-lands as `ci(tooling)` for every update type, majors included, and `semantic-release-config` cuts
+in `.forgejo/**`, `.github/**` or `mise.toml` changes how a repository is built, not what it ships,
+so a Webgrip package found there (a reusable workflow or composite action ref, the
+`harbor.webgrip.dev/webgrip/semantic-release` toolchain image in `container:`, `toolchain-image:` or
+a mise task that runs it) lands as `ci(tooling)` for every update type, majors included, and `semantic-release-config` cuts
 no release for `ci`. The rule sits in `parts/base.json`, after the per-update-type commit rules, so
 every preset carries it, `default` included.
 
@@ -104,10 +104,21 @@ Renovate gives a branch the highest commit type among its updates (`chore` < `ci
 < `feat`), so one shared branch would commit every CI pin as `fix(deps)` whenever an update that
 ships sat in it, which is how `fix(actions): Update webgrip dependencies` kept releasing. Every
 stack that groups updates carries `parts/ci-tooling-group.json` after its grouping parts. The rule
-changes only the branch: in a gate it opens without a tick, skips the soak and merges itself like
-the rest of Webgrip's packages; in a hand-composed stack it keeps the tick, soak and merge of the
-branch it replaces. Majors stay out of both branches, one pull request each that a person merges.
-A repository gets at most two Webgrip branches per round: one `ci`, one `fix`.
+changes the branch and the major split: in a gate it opens without a tick, skips the soak and
+merges itself like the rest of Webgrip's packages; in a hand-composed stack it keeps the tick, soak
+and merge of the branch it replaces. Majors of these pins join the branch, and `separateMajorMinor`
+is off for them, so every pin moves straight to the newest release. Two pins of `webgrip/workflows`
+on different majors in one file used to split into a minor in the shared branch and a major of
+their own, and whichever merged second conflicted. A Webgrip major never merges itself, so a branch
+that holds one waits for a person. Majors of Webgrip packages that ship stay out of both branches,
+one pull request each that a person merges. A repository gets at most two Webgrip branches per
+round: one `ci`, one `fix`, plus one per agent package, whose post-upgrade install needs its own
+branch.
+
+A pin of the same image in `mise.toml` was left out at first: Unfold runs the toolchain image in
+a `release-check` task, and that pin opened a `fix(deps)` branch of its own next to the `ci(tooling)`
+one, so one toolchain release opened two pull requests and cut an Unfold release. A Webgrip package
+in a Dockerfile or `package.json` still ships and keeps its `fix`.
 
 `webgrip/workflows` is excluded by name. Its `.forgejo/workflows` and `.forgejo/composite-actions`
 are what it ships: a caller receives the toolchain image pinned as an input default in a reusable
