@@ -35,7 +35,7 @@
       "depTypeTemplate": "action"
     },
     {
-      "description": "Org preset references written as local>webgrip/renovate-config[:name]#vX.Y.Z in the repository config. The renovate-config manager resolves github>, gitlab> and gitea> presets but skips local>, so every pin froze where it was set: Glide sat on v1.9.0 and homelab-cluster on v1.6.0 while v1.10.0 shipped. forgejo-tags rather than gitea-tags keeps the bump out of the CI-only commit rule for workflow pins below.",
+      "description": "Org preset references written as local>webgrip/renovate-config[:name]#vX.Y.Z in the repository config. The renovate-config manager resolves github>, gitlab> and gitea> presets but skips local>, so every pin froze where it was set: Unfold sat on v1.9.0 and homelab-cluster on v1.6.0 while v1.10.0 shipped. forgejo-tags rather than gitea-tags keeps the bump out of the CI-only commit rule for workflow pins below.",
       "customType": "regex",
       "managerFilePatterns": [
         "/^(?:\\.(?:github|gitea|forgejo)/)?(?:renovate\\.json5?|\\.renovaterc(?:\\.json5?)?)$/"

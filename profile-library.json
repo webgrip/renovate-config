@@ -208,7 +208,7 @@
       "pinDigests": false
     },
     {
-      "description": "Never digest-pin an action's version input (`with: version:`, depType uses-with). The value is handed to the action, which cannot take a digest. The digest lookup searches for the tag without its v prefix, fails ('Could not determine new digest for update'), and drops the update silently: Glide sat on mise 2026.6.14 while 2026.9.17 shipped.",
+      "description": "Never digest-pin an action's version input (`with: version:`, depType uses-with). The value is handed to the action, which cannot take a digest. The digest lookup searches for the tag without its v prefix, fails ('Could not determine new digest for update'), and drops the update silently: Unfold sat on mise 2026.6.14 while 2026.9.17 shipped.",
       "matchManagers": [
         "github-actions"
       ],
