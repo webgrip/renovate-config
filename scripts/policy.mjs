@@ -33,6 +33,7 @@ export async function effective(stack, update) {
     commitType: upgrade.semanticCommitType,
     commitScope: upgrade.semanticCommitScope,
     install: upgrade.postUpgradeTasks?.commands?.at(-1) ?? null,
+    splitsMajor: upgrade.separateMajorMinor !== false,
   };
 }
 
@@ -66,6 +67,7 @@ export const deps = {
   webgripCiComposite: { ...dep('github-actions', 'gitea-tags', 'https://forgejo.webgrip.dev/webgrip/workflows', 'action'), packageFile: '.forgejo/workflows/on_source_change.yml', repository: consumer },
   webgripCiContainer: { ...dep('github-actions', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', 'container'), packageFile: '.forgejo/workflows/on_source_change.yml', repository: consumer },
   webgripCiToolchainInput: { ...dep('regex', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', undefined), packageFile: '.forgejo/workflows/ci.yml', repository: consumer },
+  webgripMiseTaskImage: { ...dep('regex', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', undefined), packageFile: 'mise.toml', repository: 'webgrip/unfold' },
   webgripGithubCiAction: { ...dep('github-actions', 'github-tags', 'webgrip/copilot-action', 'action'), packageFile: '.github/workflows/review.yml', repository: consumer },
   webgripReleaseConfig: { ...dep('npm', 'npm', '@webgrip/semantic-release-config', 'devDependencies'), packageFile: 'package.json', repository: consumer },
   workflowsToolchainDefault: { ...dep('regex', 'docker', 'harbor.webgrip.dev/webgrip/semantic-release', undefined), packageFile: '.forgejo/workflows/semantic-release.yml', repository: 'webgrip/workflows' },
@@ -120,6 +122,7 @@ export const rows = [
   ['Webgrip toolchain image in a CI `container:`, minor', { ...deps.webgripCiContainer, updateType: 'minor' }],
   ['Webgrip toolchain image in a CI `container:`, digest', { ...deps.webgripCiContainer, updateType: 'digest' }],
   ['Webgrip `toolchain-image:` in CI, patch', { ...deps.webgripCiToolchainInput, updateType: 'patch' }],
+  ['Webgrip toolchain image in a `mise.toml` task, patch', { ...deps.webgripMiseTaskImage, updateType: 'patch' }],
   ['Webgrip ref in CI, major', { ...deps.webgripCiComposite, updateType: 'major' }],
   ['Webgrip toolchain image in a CI `container:`, major', { ...deps.webgripCiContainer, updateType: 'major' }],
   ['`@webgrip/semantic-release-config` in package.json, minor', { ...deps.webgripReleaseConfig, updateType: 'minor' }],

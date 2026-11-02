@@ -22,8 +22,8 @@ const agentBranch = (group, install) => ({ ...ownBranch, group, commitType: 'cho
 const installNew = 'uv tool run --from git+https://forgejo.webgrip.dev/webgrip/agent-standards.git@{{{newValue}}}#subdirectory=cli agentstd install';
 const ciTooling = { commitType: 'ci', commitScope: 'tooling' };
 const ciBranch = { group: 'webgrip CI dependencies', automerge: true, approval: false, soak: '0 days', ...ciTooling };
-const ciMajor = { ...ownMajor, ...ciTooling };
-const ciOnly = { workflowRef: deps.webgripCiWorkflow, compositeRef: deps.webgripCiComposite, container: deps.webgripCiContainer, toolchainInput: deps.webgripCiToolchainInput, githubAction: deps.webgripGithubCiAction };
+const ciMajor = { ...ownMajor, group: 'webgrip CI dependencies', ...ciTooling };
+const ciOnly = { workflowRef: deps.webgripCiWorkflow, compositeRef: deps.webgripCiComposite, container: deps.webgripCiContainer, toolchainInput: deps.webgripCiToolchainInput, githubAction: deps.webgripGithubCiAction, miseTask: deps.webgripMiseTaskImage };
 const ships = { npm: deps.webgripNpm, releaseConfig: deps.webgripReleaseConfig, image: deps.webgripImage, gitTag: deps.webgripGitTag, workflowsDefault: deps.workflowsToolchainDefault };
 const installPinned = /^uv tool run --from git\+https:\/\/forgejo\.webgrip\.dev\/webgrip\/agent-standards\.git@v\d+\.\d+\.\d+#subdirectory=cli agentstd install$/;
 
@@ -119,9 +119,20 @@ for (const preset of [...presetsByPolicy.reviewed, ...presetsByPolicy.unattended
     assert.deepEqual(new Set(shipping.get('webgrip dependencies')), new Set(['fix']));
   });
 
-  test(`${preset}: a Webgrip major stays out of both shared branches`, async () => {
-    const majors = await branchesOf(preset, [...Object.values(ciOnly), ...Object.values(ships), deps.workflowsOwnCiContainer].map(update => ({ ...update, updateType: 'major' })));
+  test(`${preset}: a Webgrip major of a build-only pin joins the CI branch, which then waits for a person`, async () => {
+    const majors = await branchesOf(preset, Object.values(ciOnly).map(update => ({ ...update, updateType: 'major' })));
+    assert.deepEqual([...majors.keys()], ['webgrip CI dependencies']);
+    for (const update of Object.values(ciOnly)) assert.equal((await effective(preset, { ...update, updateType: 'major' })).automerge, false);
+  });
+
+  test(`${preset}: a Webgrip major that ships stays out of both shared branches`, async () => {
+    const majors = await branchesOf(preset, [...Object.values(ships), deps.workflowsOwnCiContainer].map(update => ({ ...update, updateType: 'major' })));
     assert.deepEqual([...majors.keys()], [null]);
+  });
+
+  test(`${preset}: a build-only pin moves straight to the newest release, and an agent package keeps its pins in one branch`, async () => {
+    for (const update of Object.values(ciOnly)) assert.equal((await effective(preset, { ...update, updateType: 'minor' })).splitsMajor, false);
+    for (const update of [deps.agentPackage, deps.agentCli]) assert.equal((await effective(preset, { ...update, repository: 'webgrip/unfold', updateType: 'minor' })).splitsMajor, true);
   });
 }
 

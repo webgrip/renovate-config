@@ -1,12 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Webgrip's CI-only pins in one branch per repository that commits as ci(tooling) and releases nothing. Every stack that groups updates carries it after its grouping parts, so no group can mix these pins with an update that commits as fix.",
+  "description": "Webgrip's build-only pins in one branch per repository that commits as ci(tooling) and releases nothing. Every stack that groups updates carries it after its grouping parts, so no group can mix these pins with an update that commits as fix.",
   "packageRules": [
     {
-      "description": "Webgrip packages pinned only in CI files get a branch of their own in every stack that groups updates. Renovate gives a branch the highest commit type among its updates (fix beats ci), so a branch shared with anything that ships would commit these pins as fix(deps) and cut a release again. The rule changes only the branch: whoever merges the branch it replaces, its tick and its soak stay as the earlier parts set them, so in a gate it opens without a tick, skips the soak and merges itself like the rest of Webgrip's packages. webgrip/workflows ships its CI files, so its pins stay where they were. Majors stay out of it, one pull request each.",
+      "description": "Webgrip packages pinned in files a repository never ships (CI files and mise.toml) share one branch per repository in every stack that groups updates, majors included. Renovate gives a branch the highest commit type among its updates (fix beats ci), so a branch shared with anything that ships would commit these pins as fix(deps) and cut a release again. Majors join the branch and separateMajorMinor is off for these pins, so each pin moves straight to the newest release: two pins of webgrip/workflows on different majors used to split into a minor in the shared branch and a major of their own, and the second to merge conflicted with the first. Renovate merges a branch only when every update in it merges itself, and a Webgrip major never does, so a branch that holds a major waits for a person. The rule changes only the branch and the major split: whoever merges, the tick and the soak stay as the earlier parts set them. webgrip/workflows ships its CI files, so its pins stay where they were.",
       "matchFileNames": [
         ".forgejo/**",
-        ".github/**"
+        ".github/**",
+        "**/mise.toml",
+        "**/.mise.toml"
       ],
       "matchPackageNames": [
         "harbor.webgrip.dev/webgrip/**",
@@ -19,15 +21,9 @@
       "matchRepositories": [
         "!webgrip/workflows"
       ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "digest",
-        "pin",
-        "pinDigest"
-      ],
       "groupName": "webgrip CI dependencies",
-      "groupSlug": "webgrip-ci"
+      "groupSlug": "webgrip-ci",
+      "separateMajorMinor": false
     }
   ]
 }

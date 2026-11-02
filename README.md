@@ -58,9 +58,10 @@ The profile names stay published, generated from the gates: `profile-app` and `p
 `reviewed`, `profile-library` is `unattended`, and `profile-image-set` is `unattended` plus
 `docker-arg-pins`. Existing `extends` lines keep working.
 
-A Webgrip package pinned in `.forgejo/**` or `.github/**` (outside `webgrip/workflows`, which ships
-those files) commits as `ci(tooling)` in every preset, so a release of one tooling repository no
-longer releases every repository that runs it in CI. [Why, and which pins stay `fix`](docs/profiles.md).
+A Webgrip package pinned in `.forgejo/**`, `.github/**` or `mise.toml` (outside `webgrip/workflows`,
+which ships its CI files) commits as `ci(tooling)` in every preset and lands in one branch per
+repository, majors included, so a release of one tooling repository no longer releases every
+repository that runs it. [Why, and which pins stay `fix`](docs/profiles.md).
 
 [The policy table](docs/policy.md) shows what every gate does with each kind of update; it is generated from the presets, so a pull request that changes behaviour changes that table. [What each gate does, and why](docs/profiles.md) gives the reasons and the decisions that stay open.
 
