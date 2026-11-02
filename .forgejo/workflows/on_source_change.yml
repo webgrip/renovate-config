@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Semantic Release
         id: semrel
-        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v3.4.0
+        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v4.1.1
         with:
           token: ${{ secrets.WEBGRIP_CI_TOKEN }}
           install-dependencies: "false"
