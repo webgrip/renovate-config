@@ -148,7 +148,7 @@ rather than in a preset:
 - `constraintsFiltering` must be `none` for `gomod`. `default.json` sets it to `strict`, which
   compares each release's `go` directive against the repository's as an exact version, filters
   out every release that declares one, and proposes a rollback to the last release that did not
-  (`lib/pq` v1.10.9 to v1.5.2 on Glide). `renovate-config-forgejo` carries that rule for `gomod`
+  (`lib/pq` v1.10.9 to v1.5.2 on Unfold). `renovate-config-forgejo` carries that rule for `gomod`
   and `pep621` on the Forgejo path.
 
 The GitOps overlay intentionally extends specific upstream home-operations presets instead of the entire `github>home-operations/renovate-presets` default, so Webgrip keeps its own dashboard, scheduling, approval, concurrency, and automerge policy from the default preset.
