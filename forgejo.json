@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Forgejo-platform overrides. Three things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManagers below read webgrip/* pins from Forgejo instead, in both shapes consumers write: digest plus version comment, and bare version tag. (3) The renovate-config manager skips local> presets, which is how a Forgejo-hosted preset is referenced, so the last customManager tracks those preset pins against Forgejo tags.",
+  "description": "Forgejo-platform overrides. Three things the platform gets wrong on its own. (1) Forgejo Actions don't populate the commit-status API that Renovate's prCreation:not-pending reads (GET /commits/{sha}/status is empty even on green CI), so not-pending never resolves and PRs hang the full prNotPendingHours. Force immediate PR creation on the Forgejo path. force: because consumers extend :default (not-pending) at the repo level, which only an admin-level force overrides. (2) The github-actions manager assigns datasource github-tags unconditionally, so a `uses:` pointing at a Forgejo-native repo is resolved against api.github.com. Where a github.com twin exists but carries no tags, that returns an empty list rather than an error — the pin freezes silently. The customManagers below read webgrip/* pins from Forgejo instead, in both shapes consumers write: digest plus version comment, and bare version tag. A bare forgejo/* action such as forgejo/upload-artifact has no github.com twin at all, so it fails as a lookup failure on every dashboard; the runner resolves it against the instance's DEFAULT_ACTIONS_URL, and a customManager reads it from there too. (3) The renovate-config manager skips local> presets, which is how a Forgejo-hosted preset is referenced, so the last customManager tracks those preset pins against Forgejo tags.",
   "force": {
     "prCreation": "immediate"
   },
@@ -35,6 +35,21 @@
       "depTypeTemplate": "action"
     },
     {
+      "description": "forgejo/* actions written as a floating tag, such as `uses: forgejo/upload-artifact@v4`. DEFAULT_ACTIONS_URL on the webgrip instance points at the instance itself, which mirrors these repositories from code.forgejo.org, so the runner and this lookup read the same tags. docker versioning keeps a major-only tag major-only: v4 moves to v5, never to a pinned v4.3.1.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.forgejo/workflows/.*\\.ya?ml$/",
+        "/^\\.forgejo/(?:actions|composite-actions)/.+/action\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "uses:\\s+[\"']?(?<depName>forgejo/[\\w.-]+)@(?<currentValue>v\\d+(?:\\.\\d+){0,2})[\"']?(?:\\s|$)"
+      ],
+      "datasourceTemplate": "gitea-tags",
+      "registryUrlTemplate": "https://forgejo.webgrip.dev",
+      "versioningTemplate": "docker",
+      "depTypeTemplate": "action"
+    },
+    {
       "description": "Org preset references written as local>webgrip/renovate-config[:name]#vX.Y.Z in the repository config. The renovate-config manager resolves github>, gitlab> and gitea> presets but skips local>, so every pin froze where it was set: Unfold sat on v1.9.0 and homelab-cluster on v1.6.0 while v1.10.0 shipped. forgejo-tags rather than gitea-tags keeps the bump out of the CI-only commit rule for workflow pins below.",
       "customType": "regex",
       "managerFilePatterns": [
@@ -50,12 +65,13 @@
   ],
   "packageRules": [
     {
-      "description": "The github-actions manager still parses these files. Without this it proposes the same webgrip/* deps against github.com alongside the customManager and re-raises the lookup failures. custom.regex owns webgrip/* on the Forgejo path.",
+      "description": "The github-actions manager still parses these files. Without this it proposes the same webgrip/* deps against github.com alongside the customManager and re-raises the lookup failures. custom.regex owns webgrip/* and forgejo/* on the Forgejo path.",
       "matchManagers": [
         "github-actions"
       ],
       "matchPackageNames": [
-        "webgrip/**"
+        "webgrip/**",
+        "forgejo/**"
       ],
       "enabled": false
     },
