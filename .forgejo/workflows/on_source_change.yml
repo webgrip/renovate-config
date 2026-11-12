@@ -80,13 +80,13 @@ jobs:
     steps:
       - name: Semantic Release
         id: semrel
-        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v4.1.1
+        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/semantic-release@v4.2.0
         with:
           token: ${{ secrets.WEBGRIP_CI_TOKEN }}
           install-dependencies: "false"
       - name: Ask Renovate to update consumers
         if: steps.semrel.outputs.version != ''
-        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/renovate-trigger@v4.1.1
+        uses: https://forgejo.webgrip.dev/webgrip/workflows/.forgejo/composite-actions/renovate-trigger@v4.2.0
         with:
           token: ${{ secrets.RENOVATE_WEBHOOK_TOKEN }}
           forgejo-token: ${{ secrets.WEBGRIP_CI_TOKEN }}
