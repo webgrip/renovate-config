@@ -35,14 +35,14 @@
       "depTypeTemplate": "action"
     },
     {
-      "description": "forgejo/* actions written as a floating tag, such as `uses: forgejo/upload-artifact@v4`. DEFAULT_ACTIONS_URL on the webgrip instance points at the instance itself, which mirrors these repositories from code.forgejo.org, so the runner and this lookup read the same tags. docker versioning keeps a major-only tag major-only: v4 moves to v5, never to a pinned v4.3.1.",
+      "description": "forgejo/* actions written as a floating tag, such as `uses: forgejo/upload-artifact@v4`, bare or by the instance's full URL, which runners outside the homelab need because a bare name resolves against Forgejo's in-cluster address. DEFAULT_ACTIONS_URL on the webgrip instance points at the instance itself, which mirrors these repositories from code.forgejo.org, so the runner and this lookup read the same tags. docker versioning keeps a major-only tag major-only: v4 moves to v5, never to a pinned v4.3.1.",
       "customType": "regex",
       "managerFilePatterns": [
         "/^\\.forgejo/workflows/.*\\.ya?ml$/",
         "/^\\.forgejo/(?:actions|composite-actions)/.+/action\\.ya?ml$/"
       ],
       "matchStrings": [
-        "uses:\\s+[\"']?(?<depName>forgejo/[\\w.-]+)@(?<currentValue>v\\d+(?:\\.\\d+){0,2})[\"']?(?:\\s|$)"
+        "uses:\\s+[\"']?(?:https://forgejo\\.webgrip\\.dev/)?(?<depName>forgejo/[\\w.-]+)@(?<currentValue>v\\d+(?:\\.\\d+){0,2})[\"']?(?:\\s|$)"
       ],
       "datasourceTemplate": "gitea-tags",
       "registryUrlTemplate": "https://forgejo.webgrip.dev",
